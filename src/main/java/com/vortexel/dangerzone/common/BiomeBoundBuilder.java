@@ -15,12 +15,10 @@ public class BiomeBoundBuilder {
 
     private static final int BLOCKS_INCLUDED_THRESHOLD = 16 * 4; // out of 16 * 16
 
-
     private World world;
     private Biome biome;
     private BlockPos originPos;
     private ChunkPos originChunk;
-
 
     public BiomeBoundBuilder(World world, BlockPos pos) {
         this.world = world;
@@ -32,11 +30,11 @@ public class BiomeBoundBuilder {
     public ArrayList<Rectangle> getBoundingBoxes() {
         Rectangle allBounds = new Rectangle();
         HashSet<ChunkPos> chunks = floodFillChunks(allBounds);
-
         return null;
     }
 
     private ArrayList<Rectangle> boundBoxes(HashSet<ChunkPos> chunks, Rectangle area) {
+
         return null;
     }
 
