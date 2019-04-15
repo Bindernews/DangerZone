@@ -23,10 +23,9 @@ public class ChunkDifficultyData {
         // Default value
         biomeCount.put(-1, -1);
 
-        Biome[] biomes = new Biome[16 * 16];
-        biomes = world.getBiomeProvider().getBiomes(biomes, pos.getXStart(), pos.getZStart(), 16, 16);
-        for (Biome b : biomes) {
-            int biomeId = BiomeComparator.getBiomeBaseId(b);
+        byte[] biomes = world.getChunkFromChunkCoords(pos.x, pos.z).getBiomeArray();
+        for (byte biomeIdB : biomes) {
+            int biomeId = (int)biomeIdB;
             biomeCount.putIfAbsent(biomeId, 0);
             biomeCount.put(biomeId, biomeCount.get(biomeId) + 1);
         }

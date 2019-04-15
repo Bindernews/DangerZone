@@ -8,7 +8,8 @@ import net.minecraft.world.biome.Biome;
  */
 public class BiomeComparator {
     public static boolean equal(Biome b1, Biome b2) {
-        return getBiomeBaseId(b1) == getBiomeBaseId(b2);
+        return b1.getBiomeClass() == b2.getBiomeClass();
+//        return getBiomeBaseId(b1) == getBiomeBaseId(b2);
     }
 
     public static int getBiomeBaseId(Biome b) {

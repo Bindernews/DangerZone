@@ -1,6 +1,7 @@
 package com.vortexel.dangerzone;
 
 import com.vortexel.dangerzone.common.CommonProxy;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -11,21 +12,24 @@ import org.apache.logging.log4j.Logger;
 @Mod(modid = DangerZone.ID, name = DangerZone.NAME, version = DangerZone.VERSION, useMetadata = true)
 public class DangerZone {
 
-    public static final String ID = "levelzones";
-    public static final String NAME = "LevelZones";
+    public static final String ID = "dangerzone";
+    public static final String NAME = "Danger Zone";
     public static final String VERSION = "@VERSION@";
 
-    private static DangerZone instance;
+    public static Logger log;
 
-    public Logger log;
+    public CreativeTabs tab;
+
+    @Mod.Instance(ID)
+    public static DangerZone instance;
 
     @SidedProxy(clientSide = "com.vortexel.dangerzone.client.Proxy",
                 serverSide = "com.vortexel.dangerzone.server.Proxy")
-    public CommonProxy proxy = null;
+    public static CommonProxy proxy = null;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
-        instance = this;
+        tab = new CreativeTab();
         log = e.getModLog();
         proxy.preInit(e);
         log.info("PreInit complete");
@@ -41,13 +45,5 @@ public class DangerZone {
     public void postInit(FMLPostInitializationEvent e) {
         proxy.postInit(e);
         log.info("PostInit complete");
-    }
-
-    public static DangerZone getInstance() {
-        return instance;
-    }
-
-    public static Logger getLog() {
-        return getInstance().log;
     }
 }

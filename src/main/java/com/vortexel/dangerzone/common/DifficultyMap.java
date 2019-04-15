@@ -1,5 +1,6 @@
 package com.vortexel.dangerzone.common;
 
+import com.vortexel.dangerzone.common.config.DZConfig;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -9,30 +10,71 @@ import net.minecraft.world.gen.NoiseGeneratorPerlin;
 import java.util.Random;
 import java.util.WeakHashMap;
 
+/**
+ * Generates the difficulty map for a given world. It simply returns values between 0 and 1 based on where
+ * the location is in the world.
+ *
+ *
+ */
 public class DifficultyMap {
 
-    private static final double SCALE_FACTOR = 0.5;
-    private static final int NEIGHBOR_SIZE = 7;
-    private static final int CENTER_INDEX = 4 * NEIGHBOR_SIZE + 4;
+    private static final double SCALE_FACTOR = 0.001;
+    private static final int NEIGHBOR_SIZE = 5;
     private static final int CHUNK_SIZE = 16;
 
     private World world;
     private NoiseGeneratorPerlin generator;
     private WeakHashMap<ChunkPos, ChunkDifficultyData> weakChunkInfoCache;
+    private DZConfig.PerWorld worldConfig;
 
     public DifficultyMap(World world) {
         this.world = world;
         generator = new NoiseGeneratorPerlin(new Random(world.getSeed()), 1);
         weakChunkInfoCache = new WeakHashMap<>();
+        worldConfig = DZConfig.INSTANCE.getWorld(world.provider.getDimension());
     }
 
     /**
      * Determine the difficulty for a specific column of blocks at (x, z).
-     * @param x
-     * @param z
-     * @return the difficulty value, between 1 and 16
+     * @param x block X
+     * @param z block Z
+     * @return the difficulty value, between 0.0 and 1.0 inclusive
      */
     public double getDifficulty(int x, int z) {
+        double d = 0.0;
+        d = genChunkDifficulty(d, x, z);
+        d = adjustForSpawn(d, x, z);
+        return d;
+    }
+
+    /**
+     * Adjust the difficulty of the area based on distance from spawn.
+     * @param d input difficulty
+     * @param x block X
+     * @param z block Z
+     * @return adjusted difficulty
+     */
+    private double adjustForSpawn(double d, int x, int z) {
+        BlockPos bp = world.getSpawnPoint();
+        double distSq = bp.distanceSq(x, bp.getY(), z);
+        double spawnRadiusSq = pow2(worldConfig.spawnRadius);
+        double transitionRadiusSq = pow2(worldConfig.spawnRadius + worldConfig.spawnTransitionRadius);
+        // difficulty = 0 in spawn area
+        if (distSq <= spawnRadiusSq) {
+            return 0;
+        }
+        // Deal with areas within the transition radius
+        if (distSq <= transitionRadiusSq) {
+            return d * (distSq - spawnRadiusSq) / (transitionRadiusSq - spawnRadiusSq);
+        }
+        return d;
+    }
+
+    private double genChunkDifficulty(double d, int x, int z) {
+        return getChunkDifficulty(new ChunkPos(x, z));
+    }
+
+    private double getDifficultySpecific(int x, int z) {
         int minX = x - NEIGHBOR_SIZE / 2;
         int minZ = z - NEIGHBOR_SIZE / 2;
 
@@ -52,11 +94,26 @@ public class DifficultyMap {
             }
         }
 
+        // If we're in a river or something, just use the difficulty of the current chunk
+        if (usedCount < 5) {
+            final ChunkPos key = new ChunkPos(x, z);
+            sumDifficulty = computeChunkInfo(key).getDifficulty();
+            usedCount = 1;
+        }
+
         return sumDifficulty / usedCount;
     }
 
     public double getRaw(int x, int z) {
-        return generator.getValue((double)x * SCALE_FACTOR, (double)z * SCALE_FACTOR);
+        double v = generator.getValue((double)x * SCALE_FACTOR, (double)z * SCALE_FACTOR);
+        if (v < -1.0) {
+            v = -1.0;
+        }
+        if (v > 1.0) {
+            v = 1.0;
+        }
+        v += 1.0;
+        return v;
     }
 
     public double[] getRawRegion(double[] out_values, int minX, int minZ, int width, int depth) {
@@ -71,6 +128,10 @@ public class DifficultyMap {
         return out_values;
     }
 
+    public double getChunkDifficulty(ChunkPos pos) {
+        return computeChunkInfo(pos).getDifficulty();
+    }
+
     private ChunkDifficultyData computeChunkInfo(ChunkPos pos) {
         ChunkDifficultyData info = weakChunkInfoCache.get(pos);
         if (info != null) {
@@ -79,5 +140,9 @@ public class DifficultyMap {
         ChunkDifficultyData cdd = ChunkDifficultyData.fromWorld(world, this, pos);
         weakChunkInfoCache.put(pos, cdd);
         return cdd;
+    }
+
+    private static double pow2(double v) {
+        return v * v;
     }
 }
