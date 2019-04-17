@@ -1,5 +1,6 @@
 package com.vortexel.dangerzone.common.config;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigCategory;
@@ -96,17 +97,17 @@ public class ConfigHelper {
      * @param initial
      * @param <T>
      */
-    public static <T extends Loadable> void loadIntegerMap(Configuration cfg, String prefix, Class<T> clazz,
-                                                           Map<Integer, T> initial) {
+    public static <T extends Loadable> void loadIntegerMap(Map<String, ConfigCategory> cfg, String prefix,
+                                                           Class<T> clazz, Map<Integer, T> initial) {
         final String realPrefix = prefix + ".";
 
         // For each category name that starts with [prefix].
-        for (String categoryName : Sets.filter(cfg.getCategoryNames(), (s) -> s.startsWith(realPrefix))) {
+        for (String categoryName : Sets.filter(cfg.keySet(), (s) -> s.startsWith(realPrefix))) {
             String categoryIdSuffix = categoryName.substring(realPrefix.length());
             try {
                 int keyId = Integer.parseInt(categoryIdSuffix);
                 T value = construct(clazz);
-                value.load(cfg.getCategory(categoryName));
+                value.load(cfg.get(categoryName));
                 initial.put(keyId, value);
             } catch (NumberFormatException nfe) {
                 throw new RuntimeException(String.format("Configuration key \"%s\" is not a number", categoryIdSuffix));
@@ -114,17 +115,31 @@ public class ConfigHelper {
         }
     }
 
-    public static <T extends Loadable> void loadStringMap(Configuration cfg, String prefix, Class<T> clazz,
-                                                          Map<String, T> initial) {
+    public static <T extends Loadable> void loadIntegerMap(Configuration cfg, String prefix,
+                                                           Class<T> clazz, Map<Integer, T> initial) {
+        loadIntegerMap(configurationToMap(cfg), prefix, clazz, initial);
+    }
+
+    public static <T extends Loadable> void loadStringMap(Map<String, ConfigCategory> cfg, String prefix,
+                                                          Class<T> clazz, Map<String, T> initial) {
         final String realPrefix = prefix + ".";
 
         // For each category name that starts with [prefix].
-        for (String categoryName : Sets.filter(cfg.getCategoryNames(), (s) -> s.startsWith(realPrefix))) {
+        for (String categoryName : Sets.filter(cfg.keySet(), (s) -> s.startsWith(realPrefix))) {
             String keyId = categoryName.substring(realPrefix.length());
             T value = construct(clazz);
-            value.load(cfg.getCategory(categoryName));
+            value.load(cfg.get(categoryName));
             initial.put(keyId, value);
         }
+    }
+
+    public static <T extends Loadable> void loadStringMap(Configuration cfg, String prefix,
+                                                          Class<T> clazz, Map<String, T> initial) {
+        loadStringMap(configurationToMap(cfg), prefix, clazz, initial);
+    }
+
+    public static Map<String, ConfigCategory> configurationToMap(Configuration cfg) {
+        return Maps.asMap(cfg.getCategoryNames(), (name) -> cfg.getCategory(name));
     }
 
     public static int[] integerToIntList(Collection<Integer> c) {

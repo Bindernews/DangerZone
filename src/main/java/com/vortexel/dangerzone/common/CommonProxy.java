@@ -2,11 +2,8 @@ package com.vortexel.dangerzone.common;
 
 import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.common.config.DZConfig;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -23,10 +20,15 @@ public class CommonProxy {
      */
     public HashMap<Integer, DifficultyMap> worldDifficultyMaps;
 
+    public DifficultyAdjuster adjuster;
+
     public void preInit(FMLPreInitializationEvent e) {
         DZConfig.INSTANCE.loadFromDirectory(new File(e.getModConfigurationDirectory(), DangerZone.ID));
 
+        adjuster = new DifficultyAdjuster();
+
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(adjuster);
 
         worldDifficultyMaps = new HashMap<>();
     }
@@ -36,31 +38,12 @@ public class CommonProxy {
     }
 
     public void postInit(FMLPostInitializationEvent e) {
-
     }
 
-    @SubscribeEvent
-    public void entitySpawn(LivingSpawnEvent e) {
-        // TODO modify the entity based on the difficulty of its spawn area
-        int dim = e.getWorld().provider.getDimension();
-        int difficulty = (int)(8 * worldDifficultyMaps.get(dim).getDifficulty((int)e.getX(), (int)e.getZ()));
-        double amount = 1.0;
-        if (difficulty <= 2) {
-            amount = 0.5;
-        }
-        else if (difficulty <= 5) {
-            amount = 1.5;
-        }
-        else if (difficulty <= 7) {
-            amount = 2.0;
-        }
-        else {
-            amount = 3.0;
-        }
-        e.getEntityLiving().getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(
-                new AttributeModifier("DangerZone", amount, 2)
-        );
+    public double getDifficulty(World world, int x, int z) {
+        return worldDifficultyMaps.get(world.provider.getDimension()).getDifficulty(x, z);
     }
+
 
     @SubscribeEvent
     public void worldLoaded(WorldEvent.Load e) {

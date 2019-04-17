@@ -32,9 +32,6 @@ public class DZConfig {
     }
 
     public static class Advanced implements ConfigHelper.Loadable {
-        @Comment({"The scale factor used to influence how the difficulty map is generated."})
-        @Config.RangeDouble(min = 0.000000001, max = 0.01)
-        public double scaleFactor = 0.001;
 
         public void load(ConfigCategory cat) {
             ConfigHelper.loadAllCommented(this, cat);
@@ -54,6 +51,11 @@ public class DZConfig {
                 "This acts as a safety buffer where mobs can spawn, but you won't be dumped into super-hard mode."})
         @Config.RangeInt(min = 0)
         public int spawnTransitionRadius = 32;
+
+        @Comment({"The scale factor used to influence how the difficulty map is generated.",
+                "DO NOT change this unless you really know what you are doing!"})
+        @Config.RangeDouble(min = 0.000000001, max = 0.01)
+        public double scaleFactor = 0.001;
 
         public void load(ConfigCategory cat) {
             ConfigHelper.loadAllCommented(this, cat);

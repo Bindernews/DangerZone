@@ -59,9 +59,41 @@ Bosses:
 
 ## Catacombs
 
-
-## Witch Coven Lair
-
+Bosses:
+- Dead Hand - This is Dead Hand from Ocarina of Time. Not straight up, because that would be
+  copyright infringement, but that's the general idea.
+- 
 
 ## Witch Circle
+Less of a dungeon and more of a standalone boss fight. You fight a group of extra-tough
+witches. That's basically it.
 
+
+## Whirlpool
+An, initially small, whirlpool in the ocean. Once you get close a sea monster spawns!
+
+Bosses:
+- Whirlpool Kraken
+- 
+
+## Sunken City
+It's R'leth. 
+
+Bosses:
+- Cthulhu
+- Azathoh
+
+## Fishing Village
+This is basically Innsmouth. Under the village are caves filled with various non-euclidian
+horrors. Deep in the caves you can find ritual circles, and potentially a portal to a boss
+fight.
+
+Ideas:
+- You have a limited amount of time to interrupt a ritual. If you fail, you are immediately
+  forced to fight the boss. If you succeed, then you can open a "weakened" portal, and
+  the boss fight becomes easier.
+
+Bosses:
+- Cthulhu
+- Azathoth
+- Kraken

@@ -18,7 +18,6 @@ import java.util.WeakHashMap;
  */
 public class DifficultyMap {
 
-    private static final double SCALE_FACTOR = 0.001;
     private static final int NEIGHBOR_SIZE = 5;
     private static final int CHUNK_SIZE = 16;
 
@@ -41,6 +40,8 @@ public class DifficultyMap {
      * @return the difficulty value, between 0.0 and 1.0 inclusive
      */
     public double getDifficulty(int x, int z) {
+        // This should look like a list where each function takes as input the output of the previous call.
+        // If any modifiers are added or removed, they should be done here.
         double d = 0.0;
         d = genChunkDifficulty(d, x, z);
         d = adjustForSpawn(d, x, z);
@@ -105,7 +106,8 @@ public class DifficultyMap {
     }
 
     public double getRaw(int x, int z) {
-        double v = generator.getValue((double)x * SCALE_FACTOR, (double)z * SCALE_FACTOR);
+        double v = generator.getValue((double)x * worldConfig.scaleFactor,
+                (double)z * worldConfig.scaleFactor);
         if (v < -1.0) {
             v = -1.0;
         }
