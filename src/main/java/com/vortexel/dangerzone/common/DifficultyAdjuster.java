@@ -3,6 +3,7 @@ package com.vortexel.dangerzone.common;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.vortexel.dangerzone.DangerZone;
+import lombok.val;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.EntityMob;
@@ -51,7 +52,7 @@ public class DifficultyAdjuster {
      */
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onEntityDrops(LivingDropsEvent e) {
-        DropData data = dropDataMap.get(e.getEntity().getEntityId());
+        val data = dropDataMap.get(e.getEntity().getEntityId());
         if (data != null) {
             // Now we do the drop manipulation
 

@@ -1,7 +1,7 @@
 [
 {
-  "modid": "dangerzone",
-  "name": "Danger Zone",
+  "modid": "${mod_id}",
+  "name": "${mod_name}",
   "description": "Creates difficulty zones to make late-game combat more interesting.",
   "version": "${version}",
   "mcversion": "${mcversion}",

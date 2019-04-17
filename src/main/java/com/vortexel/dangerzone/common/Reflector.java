@@ -1,21 +1,21 @@
 package com.vortexel.dangerzone.common;
 
-import com.google.common.collect.Maps;
-import com.google.common.reflect.Invokable;
+import lombok.val;
 
-import java.lang.reflect.Field;
+import com.google.common.collect.Maps;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.function.Function;
 
-public class Reflector {
+public final class Reflector {
 
     private static Map<Class<?>, Map<String, Map<Integer, Method>>> methodCache = Maps.newIdentityHashMap();
 
     public static <T> T callMethod(Object obj, String name, Class<?>[] paramTypes, Object... params) {
         try {
-            final Method m = obj.getClass().getMethod(name, paramTypes);
+            val m = obj.getClass().getMethod(name, paramTypes);
             methodCachePut(m);
             return invokeMethod(obj, m, params);
         } catch (NoSuchMethodException e) {
@@ -25,7 +25,7 @@ public class Reflector {
 
     public static <T> T callMethod(Object obj, String name, Object... params) {
         try {
-            final Method m = findMethod(obj.getClass(), name, params.length);
+            val m = findMethod(obj.getClass(), name, params.length);
             return invokeMethod(obj, m, params);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
@@ -72,7 +72,7 @@ public class Reflector {
     @SuppressWarnings("unchecked")
     public static <T> T getField(Object obj, String name) {
         try {
-            Field f = obj.getClass().getField(name);
+            val f = obj.getClass().getField(name);
             f.setAccessible(true);
             return (T)f.get(obj);
         } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -82,7 +82,7 @@ public class Reflector {
 
     public static <T> void setField(Object obj, String name, T value) {
         try {
-            Field f = obj.getClass().getField(name);
+            val f = obj.getClass().getField(name);
             f.setAccessible(true);
             f.set(obj, value);
         } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -93,4 +93,7 @@ public class Reflector {
     public static <T> void computeField(Object obj, String name, Function<T, T> func) {
         setField(obj, name, func.apply(getField(obj, name)));
     }
+
+    // You won't make any instances of this class.
+    private Reflector() {}
 }

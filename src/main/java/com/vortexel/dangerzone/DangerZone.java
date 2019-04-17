@@ -12,8 +12,8 @@ import org.apache.logging.log4j.Logger;
 @Mod(modid = DangerZone.ID, name = DangerZone.NAME, version = DangerZone.VERSION, useMetadata = true)
 public class DangerZone {
 
-    public static final String ID = "dangerzone";
-    public static final String NAME = "Danger Zone";
+    public static final String ID = "@MOD_ID@";
+    public static final String NAME = "@MOD_NAME@";
     public static final String VERSION = "@VERSION@";
 
     public static Logger log;

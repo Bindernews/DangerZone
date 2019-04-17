@@ -2,6 +2,7 @@ package com.vortexel.dangerzone.common.config;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import lombok.val;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Property;
 
@@ -46,10 +47,9 @@ public class BiomesConfig implements ConfigHelper.Loadable {
 
     public void load(ConfigCategory cat) {
         // Add default values
-        for (Map.Entry<String, Set<Integer>> group : biomeGroups.entrySet()) {
-            final String[] defaultValues = ConfigHelper.toStringArray(
-                    ConfigHelper.integerToIntList(group.getValue()));
-            final Property orElse = new Property(group.getKey(), defaultValues, Property.Type.INTEGER);
+        for (val group : biomeGroups.entrySet()) {
+            val defaultValues = ConfigHelper.toStringArray(ConfigHelper.integerToIntList(group.getValue()));
+            val orElse = new Property(group.getKey(), defaultValues, Property.Type.INTEGER);
             ConfigHelper.getProp(cat, group.getKey(), orElse);
         }
         // Now read the real values

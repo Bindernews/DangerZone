@@ -1,22 +1,18 @@
 package com.vortexel.dangerzone.common;
 
+import lombok.Value;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 import java.util.HashMap;
 
+@Value
 public class ChunkDifficultyData {
 
     private ChunkPos pos;
     private Biome biome;
     private double difficulty;
-
-    public ChunkDifficultyData(ChunkPos pos, Biome biome, double difficulty) {
-        this.pos = pos;
-        this.biome = biome;
-        this.difficulty = difficulty;
-    }
 
     public static ChunkDifficultyData fromWorld(World world, DifficultyMap difficultyMap, ChunkPos pos) {
         HashMap<Integer, Integer> biomeCount = new HashMap<>();
@@ -46,29 +42,5 @@ public class ChunkDifficultyData {
         }
 
         return new ChunkDifficultyData(pos, Biome.getBiomeForId(bestBiome), sum / difficulties.length);
-    }
-
-    public Biome getBiome() {
-        return biome;
-    }
-
-    public void setBiome(Biome biome) {
-        this.biome = biome;
-    }
-
-    public ChunkPos getPos() {
-        return pos;
-    }
-
-    public void setPos(ChunkPos pos) {
-        this.pos = pos;
-    }
-
-    public double getDifficulty() {
-        return difficulty;
-    }
-
-    public void setDifficulty(double difficulty) {
-        this.difficulty = difficulty;
     }
 }
