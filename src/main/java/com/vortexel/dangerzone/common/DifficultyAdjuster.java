@@ -39,8 +39,6 @@ public class DifficultyAdjuster {
                 val stack = new ItemStack(ModItems.loot_bag, 1, 0);
                 ItemLootBag.setLootBagLevel(stack, dangerInfo.getDanger());
                 e.getDrops().add(MCUtil.makeItemAt(entity, stack));
-//                val oreStack = new ItemStack(Blocks.EMERALD_ORE, 1);
-//                e.getDrops().add(MCUtil.makeItemAt(entity, oreStack));
             }
         }
     }

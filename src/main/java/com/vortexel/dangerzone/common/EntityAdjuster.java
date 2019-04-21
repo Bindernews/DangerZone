@@ -42,6 +42,7 @@ public class EntityAdjuster {
         val rawDanger = DangerZone.proxy.getDifficulty(entity.getEntityWorld(), ePos.getX(), ePos.getZ());
         dangerLevel = DangerMath.dangerLevel(rawDanger);
 
+        // If dangerLevel == 0 then we don't change anything.
         if (dangerLevel == 0) {
             return;
         }
@@ -51,13 +52,13 @@ public class EntityAdjuster {
         // Apply all the modifiers to the entity
         val cfg = DZConfig.INSTANCE.general;
         applyModifier(ModifierType.MOVEMENT_SPEED,
-                DangerMath.getEffectAmount(dangerLevel, cfg.dangerLevelHaste, cfg.hasteChance, rng),
+                DangerMath.getEffectAmount(dangerLevel, cfg.hasteLevel, cfg.hasteChance, rng),
                 this::applyMovementSpeed);
         applyModifier(ModifierType.REGENERATION,
-                DangerMath.getEffectAmount(dangerLevel, cfg.dangerLevelRegenerate, cfg.regenChance, rng),
+                DangerMath.getEffectAmount(dangerLevel, cfg.regenLevel, cfg.regenChance, rng),
                 this::applyRegeneration);
         applyModifier(ModifierType.MAX_HEALTH,
-                DangerMath.randomDanger(dangerLevel, rng),
+                DangerMath.randomDanger(dangerLevel, rng) * cfg.healthScaling,
                 this::applyMaxHealth);
         applyModifier(ModifierType.ATTACK_DAMAGE,
                 DangerMath.randomDanger(dangerLevel - 1, dangerLevel + 1, rng),
@@ -101,7 +102,7 @@ public class EntityAdjuster {
     }
 
     private void applyMaxHealth(double amount) {
-        applyAttributeModifier("health", SharedMonsterAttributes.MAX_HEALTH, amount, OP_MULTIPLY);
+        applyAttributeModifier("health", SharedMonsterAttributes.MAX_HEALTH, amount, OP_ADD);
         entity.setHealth(entity.getMaxHealth());
     }
 

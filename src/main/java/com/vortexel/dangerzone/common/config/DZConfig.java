@@ -37,21 +37,24 @@ public class DZConfig {
         @Config.RangeDouble(min = 1.0, max = REAL_MAX_DANGER_LEVEL)
         public double dangerMultiplier = 10.0;
 
+        @Comment({"How much health is gained for each added difficulty point."})
+        public double healthScaling = 0.5;
+
         @Comment({"The minimum danger level where enemies can start having haste."})
         @Config.RangeInt(min = 1, max = REAL_MAX_DANGER_LEVEL)
-        public int dangerLevelHaste = 8;
+        public int hasteLevel = 10;
 
         @Comment({"The chance of applying haste at the maximum danger level. This will scale to lower levels."})
         @Config.RangeDouble(min = 0.0, max = 1.0)
-        public double hasteChance = 0.7;
+        public double hasteChance = 0.6;
 
         @Comment({"The minimum danger level where enemies can regenerate health."})
         @Config.RangeInt(min = 1, max = REAL_MAX_DANGER_LEVEL)
-        public int dangerLevelRegenerate = 12;
+        public int regenLevel = 16;
 
         @Comment({"The chance of applying regeneration at the maximum danger level. This will scale to lower levels."})
         @Config.RangeDouble(min = 0.0, max = 1.0)
-        public double regenChance = 0.9;
+        public double regenChance = 0.7;
 
         public void load(ConfigCategory cat) {
             ConfigHelper.loadAllCommented(this, cat);
@@ -77,7 +80,7 @@ public class DZConfig {
         @Comment({"The radius around spawnRadius where the difficulty transitions from 0 to its real value.",
                 "This acts as a safety buffer where mobs can spawn, but you won't be dumped into super-hard mode."})
         @Config.RangeInt(min = 0)
-        public int spawnTransitionRadius = 32;
+        public int spawnTransitionRadius = 64;
 
         @Comment({"The scale factor used to influence how the difficulty map is generated.",
                 "DO NOT change this unless you really know what you are doing!"})

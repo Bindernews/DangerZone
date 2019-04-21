@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -69,14 +70,9 @@ public class CommonProxy {
 
     @SubscribeEvent
     public void onRegisterCapabilities(AttachCapabilitiesEvent<Entity> e) {
-        if (e.getObject() instanceof EntityCreature) {
+        if (e.getObject() instanceof EntityCreature && !(e.getObject() instanceof EntityPlayer)) {
             e.addCapability(IDangerLevel.RESOURCE_LOCATION, new DangerLevelProvider());
         }
-    }
-
-    @SubscribeEvent
-    public void registerBlocks(RegistryEvent.Register<Block> e) {
-
     }
 
     @SubscribeEvent

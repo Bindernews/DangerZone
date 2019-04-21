@@ -47,10 +47,9 @@ public class DifficultyMap {
         // If any modifiers are added or removed, they should be done here.
         double d = 0.0;
         d = genChunkDifficulty(d, x, z);
+        d = adjustIndividual(d, x, z);
         d = adjustForSpawn(d, x, z);
         d = adjustClamp(d, x, z);
-        d = adjustEquation(d, x, z);
-        d = adjustRound(d, x, z);
         return d;
     }
 
@@ -81,20 +80,12 @@ public class DifficultyMap {
         return MathHelper.clamp(d, 0.0, NOT_ONE);
     }
 
-    private double adjustRound(double d, int x, int z) {
-        return DangerMath.roundDecimal(d, 1000000000);
-    }
-
-    /**
-     * Takes a difficulty (range [0,1)) and scales it so that harder difficulties are rarer.
-     * Literally just x^2.
-     */
-    private double adjustEquation(double d, int x, int z) {
-        return Math.pow(d, 2);
+    private double adjustIndividual(double d, int x, int z) {
+        return (getRaw(x, z) * 0.1) + (d * 0.9);
     }
 
     private double genChunkDifficulty(double d, int x, int z) {
-        return getChunkDifficulty(new ChunkPos(x, z));
+        return getChunkDifficulty(new ChunkPos(x / 16, z / 16));
     }
 
     private double getDifficultySpecific(int x, int z) {
@@ -131,9 +122,12 @@ public class DifficultyMap {
         double v = generator.getValue((double)x * worldConfig.scaleFactor,
                 (double)z * worldConfig.scaleFactor);
         if (v < -1 || v > 1) {
-            DangerZone.log.debug("Noise value outside range " + v);
+            DangerZone.log.warn("Noise value outside range " + v);
         }
-        v = (MathHelper.clamp(v, -1, 1) + 1) / 2.0;
+        // Bind v to [0, 1)
+        v = (MathHelper.clamp(v, -1, NOT_ONE) + 1) / 2.0;
+        // v = v^2 to make lower difficulties more common
+        v = v * v;
         return v;
     }
 
