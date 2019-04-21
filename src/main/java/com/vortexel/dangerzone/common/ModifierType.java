@@ -13,5 +13,5 @@ public enum ModifierType {
     ARMOR,
     ARMOR_TOUGHNESS,
 
-    DROPS,
+    WITHER,
 }

@@ -11,6 +11,8 @@ import java.util.Map;
 
 public class DZConfig {
 
+    public static final int REAL_MAX_DANGER_LEVEL = 500;
+
     private static final String WORLD_PREFIX = "world";
 
     public static DZConfig INSTANCE = new DZConfig();
@@ -25,6 +27,31 @@ public class DZConfig {
                 "at the cost of memory usage"})
         @Config.RangeInt(min = 60)
         public int cacheClearTime =  60 * 5;
+
+        @Comment({"The maximum danger level. An enemy's difficulty can be anywhere within its danger level",
+                "so the number of levels should be proportional to the danger multiplier."})
+        @Config.RangeInt(min = 1, max = REAL_MAX_DANGER_LEVEL)
+        public int maxDangerLevel = 20;
+
+        @Comment({"The maximum danger multiplier. Make this higher to make the toughest enemies tougher."})
+        @Config.RangeDouble(min = 1.0, max = REAL_MAX_DANGER_LEVEL)
+        public double dangerMultiplier = 10.0;
+
+        @Comment({"The minimum danger level where enemies can start having haste."})
+        @Config.RangeInt(min = 1, max = REAL_MAX_DANGER_LEVEL)
+        public int dangerLevelHaste = 8;
+
+        @Comment({"The chance of applying haste at the maximum danger level. This will scale to lower levels."})
+        @Config.RangeDouble(min = 0.0, max = 1.0)
+        public double hasteChance = 0.7;
+
+        @Comment({"The minimum danger level where enemies can regenerate health."})
+        @Config.RangeInt(min = 1, max = REAL_MAX_DANGER_LEVEL)
+        public int dangerLevelRegenerate = 12;
+
+        @Comment({"The chance of applying regeneration at the maximum danger level. This will scale to lower levels."})
+        @Config.RangeDouble(min = 0.0, max = 1.0)
+        public double regenChance = 0.9;
 
         public void load(ConfigCategory cat) {
             ConfigHelper.loadAllCommented(this, cat);

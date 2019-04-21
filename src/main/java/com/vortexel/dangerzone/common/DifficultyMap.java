@@ -1,8 +1,10 @@
 package com.vortexel.dangerzone.common;
 
+import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.common.config.DZConfig;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
@@ -20,6 +22,7 @@ public class DifficultyMap {
 
     private static final int NEIGHBOR_SIZE = 5;
     private static final int CHUNK_SIZE = 16;
+    private static final double NOT_ONE = 1.0 - 1e-20;
 
     private World world;
     private NoiseGeneratorPerlin generator;
@@ -37,7 +40,7 @@ public class DifficultyMap {
      * Determine the difficulty for a specific column of blocks at (x, z).
      * @param x block X
      * @param z block Z
-     * @return the difficulty value, between 0.0 and 1.0 inclusive
+     * @return the difficulty value, between 0.0 inclusive and 1.0 exclusive
      */
     public double getDifficulty(int x, int z) {
         // This should look like a list where each function takes as input the output of the previous call.
@@ -45,6 +48,9 @@ public class DifficultyMap {
         double d = 0.0;
         d = genChunkDifficulty(d, x, z);
         d = adjustForSpawn(d, x, z);
+        d = adjustClamp(d, x, z);
+        d = adjustEquation(d, x, z);
+        d = adjustRound(d, x, z);
         return d;
     }
 
@@ -69,6 +75,22 @@ public class DifficultyMap {
             return d * (distSq - spawnRadiusSq) / (transitionRadiusSq - spawnRadiusSq);
         }
         return d;
+    }
+
+    private double adjustClamp(double d, int x, int z) {
+        return MathHelper.clamp(d, 0.0, NOT_ONE);
+    }
+
+    private double adjustRound(double d, int x, int z) {
+        return DangerMath.roundDecimal(d, 1000000000);
+    }
+
+    /**
+     * Takes a difficulty (range [0,1)) and scales it so that harder difficulties are rarer.
+     * Literally just x^2.
+     */
+    private double adjustEquation(double d, int x, int z) {
+        return Math.pow(d, 2);
     }
 
     private double genChunkDifficulty(double d, int x, int z) {
@@ -108,13 +130,10 @@ public class DifficultyMap {
     public double getRaw(int x, int z) {
         double v = generator.getValue((double)x * worldConfig.scaleFactor,
                 (double)z * worldConfig.scaleFactor);
-        if (v < -1.0) {
-            v = -1.0;
+        if (v < -1 || v > 1) {
+            DangerZone.log.debug("Noise value outside range " + v);
         }
-        if (v > 1.0) {
-            v = 1.0;
-        }
-        v += 1.0;
+        v = (MathHelper.clamp(v, -1, 1) + 1) / 2.0;
         return v;
     }
 

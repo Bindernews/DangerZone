@@ -6,7 +6,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class Proxy extends CommonProxy {
@@ -18,5 +20,10 @@ public class Proxy extends CommonProxy {
         DifficultyMap dmap = worldDifficultyMaps.get(ep.dimension);
         e.getLeft().add("Avg Difficulty: " + dmap.getDifficulty(bp.getX(), bp.getZ()));
         e.getLeft().add("Chunk Difficulty: " + dmap.getChunkDifficulty(new ChunkPos(bp)));
+    }
+
+    @SubscribeEvent
+    public void onRegisterModels(ModelRegistryEvent e) {
+
     }
 }

@@ -1,18 +1,35 @@
 package com.vortexel.dangerzone.common;
 
 import com.vortexel.dangerzone.DangerZone;
+import com.vortexel.dangerzone.common.capability.*;
 import com.vortexel.dangerzone.common.config.DZConfig;
+import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.monster.EntityGolem;
+import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.living.LootingLevelEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.io.File;
 import java.util.HashMap;
 
+/**
+ * {@code CommonProxy} contains most of the logic for the mod. It also acts as a hub for most of the events
+ * the mod receives.
+ */
 public class CommonProxy {
 
     /**
@@ -23,14 +40,19 @@ public class CommonProxy {
     public DifficultyAdjuster adjuster;
 
     public void preInit(FMLPreInitializationEvent e) {
+        // First things first, load the config.
         DZConfig.INSTANCE.loadFromDirectory(new File(e.getModConfigurationDirectory(), DangerZone.ID));
 
+        // Create our object instances so they exist when other things try to use them.
         adjuster = new DifficultyAdjuster();
-
-        MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(adjuster);
-
         worldDifficultyMaps = new HashMap<>();
+
+        // Register the IDangerLevel CAPABILITY
+        CapabilityManager.INSTANCE.register(IDangerLevel.class, new DangerLevelStorage(), SimpleDangerLevel::new);
+
+        // Register ourselves and our adjuster. The adjuster doesn't register itself because I want
+        // the CommonProxy to be able to "reload" itself and thus it needs to be able to un-register the adjuster.
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     public void init(FMLInitializationEvent e) {
@@ -41,14 +63,26 @@ public class CommonProxy {
     }
 
     public double getDifficulty(World world, int x, int z) {
+        worldDifficultyMaps.putIfAbsent(world.provider.getDimension(), new DifficultyMap(world));
         return worldDifficultyMaps.get(world.provider.getDimension()).getDifficulty(x, z);
     }
 
+    @SubscribeEvent
+    public void onRegisterCapabilities(AttachCapabilitiesEvent<Entity> e) {
+        if (e.getObject() instanceof EntityCreature) {
+            e.addCapability(IDangerLevel.RESOURCE_LOCATION, new DangerLevelProvider());
+        }
+    }
+
+    @SubscribeEvent
+    public void registerBlocks(RegistryEvent.Register<Block> e) {
+
+    }
 
     @SubscribeEvent
     public void worldLoaded(WorldEvent.Load e) {
         World w = e.getWorld();
-        worldDifficultyMaps.put(w.provider.getDimension(), new DifficultyMap(w));
+        worldDifficultyMaps.putIfAbsent(w.provider.getDimension(), new DifficultyMap(w));
     }
 
     @SubscribeEvent
@@ -57,4 +91,23 @@ public class CommonProxy {
         worldDifficultyMaps.remove(w.provider.getDimension());
     }
 
+    /**
+     * Event for when an entity drops items. We use this to change the drop loot.
+     * We set the priority at lowest so that we are one of the first to receive the event.
+     * That way we can modify the drops, and let others deal with if it's allowed or not.
+     */
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onEntityDrops(LivingDropsEvent e) {
+        adjuster.modifyDrops(e);
+    }
+
+    @SubscribeEvent
+    public void onLootingLevel(LootingLevelEvent e) {
+        adjuster.modifyLootingLevel(e);
+    }
+
+    @SubscribeEvent
+    public void onEntitySpawn(EntityJoinWorldEvent e) {
+        adjuster.adjustEntityDifficulty(e.getEntity());
+    }
 }
