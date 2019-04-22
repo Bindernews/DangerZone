@@ -1,6 +1,7 @@
 package com.vortexel.dangerzone.common;
 
 import lombok.Value;
+import lombok.val;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -14,14 +15,12 @@ public class ChunkDifficultyData {
     private Biome biome;
     private double difficulty;
 
-    public static ChunkDifficultyData fromWorld(World world, DifficultyMap difficultyMap, ChunkPos pos) {
+    public static ChunkDifficultyData fromWorld(IWorldAdapter world, DifficultyMap difficultyMap, ChunkPos pos) {
         HashMap<Integer, Integer> biomeCount = new HashMap<>();
         // Default value
         biomeCount.put(-1, -1);
 
-        Biome[] biomes = world.getBiomeProvider().getBiomesForGeneration(null,
-                pos.getXStart(), pos.getZStart(), 16, 16);
-        for (Biome b : biomes) {
+        for (Biome b : world.getChunkBiomes(null, pos.x, pos.z)) {
             final int biomeId = Biome.getIdForBiome(b);
             biomeCount.putIfAbsent(biomeId, 0);
             biomeCount.put(biomeId, biomeCount.get(biomeId) + 1);

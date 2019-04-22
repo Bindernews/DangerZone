@@ -64,7 +64,8 @@ public class CommonProxy {
     }
 
     public double getDifficulty(World world, int x, int z) {
-        worldDifficultyMaps.putIfAbsent(world.provider.getDimension(), new DifficultyMap(world));
+        worldDifficultyMaps.putIfAbsent(world.provider.getDimension(),
+                new DifficultyMap(new ForgeWorldAdapter(world)));
         return worldDifficultyMaps.get(world.provider.getDimension()).getDifficulty(x, z);
     }
 
@@ -78,7 +79,7 @@ public class CommonProxy {
     @SubscribeEvent
     public void worldLoaded(WorldEvent.Load e) {
         World w = e.getWorld();
-        worldDifficultyMaps.putIfAbsent(w.provider.getDimension(), new DifficultyMap(w));
+        worldDifficultyMaps.putIfAbsent(w.provider.getDimension(), new DifficultyMap(new ForgeWorldAdapter(w)));
     }
 
     @SubscribeEvent

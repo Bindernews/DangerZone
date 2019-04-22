@@ -5,7 +5,6 @@ import com.vortexel.dangerzone.common.config.DZConfig;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
 
@@ -24,16 +23,16 @@ public class DifficultyMap {
     private static final int CHUNK_SIZE = 16;
     private static final double NOT_ONE = 1.0 - 1e-20;
 
-    private World world;
+    private IWorldAdapter world;
     private NoiseGeneratorPerlin generator;
     private WeakHashMap<ChunkPos, ChunkDifficultyData> weakChunkInfoCache;
     private DZConfig.PerWorld worldConfig;
 
-    public DifficultyMap(World world) {
+    public DifficultyMap(IWorldAdapter world) {
         this.world = world;
         generator = new NoiseGeneratorPerlin(new Random(world.getSeed()), 1);
         weakChunkInfoCache = new WeakHashMap<>();
-        worldConfig = DZConfig.INSTANCE.getWorld(world.provider.getDimension());
+        worldConfig = DZConfig.INSTANCE.getWorld(world.getDimension());
     }
 
     /**
@@ -93,7 +92,7 @@ public class DifficultyMap {
         int minZ = z - NEIGHBOR_SIZE / 2;
 
         // The biome of our block. We only want to average with chunks who have the same biome.
-        Biome targetBiome = world.getBiome(new BlockPos(x, 60, z));
+        Biome targetBiome = world.getBiome(x, z);
         double sumDifficulty = 0.0;
         int usedCount = 0;
 
