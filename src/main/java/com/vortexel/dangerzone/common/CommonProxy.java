@@ -1,19 +1,18 @@
 package com.vortexel.dangerzone.common;
 
 import com.vortexel.dangerzone.DangerZone;
-import com.vortexel.dangerzone.common.capability.*;
+import com.vortexel.dangerzone.common.capability.DangerLevelProvider;
+import com.vortexel.dangerzone.common.capability.DangerLevelStorage;
+import com.vortexel.dangerzone.common.capability.IDangerLevel;
+import com.vortexel.dangerzone.common.capability.SimpleDangerLevel;
 import com.vortexel.dangerzone.common.config.DZConfig;
-import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.monster.EntityGolem;
-import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LootingLevelEvent;
@@ -51,8 +50,7 @@ public class CommonProxy {
         // Register the IDangerLevel CAPABILITY
         CapabilityManager.INSTANCE.register(IDangerLevel.class, new DangerLevelStorage(), SimpleDangerLevel::new);
 
-        // Register ourselves and our adjuster. The adjuster doesn't register itself because I want
-        // the CommonProxy to be able to "reload" itself and thus it needs to be able to un-register the adjuster.
+        // Register ourselves so we can receive events.
         MinecraftForge.EVENT_BUS.register(this);
     }
 

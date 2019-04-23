@@ -2,10 +2,12 @@ package com.vortexel.dangerzone.common;
 
 import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.common.capability.IDangerLevel;
+import com.vortexel.dangerzone.common.config.DZConfig;
 import lombok.val;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 import net.minecraftforge.event.entity.EntityEvent;
 
 /**
@@ -24,6 +26,20 @@ public class MCUtil {
 
     public static boolean isWorldLocal(Entity e) {
         return !e.getEntityWorld().isRemote;
+    }
+
+    /**
+     * Return true if the world containing {@code entity} is enabled in the config.
+     */
+    public static boolean isWorldEnabled(Entity entity) {
+        return isWorldEnabled(entity.getEntityWorld());
+    }
+
+    /**
+     * Return true if {@code world} has danger zone enabled for it in the config.
+     */
+    public static boolean isWorldEnabled(World world) {
+        return DZConfig.INSTANCE.getWorld(world.provider.getDimension()).enabled;
     }
 
     public static String translationKey(String prefix, String... suffixes) {

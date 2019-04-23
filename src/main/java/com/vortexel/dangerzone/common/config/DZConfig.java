@@ -12,15 +12,23 @@ import java.util.Map;
 public class DZConfig {
 
     public static final int REAL_MAX_DANGER_LEVEL = 500;
-
     private static final String WORLD_PREFIX = "world";
 
     public static DZConfig INSTANCE = new DZConfig();
 
-    public General general = new General();
-    public Advanced advanced = new Advanced();
-    public BiomesConfig biomes = new BiomesConfig();
-    public Map<Integer, PerWorld> world = Maps.newHashMap();
+    public General general;
+    public BiomesConfig biomes;
+    public Map<Integer, PerWorld> world;
+
+    public DZConfig() {
+        general = new General();
+        biomes = new BiomesConfig();
+        world = Maps.newHashMap();
+
+        // Enable for the Overworld by default
+        getWorld(0).enabled = true;
+    }
+
 
     public static class General implements ConfigHelper.Loadable {
         @Comment({"Time in seconds between cache clears. Increasing this can improve performance slightly",
@@ -40,6 +48,16 @@ public class DZConfig {
         @Comment({"How much health is gained for each added difficulty point."})
         public double healthScaling = 0.5;
 
+        @Comment({"Should the increased looting level be applied even if the mob wasn't killed by a player?"})
+        public boolean lootingOnNonPlayerKills = true;
+
+        @Comment({"Should mobs drop loot bags even if they weren't killed by a player?"})
+        public boolean lootBagOnNonPlayerKills = false;
+
+        @Comment({"Should Fake Players (e.g. Draconic Evolution mob_grinder) count as player kills?",
+                "If this is true, then players can build a mob grinder and get ores from it. Be careful."})
+        public boolean doFakePlayersDropLoot = false;
+
         @Comment({"The minimum danger level where enemies can start having haste."})
         @Config.RangeInt(min = 1, max = REAL_MAX_DANGER_LEVEL)
         public int hasteLevel = 10;
@@ -55,13 +73,6 @@ public class DZConfig {
         @Comment({"The chance of applying regeneration at the maximum danger level. This will scale to lower levels."})
         @Config.RangeDouble(min = 0.0, max = 1.0)
         public double regenChance = 0.7;
-
-        public void load(ConfigCategory cat) {
-            ConfigHelper.loadAllCommented(this, cat);
-        }
-    }
-
-    public static class Advanced implements ConfigHelper.Loadable {
 
         public void load(ConfigCategory cat) {
             ConfigHelper.loadAllCommented(this, cat);
@@ -99,7 +110,6 @@ public class DZConfig {
 
     public void load(Configuration cfgGeneral, Configuration cfgBiomes) {
         general.load(cfgGeneral.getCategory("general"));
-        advanced.load(cfgGeneral.getCategory("advanced"));
         ConfigHelper.loadIntegerMap(cfgGeneral, WORLD_PREFIX, PerWorld.class, world);
         biomes.load(cfgBiomes.getCategory("biomes"));
     }
