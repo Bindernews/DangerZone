@@ -32,7 +32,7 @@ public class DifficultyMap {
         this.world = world;
         generator = new NoiseGeneratorPerlin(new Random(world.getSeed()), 1);
         weakChunkInfoCache = new WeakHashMap<>();
-        worldConfig = DZConfig.INSTANCE.getWorld(world.getDimension());
+        worldConfig = DZConfig.getWorld(world.getDimension());
     }
 
     /**

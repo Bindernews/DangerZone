@@ -34,7 +34,7 @@ public class DifficultyAdjuster {
      * (that's taken care of in {@link DifficultyAdjuster#modifyLootingLevel}).
      */
     public void modifyDrops(LivingDropsEvent e) {
-        val canLoot = DZConfig.INSTANCE.general.lootBagOnNonPlayerKills
+        val canLoot = DZConfig.general.lootBagOnNonPlayerKills
                 || shouldLoot(e.getSource().getTrueSource());
         if (shouldModifyWorld(e.getEntity()) && canLoot) {
             val entity = e.getEntity();
@@ -51,7 +51,7 @@ public class DifficultyAdjuster {
      * Modify the looting level for any entities so that their normal drops are increased.
      */
     public void modifyLootingLevel(LootingLevelEvent e) {
-        val canLoot = DZConfig.INSTANCE.general.lootingOnNonPlayerKills
+        val canLoot = DZConfig.general.lootingOnNonPlayerKills
                 || shouldLoot(e.getDamageSource().getTrueSource());
         if (shouldModifyWorld(e.getEntity()) && canLoot) {
             val dangerLevelCap = MCUtil.getDangerLevelCapability(e.getEntity());
@@ -66,7 +66,7 @@ public class DifficultyAdjuster {
      * @param src The result of {@link DamageSource#getTrueSource()} for your particular event
      */
     protected boolean shouldLoot(Entity src) {
-        if (DZConfig.INSTANCE.general.doFakePlayersDropLoot) {
+        if (DZConfig.general.doFakePlayersDropLoot) {
             return (src instanceof EntityPlayer);
         } else {
             return (src instanceof EntityPlayer) && !(src instanceof FakePlayer);

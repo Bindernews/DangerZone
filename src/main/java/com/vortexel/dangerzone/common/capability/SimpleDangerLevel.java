@@ -17,6 +17,6 @@ public class SimpleDangerLevel implements IDangerLevel {
 
     @Override
     public void setDanger(int v) {
-        danger = MathHelper.clamp(v, 0, DZConfig.INSTANCE.general.maxDangerLevel);
+        danger = MathHelper.clamp(v, 0, DZConfig.general.maxDangerLevel);
     }
 }

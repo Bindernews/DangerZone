@@ -78,13 +78,13 @@ public class DangerMath {
      * Shortcut for getting the maximum danger level from the config.
      */
     public static int maxDangerLevel() {
-        return DZConfig.INSTANCE.general.maxDangerLevel;
+        return DZConfig.general.maxDangerLevel;
     }
 
     /**
      * Shortcut for getting the danger multiplier from the config.
      */
     public static double dangerMultiplier() {
-        return DZConfig.INSTANCE.general.dangerMultiplier;
+        return DZConfig.general.dangerMultiplier;
     }
 }

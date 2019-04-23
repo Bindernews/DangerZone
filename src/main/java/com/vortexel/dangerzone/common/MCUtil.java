@@ -39,7 +39,7 @@ public class MCUtil {
      * Return true if {@code world} has danger zone enabled for it in the config.
      */
     public static boolean isWorldEnabled(World world) {
-        return DZConfig.INSTANCE.getWorld(world.provider.getDimension()).enabled;
+        return DZConfig.getWorld(world.provider.getDimension()).enabled;
     }
 
     public static String translationKey(String prefix, String... suffixes) {

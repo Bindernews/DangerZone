@@ -11,8 +11,7 @@ import java.util.Map;
  */
 public class BiomeComparator {
     public static boolean equal(int b1Id, int b2Id) {
-        Map<Integer, String> idMap = DZConfig.INSTANCE.biomes.biomeIdToGroup;
-        return idMap.get(b1Id).equals(idMap.get(b2Id));
+        return DZConfig.getBiomeGroup(b1Id).equals(DZConfig.getBiomeGroup(b2Id));
     }
 
     public static boolean equal(Biome b1, Biome b2) {
