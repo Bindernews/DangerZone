@@ -1,5 +1,6 @@
 package com.vortexel.dangerzone.common;
 
+import com.vortexel.dangerzone.common.config.BiomeConfig;
 import com.vortexel.dangerzone.common.config.DZConfig;
 import net.minecraft.world.biome.Biome;
 
@@ -11,7 +12,7 @@ import java.util.Map;
  */
 public class BiomeComparator {
     public static boolean equal(int b1Id, int b2Id) {
-        return DZConfig.getBiomeGroup(b1Id).equals(DZConfig.getBiomeGroup(b2Id));
+        return BiomeConfig.areGrouped(b1Id, b2Id);
     }
 
     public static boolean equal(Biome b1, Biome b2) {

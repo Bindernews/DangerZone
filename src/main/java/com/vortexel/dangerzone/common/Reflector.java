@@ -4,6 +4,7 @@ import lombok.val;
 
 import com.google.common.collect.Maps;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -67,6 +68,16 @@ public final class Reflector {
     private static void methodCacheEnsureExists(Class<?> clazz, String name) {
         methodCache.putIfAbsent(clazz, Maps.newIdentityHashMap());
         methodCache.get(clazz).putIfAbsent(name, Maps.newHashMap());
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getField(Object instance, Field field) {
+        try {
+            field.setAccessible(true);
+            return (T)field.get(instance);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @SuppressWarnings("unchecked")

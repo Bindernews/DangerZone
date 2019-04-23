@@ -50,7 +50,7 @@ public class EntityAdjuster {
         dangerLevelCap.setDanger(dangerLevel);
 
         // Apply all the modifiers to the entity
-        val cfg = DZConfig.general;
+        val cfg = DZConfig.effects;
         applyModifier(ModifierType.MOVEMENT_SPEED,
                 DangerMath.getEffectAmount(dangerLevel, cfg.hasteLevel, cfg.hasteChance, rng),
                 this::applyMovementSpeed);

@@ -5,7 +5,9 @@ import com.vortexel.dangerzone.common.capability.DangerLevelProvider;
 import com.vortexel.dangerzone.common.capability.DangerLevelStorage;
 import com.vortexel.dangerzone.common.capability.IDangerLevel;
 import com.vortexel.dangerzone.common.capability.SimpleDangerLevel;
+import com.vortexel.dangerzone.common.config.BiomeConfig;
 import com.vortexel.dangerzone.common.config.DZConfig;
+import lombok.val;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,6 +16,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -43,8 +46,12 @@ public class CommonProxy {
 
     public void preInit(FMLPreInitializationEvent e) {
         // First things first, load the config.
-//        DZConfig.INSTANCE.loadFromDirectory(new File(e.getModConfigurationDirectory(), DangerZone.ID));
         ConfigManager.sync(DangerZone.ID, Config.Type.INSTANCE);
+        val cfg = new Configuration(e.getSuggestedConfigurationFile());
+        cfg.load();
+        DZConfig.load(cfg);
+        cfg.save();
+        BiomeConfig.afterLoad();
 
         // Create our object instances so they exist when other things try to use them.
         adjuster = new DifficultyAdjuster();

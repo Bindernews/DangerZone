@@ -1,15 +1,19 @@
 package com.vortexel.dangerzone.common.config;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.vortexel.dangerzone.common.Reflector;
+import lombok.val;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ConfigHelper {
 
@@ -31,7 +35,7 @@ public class ConfigHelper {
         }
     }
 
-    public static final Map<Class<?>, FieldHandler> FIELD_HANDLER_REGISTRY = Arrays.asList(
+    private static final Map<Class<?>, FieldHandler> FIELD_HANDLER_REGISTRY = Stream.of(
             new FHReg(int.class, ConfigHelper::handleInteger),
             new FHReg(int[].class, ConfigHelper::handleIntegerList),
             new FHReg(boolean.class, ConfigHelper::handleBoolean),
@@ -40,13 +44,26 @@ public class ConfigHelper {
             new FHReg(double[].class, ConfigHelper::handleDoubleList),
             new FHReg(String.class, ConfigHelper::handleString),
             new FHReg(String[].class, ConfigHelper::handleStringList)
-    ).stream().collect(Collectors.toMap(r -> r.clazz, r -> r.handler));
+    ).collect(Collectors.toMap(r -> r.clazz, r -> r.handler));
 
     public static void loadAllCommented(Object obj, ConfigCategory cfg) {
         for (Field f : obj.getClass().getFields()) {
             if (f.getAnnotation(Config.Comment.class) != null) {
                 readField(obj, f, cfg);
             }
+        }
+    }
+
+    public static void loadStaticCategories(Configuration cfg, Class<?> clazz, String... categories) {
+        try {
+            for (val category : categories) {
+                val field = clazz.getField(category);
+                val subCat = cfg.getCategory(category);
+                subCat.setComment(getComment(field));
+                readField(null, field, subCat);
+            }
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -59,7 +76,10 @@ public class ConfigHelper {
                 throw new RuntimeException(e);
             }
         }
-        else {
+        // If the field implements Loadable then load it
+        else if (Reflector.getField(obj, field) instanceof Loadable) {
+            ((Loadable) Reflector.getField(obj, field)).load(cfg);
+        } else {
             throw new RuntimeException("No handler for class " + field.getType().getName());
         }
     }
@@ -89,76 +109,57 @@ public class ConfigHelper {
 
     /**
      * Searches {@param cfg} for categories in the form "[prefix].[integer]" and fills {@param initial}
-     * with objects of type {@param clazz}.
+     * with objects of type {@param T}.
      *
-     * @param cfg
-     * @param prefix
-     * @param clazz
-     * @param initial
-     * @param <T>
+     * @param cfg the configuration object, may be modified to populate default values
+     * @param prefix the prefix string to search for
+     * @param initial map containing the default values which will be populated with the parsed results
+     * @param newValue factory function to produce a new {@code T}
      */
-    public static <T extends Loadable> void loadIntegerMap(Map<String, ConfigCategory> cfg, String prefix,
-                                                           Class<T> clazz, Map<Integer, T> initial) {
-        final String realPrefix = prefix + ".";
-
-        // For each category name that starts with [prefix].
-        for (String categoryName : Sets.filter(cfg.keySet(), (s) -> s.startsWith(realPrefix))) {
-            String categoryIdSuffix = categoryName.substring(realPrefix.length());
-            try {
-                int keyId = Integer.parseInt(categoryIdSuffix);
-                T value = construct(clazz);
-                value.load(cfg.get(categoryName));
-                initial.put(keyId, value);
-            } catch (NumberFormatException nfe) {
-                throw new RuntimeException(String.format("Configuration key \"%s\" is not a number", categoryIdSuffix));
-            }
-        }
-    }
-
     public static <T extends Loadable> void loadIntegerMap(Configuration cfg, String prefix,
-                                                           Class<T> clazz, Map<Integer, T> initial) {
-        loadIntegerMap(configurationToMap(cfg), prefix, clazz, initial);
+                                                           Map<Integer, T> initial, Supplier<T> newValue) {
+        loadMap(cfg, prefix, initial, ConfigHelper::parseIntSafer, newValue);
     }
 
-    public static <T extends Loadable> void loadStringMap(Map<String, ConfigCategory> cfg, String prefix,
-                                                          Class<T> clazz, Map<String, T> initial) {
-        final String realPrefix = prefix + ".";
-
-        // For each category name that starts with [prefix].
-        for (String categoryName : Sets.filter(cfg.keySet(), (s) -> s.startsWith(realPrefix))) {
-            String keyId = categoryName.substring(realPrefix.length());
-            T value = construct(clazz);
-            value.load(cfg.get(categoryName));
-            initial.put(keyId, value);
+    /**
+     * Parses a string into a integer (base 10). Throws a RuntimeException if the parsing fails.
+     */
+    public static int parseIntSafer(String s) {
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException nfe) {
+            throw new RuntimeException(String.format("Configuration key \"%s\" is not a number", s));
         }
     }
 
     public static <T extends Loadable> void loadStringMap(Configuration cfg, String prefix,
-                                                          Class<T> clazz, Map<String, T> initial) {
-        loadStringMap(configurationToMap(cfg), prefix, clazz, initial);
+                                                          Map<String, T> initial, Supplier<T> newValue) {
+        loadMap(cfg, prefix, initial, (s) -> s, newValue);
     }
 
-    public static Map<String, ConfigCategory> configurationToMap(Configuration cfg) {
-        return Maps.asMap(cfg.getCategoryNames(), (name) -> cfg.getCategory(name));
-    }
+    public static <K, V extends Loadable> void loadMap(Configuration cfg, String prefix,
+                                                       Map<K, V> initial, Function<String, K> stringToKey,
+                                                       Supplier<V> newValue) {
+        final String realPrefix = prefix + ".";
 
-    public static int[] integerToIntList(Collection<Integer> c) {
-        int[] values = new int[c.size()];
-        int i = 0;
-        for (Integer v : c) {
-            values[i] = v;
-            i++;
+        // Make sure all our default values get a chance to load
+        for (val entry : initial.entrySet()) {
+            val category = realPrefix + entry.getKey();
+            // This will create the category if it wasn't already in cfg
+            cfg.getCategory(category);
         }
-        return values;
+
+        // For each category name that starts with [prefix].
+        for (String categoryName : Sets.filter(cfg.getCategoryNames(), (s) -> s.startsWith(realPrefix))) {
+            // Parse the "key" portion of the string
+            String categoryIdSuffix = categoryName.substring(realPrefix.length());
+            K catKey = stringToKey.apply(categoryIdSuffix);
+            initial.putIfAbsent(catKey, newValue.get());
+            initial.get(catKey).load(cfg.getCategory(categoryName));
+        }
     }
 
-    public static List<Integer> intToIntegerList(int[] a) {
-        List<Integer> values = new ArrayList<>(a.length);
-        for (int v : a) {
-            values.add(v);
-        }
-        return values;
-    }
+    //region list conversion
 
     public static String[] toStringArray(int[] a) {
         String[] out = new String[a.length];
@@ -184,13 +185,9 @@ public class ConfigHelper {
         return out;
     }
 
-    private static <T> T construct(Class<T> clazz) {
-        try {
-            return clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    //endregion list conversion
+
+    //region field handlers
 
     private static void handleInteger(Object obj, Field field, ConfigCategory cfg) throws Exception {
         String defaultValue = Integer.toString(field.getInt(obj));
@@ -296,6 +293,8 @@ public class ConfigHelper {
         prop.set(values);
         field.set(obj, values);
     }
+
+    //endregion field handlers
 
     public static Property setupProperty(ConfigCategory cfg, Field field, String value, Property.Type type) {
         final String name = field.getName();

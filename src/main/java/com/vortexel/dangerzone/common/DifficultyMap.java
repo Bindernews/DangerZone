@@ -26,7 +26,7 @@ public class DifficultyMap {
     private IWorldAdapter world;
     private NoiseGeneratorPerlin generator;
     private WeakHashMap<ChunkPos, ChunkDifficultyData> weakChunkInfoCache;
-    private DZConfig.PerWorld worldConfig;
+    private DZConfig.WorldConfig worldConfig;
 
     public DifficultyMap(IWorldAdapter world) {
         this.world = world;
@@ -118,8 +118,8 @@ public class DifficultyMap {
     }
 
     public double getRaw(int x, int z) {
-        double v = generator.getValue((double)x * worldConfig.scaleFactor,
-                (double)z * worldConfig.scaleFactor);
+        double v = generator.getValue((double)x * DZConfig.general.scaleFactor,
+                (double)z * DZConfig.general.scaleFactor);
         if (v < -1 || v > 1) {
             DangerZone.log.warn("Noise value outside range " + v);
         }
