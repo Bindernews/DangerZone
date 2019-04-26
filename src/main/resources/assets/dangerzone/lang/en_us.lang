@@ -1,7 +1,5 @@
-#PARSE_ESCAPES
-
 # Items
 item.dangerzone:loot_bag.name=Loot Bag
-item.dangerzone:loot_bag.tooltip=Level %s
+item.dangerzone:loot_bag.tooltip=Level %1$s
 
 

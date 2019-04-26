@@ -1,0 +1,20 @@
+{
+  "pools": [
+    {
+      "name": "main",
+      "rolls": 2,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:iron_ore",
+          "weight": 80
+        },
+        {
+          "type": "item",
+          "name": "minecraft:gold_ore",
+          "weight": 20
+        }
+      ]
+    }
+  ]
+}

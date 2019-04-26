@@ -1,20 +1,30 @@
 package com.vortexel.dangerzone.common.config;
 
 import com.google.common.collect.Maps;
+import com.vortexel.dangerzone.DangerZone;
 import lombok.SneakyThrows;
 import lombok.val;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Config.Comment;
 import net.minecraftforge.common.config.ConfigCategory;
+import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.common.config.Configuration;
 
 import java.util.Map;
 
 public class DZConfig {
 
+    /**
+     * The configuration we load from and save to.
+     */
+    public static Configuration cfg;
+
+    /**
+     * Constants.
+     */
     public static class C {
         public static final String WORLDS_PREFIX = "worlds";
-        public static final int REAL_MAX_DANGER_LEVEL = 500;
+        public static final int REAL_MAX_DANGER_LEVEL = (1 << 15);
     }
 
     @Comment({"General settings which apply to the mod as a whole."})
@@ -136,9 +146,17 @@ public class DZConfig {
         return worlds.get(dimensionId);
     }
 
-    public static void load(Configuration cfg) {
+    public static void load() {
+        cfg.load();
         ConfigHelper.loadStaticCategories(cfg, DZConfig.class, "general", "effects", "world");
         cfg.getCategory(C.WORLDS_PREFIX).setComment(ConfigHelper.getComment(DZConfig.class, "worlds"));
         ConfigHelper.loadIntegerMap(cfg, C.WORLDS_PREFIX, worlds, WorldConfig::new);
+        cfg.save();
+    }
+
+    public static void loadAll() {
+        ConfigManager.sync(DangerZone.MOD_ID, Config.Type.INSTANCE);
+        BiomeConfig.afterLoad();
+        load();
     }
 }

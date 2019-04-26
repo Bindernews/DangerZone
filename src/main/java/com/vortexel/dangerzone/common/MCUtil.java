@@ -7,6 +7,8 @@ import lombok.val;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.EntityEvent;
 
@@ -16,6 +18,8 @@ import net.minecraftforge.event.entity.EntityEvent;
 public class MCUtil {
 
     private static final char SEP_CHAR = '.';
+    public static final int CHUNK_SIZE = 16;
+    public static final int CHUNK_SIZE_SQ = CHUNK_SIZE * CHUNK_SIZE;
 
     /**
      * Takes any Event that deals with an Entity and returns true if the world is local.
@@ -26,6 +30,10 @@ public class MCUtil {
 
     public static boolean isWorldLocal(Entity e) {
         return !e.getEntityWorld().isRemote;
+    }
+
+    public static boolean isWorldLocal(World world) {
+        return !world.isRemote;
     }
 
     /**
@@ -42,11 +50,21 @@ public class MCUtil {
         return DZConfig.getWorld(world.provider.getDimension()).enabled;
     }
 
+    public static ChunkPos chunkFrom(int blockX, int blockZ) {
+        return new ChunkPos(blockX >> 4, blockZ >> 4);
+    }
+
+    public static EntityItem spawnItem(World worldIn, BlockPos pos, ItemStack stack) {
+        val eItem = new EntityItem(worldIn, pos.getX(), pos.getY(), pos.getZ(), stack);
+        worldIn.spawnEntity(eItem);
+        return eItem;
+    }
+
     public static String translationKey(String prefix, String... suffixes) {
-        StringBuilder sb = new StringBuilder(prefix.length() + DangerZone.ID.length() + 2);
+        StringBuilder sb = new StringBuilder(prefix.length() + DangerZone.MOD_ID.length() + 2);
         sb.append(prefix);
         sb.append(SEP_CHAR);
-        sb.append(DangerZone.ID);
+        sb.append(DangerZone.MOD_ID);
         sb.append(':');
         for (String suffix : suffixes) {
             sb.append(suffix);

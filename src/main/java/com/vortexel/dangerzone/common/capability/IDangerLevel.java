@@ -4,7 +4,7 @@ import com.vortexel.dangerzone.DangerZone;
 import net.minecraft.util.ResourceLocation;
 
 public interface IDangerLevel {
-    ResourceLocation RESOURCE_LOCATION = new ResourceLocation(DangerZone.ID, "dangerLevel");
+    ResourceLocation RESOURCE_LOCATION = new ResourceLocation(DangerZone.MOD_ID, "dangerLevel");
 
     /**
      * Get the danger level for this entity.

@@ -1,13 +1,24 @@
 package com.vortexel.dangerzone.common.item;
 
+import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.common.FnUtil;
+import com.vortexel.dangerzone.common.MCUtil;
 import com.vortexel.dangerzone.common.config.DZConfig;
 import lombok.val;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -23,6 +34,55 @@ public class ItemLootBag extends DangerZoneItem {
     public ItemLootBag() {
         super("loot_bag");
         setMaxStackSize(64);
+    }
+
+//    @Override
+//    public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand,
+//                                      EnumFacing facing, float hitX, float hitY, float hitZ) {
+//        val parentResult = super.onItemUse(player, worldIn, pos, hand, facing, hitX, hitY, hitZ);
+//        if (parentResult != EnumActionResult.PASS) {
+//            return parentResult;
+//        }
+//        return givePlayerLoot(player, worldIn, hand);
+//    }
+
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
+        val parentResult = super.onItemRightClick(worldIn, playerIn, handIn);
+        if (parentResult.getType() != EnumActionResult.PASS) {
+            return parentResult;
+        }
+        return givePlayerLoot(playerIn, worldIn, handIn);
+    }
+
+    public ActionResult<ItemStack> givePlayerLoot(EntityPlayer player, World worldIn, EnumHand hand) {
+        val stack = player.getHeldItem(hand);
+        if (!(worldIn instanceof WorldServer) || stack.getItem() != this) {
+            return new ActionResult<>(EnumActionResult.PASS, stack);
+        }
+        val world = (WorldServer)worldIn;
+        final int level = getLootBagLevel(stack);
+        stack.setCount(stack.getCount() - 1);
+        if (level > 0) {
+            val lootIter = DangerZone.proxy.lootManager.getLootBagLoot(world, level).iterator();
+            ItemStack unplacedStack = null;
+            // Keep going until we run out of items or space in the inventory
+            while (lootIter.hasNext() && unplacedStack == null) {
+                val item = lootIter.next();
+                if (!player.inventory.addItemStackToInventory(item)) {
+                    unplacedStack = item;
+                }
+            }
+            // If we ran out of inventory space, then drop it on the GROUND
+            val pos = player.getPosition();
+            if (unplacedStack != null) {
+                MCUtil.spawnItem(world, pos, unplacedStack);
+                while (lootIter.hasNext()) {
+                    MCUtil.spawnItem(world, pos, lootIter.next());
+                }
+            }
+        }
+        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
 
     @Override

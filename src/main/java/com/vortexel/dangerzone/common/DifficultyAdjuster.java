@@ -18,8 +18,11 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootTable;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LootingLevelEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.Collection;
 
@@ -28,6 +31,30 @@ import java.util.Collection;
  * to adjust the difficulty accordingly.
  */
 public class DifficultyAdjuster {
+
+    //region Event handlers
+
+    /**
+     * Event for when an entity drops items. We use this to change the drop loot.
+     * We set the priority at lowest so that we are one of the first to receive the event.
+     * That way we can modify the drops, and let others deal with if it's allowed or not.
+     */
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onEntityDrops(LivingDropsEvent e) {
+        modifyDrops(e);
+    }
+
+    @SubscribeEvent
+    public void onLootingLevel(LootingLevelEvent e) {
+        modifyLootingLevel(e);
+    }
+
+    @SubscribeEvent
+    public void onEntitySpawn(EntityJoinWorldEvent e) {
+        adjustEntityDifficulty(e.getEntity());
+    }
+
+    //endregion Event handlers
 
     /**
      * Adds additional bonus drops to the entity. This doesn't deal with increasing their default drops
@@ -40,7 +67,7 @@ public class DifficultyAdjuster {
             val entity = e.getEntity();
             val dangerInfo = MCUtil.getDangerLevelCapability(entity);
             if (dangerInfo != null) {
-                val stack = new ItemStack(ModItems.loot_bag, 1, 0);
+                val stack = new ItemStack(ModItems.lootBag, 1, 0);
                 ItemLootBag.setLootBagLevel(stack, dangerInfo.getDanger());
                 e.getDrops().add(MCUtil.makeItemAt(entity, stack));
             }

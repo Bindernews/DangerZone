@@ -17,6 +17,11 @@ public class ForgeWorldAdapter implements IWorldAdapter {
     private final World world;
 
     @Override
+    public boolean isLocal() {
+        return !world.isRemote;
+    }
+
+    @Override
     public int getDimension() {
         return world.provider.getDimension();
     }

@@ -13,6 +13,11 @@ import javax.annotation.Nullable;
 public interface IWorldAdapter {
 
     /**
+     * Returns true if the world is local, false if not.
+     */
+    boolean isLocal();
+
+    /**
      * Returns the dimension ID of the world.
      */
     int getDimension();

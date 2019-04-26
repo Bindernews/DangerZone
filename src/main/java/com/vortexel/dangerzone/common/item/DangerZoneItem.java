@@ -9,9 +9,9 @@ import java.util.Objects;
 public class DangerZoneItem extends Item {
 
     public DangerZoneItem(final String name) {
-        setRegistryName(DangerZone.ID, name);
+        setRegistryName(DangerZone.MOD_ID, name);
         val regName = Objects.requireNonNull(getRegistryName());
         setUnlocalizedName(regName.toString());
-        setCreativeTab(DangerZone.creativeTag);
+        setCreativeTab(DangerZone.creativeTab);
     }
 }

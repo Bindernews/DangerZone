@@ -7,7 +7,7 @@ import net.minecraftforge.common.config.Config;
 
 import java.util.Map;
 
-@Config(modid = DangerZone.ID, type = Config.Type.INSTANCE, name = DangerZone.ID + "_biome")
+@Config(modid = DangerZone.MOD_ID, type = Config.Type.INSTANCE, name = DangerZone.MOD_ID + "_biome")
 public class BiomeConfig {
 
     @Config.Comment({"A map of arbitrary group names to lists of biome IDs. If two biome IDs are in the same list,",
