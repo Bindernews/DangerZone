@@ -7,16 +7,12 @@ import com.vortexel.dangerzone.common.config.DZConfig;
 import lombok.val;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.Constants;
@@ -27,7 +23,7 @@ import org.apache.commons.lang3.Validate;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ItemLootBag extends DangerZoneItem {
+public class ItemLootBag extends BaseItem {
 
     public static final String BAG_LEVEL_KEY = "bagLevel";
 
@@ -62,7 +58,7 @@ public class ItemLootBag extends DangerZoneItem {
         }
         val world = (WorldServer)worldIn;
         final int level = getLootBagLevel(stack);
-        stack.setCount(stack.getCount() - 1);
+        stack.grow(-1);
         if (level > 0) {
             val lootIter = DangerZone.proxy.lootManager.getLootBagLoot(world, level).iterator();
             ItemStack unplacedStack = null;

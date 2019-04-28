@@ -118,15 +118,15 @@ public class DifficultyMap {
     }
 
     public double getRaw(int x, int z) {
-        double v = generator.getValue((double)x * DZConfig.general.scaleFactor,
-                (double)z * DZConfig.general.scaleFactor);
+        double v = generator.getValue((double)x * DZConfig.general.stretchFactor,
+                (double)z * DZConfig.general.stretchFactor);
         if (v < -1 || v > 1) {
             DangerZone.log.warn("Noise value outside range " + v);
         }
         // Bind v to [0, 1)
         v = (MathHelper.clamp(v, -1, NOT_ONE) + 1) / 2.0;
         // v = v^2 to make lower difficulties more common
-        v = v * v;
+        v = Math.pow(v, 1.6);
         return v;
     }
 

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "dangerzone:loot_bag_extractor" },
+    "facing=south": { "model": "dangerzone:loot_bag_extractor", "y": 180 },
+    "facing=west":  { "model": "dangerzone:loot_bag_extractor", "y": 270 },
+    "facing=east":  { "model": "dangerzone:loot_bag_extractor", "y": 90 }
+  }
+}

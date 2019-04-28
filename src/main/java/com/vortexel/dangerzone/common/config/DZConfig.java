@@ -77,10 +77,10 @@ public class DZConfig {
                 "If this is true, then players can build a mob grinder and get ores from it. Be careful."})
         public boolean doFakePlayersDropLoot = false;
 
-        @Comment({"The scale factor used to influence how the difficulty map is generated.",
+        @Comment({"The stretch factor used to influence how the difficulty map is generated.",
                 "DO NOT change this unless you really know what you are doing!"})
         @Config.RangeDouble(min = 0.000000001, max = 0.01)
-        public double scaleFactor = 0.001;
+        public double stretchFactor = 0.001;
 
         public void load(ConfigCategory cat) {
             ConfigHelper.loadAllCommented(this, cat);

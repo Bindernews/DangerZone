@@ -16,6 +16,11 @@ public class FakeWorldAdapter implements IWorldAdapter {
 
 
     @Override
+    public boolean isLocal() {
+        return true;
+    }
+
+    @Override
     public int getDimension() {
         return 0;
     }

@@ -34,7 +34,7 @@ public class CommonProxy {
     /**
      * Map dimension ID to the DifficultyMap.
      */
-    public Map<Integer, DifficultyMap> worldDifficultyMaps = Maps.newHashMap();
+    public Map<Integer, DifficultyMap> worldDifficultyMaps;
 
     public DifficultyAdjuster adjuster;
     public LootManager lootManager;
@@ -43,6 +43,7 @@ public class CommonProxy {
         // Create our object instances so they exist when other things try to use them.
         adjuster = new DifficultyAdjuster();
         lootManager = new LootManager();
+        worldDifficultyMaps = Maps.newHashMap();
 
         // Register the IDangerLevel capability
         CapabilityManager.INSTANCE.register(IDangerLevel.class, new DangerLevelStorage(), SimpleDangerLevel::new);

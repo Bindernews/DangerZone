@@ -1,11 +1,10 @@
 package com.vortexel.dangerzone.client;
 
 import com.google.common.collect.Maps;
-import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.common.CommonProxy;
 import com.vortexel.dangerzone.common.DangerMath;
-import com.vortexel.dangerzone.common.DifficultyMap;
 import com.vortexel.dangerzone.common.MCUtil;
+import com.vortexel.dangerzone.common.block.ModBlocks;
 import com.vortexel.dangerzone.common.item.ModItems;
 import lombok.val;
 import net.minecraft.client.Minecraft;
@@ -13,7 +12,6 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -70,12 +68,20 @@ public class Proxy extends CommonProxy {
         }
     }
 
-
-
     private void registerItemModels() {
         for (Item item : ModItems.ITEMS) {
-            ModelLoader.setCustomModelResourceLocation(item, 0,
-                    new ModelResourceLocation(item.getRegistryName().toString(), "inventory"));
+            registerItemModel(item);
         }
+        for (val block : ModBlocks.BLOCKS) {
+            val item = Item.getItemFromBlock(block);
+            if (item != null) {
+                registerItemModel(item);
+            }
+        }
+    }
+
+    private void registerItemModel(Item item) {
+        ModelLoader.setCustomModelResourceLocation(item, 0,
+                new ModelResourceLocation(item.getRegistryName().toString(), "inventory"));
     }
 }

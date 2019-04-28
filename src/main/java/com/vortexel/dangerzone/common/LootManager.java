@@ -4,7 +4,6 @@ import com.vortexel.dangerzone.DangerZone;
 import lombok.val;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraftforge.event.LootTableLoadEvent;
@@ -19,11 +18,10 @@ public class LootManager {
 
     @SubscribeEvent
     public void onLootLoad(LootTableLoadEvent event) {
-        if (event.getName().equals(ORE_LOOT_TABLE_RESOURCE)) {
+//        if (event.getName().equals(ORE_LOOT_TABLE_RESOURCE)) {
             // TODO dynamically add in all ores
-        }
+//        }
     }
-
 
     public Collection<ItemStack> getLootBagLoot(WorldServer worldIn, int level) {
         val lootTable = worldIn.getLootTableManager().getLootTableFromLocation(ORE_LOOT_TABLE_RESOURCE);

@@ -7,6 +7,7 @@ import lombok.val;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -54,12 +55,6 @@ public class MCUtil {
         return new ChunkPos(blockX >> 4, blockZ >> 4);
     }
 
-    public static EntityItem spawnItem(World worldIn, BlockPos pos, ItemStack stack) {
-        val eItem = new EntityItem(worldIn, pos.getX(), pos.getY(), pos.getZ(), stack);
-        worldIn.spawnEntity(eItem);
-        return eItem;
-    }
-
     public static String translationKey(String prefix, String... suffixes) {
         StringBuilder sb = new StringBuilder(prefix.length() + DangerZone.MOD_ID.length() + 2);
         sb.append(prefix);
@@ -83,6 +78,16 @@ public class MCUtil {
     public static EntityItem makeItemAt(Entity other, ItemStack stack) {
         val pos = other.getPosition();
         return new EntityItem(other.getEntityWorld(), pos.getX(), pos.getY(), pos.getZ(), stack);
+    }
+
+    public static EntityItem spawnItem(World worldIn, BlockPos pos, ItemStack stack) {
+        val eItem = new EntityItem(worldIn, pos.getX(), pos.getY(), pos.getZ(), stack);
+        worldIn.spawnEntity(eItem);
+        return eItem;
+    }
+
+    public static ResourceLocation makeResource(String location) {
+        return new ResourceLocation(DangerZone.MOD_ID, location);
     }
 
     private MCUtil() {}

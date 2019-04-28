@@ -35,10 +35,6 @@ public interface IWorldAdapter {
     /**
      * Returns the biome at block position (x, z), or the expected biome if the chunk containing the
      * coordinates hasn't been generated yet.
-     *
-     * @param x
-     * @param z
-     * @return
      */
     Biome getBiome(int x, int z);
 

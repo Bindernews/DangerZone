@@ -56,8 +56,8 @@ public class PacketDangerLevel implements IMessage {
         buf.writeInt(dimID);
         buf.writeInt(pos.x);
         buf.writeInt(pos.z);
-        for (int i = 0; i < levels.length; i++) {
-            buf.writeFloat(levels[i]);
+        for (float level : levels) {
+            buf.writeFloat(level);
         }
     }
 
