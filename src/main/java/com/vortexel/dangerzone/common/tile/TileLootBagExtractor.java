@@ -28,7 +28,7 @@ public class TileLootBagExtractor extends TileEntity implements ITickable {
 
     private static final String LOOT_BUFFER_KEY = "LootBuffer";
 
-    public static final ResourceLocation RESOURCE_LOCATION = MCUtil.makeResource("machine_loot_bag_extractor");
+    public static final ResourceLocation RESOURCE_LOCATION = DangerZone.prefix("machine_loot_bag_extractor");
 
     public static final SlotConfig[] SLOT_CONFIGS = new SlotConfig[5];
     static {
@@ -127,7 +127,7 @@ public class TileLootBagExtractor extends TileEntity implements ITickable {
             val bag = inventory.bypassExtract(0, 1, false);
             final int level = ItemLootBag.getLootBagLevel(bag);
             if (level > 0) {
-                lootBuffer.addAll(DangerZone.proxy.lootManager.getLootBagLoot((WorldServer)getWorld(), level));
+                lootBuffer.addAll(DangerZone.proxy.getLootManager().getLootBagLoot((WorldServer)getWorld(), level));
             }
         }
     }

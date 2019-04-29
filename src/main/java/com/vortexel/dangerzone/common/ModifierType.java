@@ -7,11 +7,12 @@ public enum ModifierType {
     ATTACK_DAMAGE,
     ATTACK_SPEED,
 
-    MOVEMENT_SPEED,
-    FLYING_SPEED,
+    MOVE_SPEED,
+    FLY_SPEED,
 
     ARMOR,
     ARMOR_TOUGHNESS,
 
     WITHER,
+    EXPLOSION_RADIUS,
 }

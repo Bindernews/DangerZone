@@ -13,10 +13,10 @@ import net.minecraft.util.math.MathHelper;
 @Data
 public class SimpleDangerLevel implements IDangerLevel {
     @Getter
-    private int danger = 0;
+    private int danger = -1;
 
     @Override
     public void setDanger(int v) {
-        danger = MathHelper.clamp(v, 0, DZConfig.general.maxDangerLevel);
+        danger = MathHelper.clamp(v, -1, DZConfig.general.maxDangerLevel);
     }
 }

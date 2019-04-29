@@ -4,6 +4,7 @@ import com.vortexel.dangerzone.common.config.DZConfig;
 import lombok.val;
 import net.minecraft.util.math.MathHelper;
 
+import javax.annotation.Nonnull;
 import java.util.Random;
 
 /**
@@ -19,15 +20,23 @@ public class DangerMath {
         return (double)level * multiplierStep();
     }
 
-    public static double randomDanger(int level, Random rng) {
-        return randomDanger(level, level + 1, rng);
+    public static double dangerDouble(double scaledLevel) {
+        return scaledLevel * multiplierStep();
     }
 
-    public static double randomDanger(int levelMin, int levelMax, Random rng) {
+    public static double divideSub(double a, double b, double min) {
+        return (a - min) / (b - min);
+    }
+
+    public static double randomDanger(Random rng, int levelMin, int levelMax) {
         final int maxDanger = maxDangerLevel();
         val min = dangerDouble(MathHelper.clamp(levelMin, 0, maxDanger));
         val max = dangerDouble(MathHelper.clamp(levelMax, 0, maxDanger + 1));
-        return nextDoubleRange(rng, min, max);
+        return randRange(rng, min, max);
+    }
+
+    public static double scale(double v, double min, double max) {
+        return (v * (max - min)) + min;
     }
 
     /**
@@ -45,7 +54,7 @@ public class DangerMath {
         val min = dangerDouble(minCutoff);
         val max = dangerDouble(maxDangerLevel() + 1);
         val threshold = dangerDouble(level);
-        val amount = nextDoubleRange(rng, min, max) * effectChance;
+        val amount = randRange(rng, min, max) * effectChance;
         return amount <= threshold ? amount : 0;
     }
 
@@ -62,8 +71,12 @@ public class DangerMath {
        return Math.floor(d * multiplier) / multiplier;
     }
 
-    public static double nextDoubleRange(Random rng, double min, double max) {
-        return (rng.nextDouble() * (max - min)) + min;
+    public static double randRange(@Nonnull Random rng, double min, double max) {
+        return scale(rng.nextDouble(), min, max);
+    }
+
+    public static double randRange(@Nonnull Random rng, double max) {
+        return randRange(rng, 0, max);
     }
 
     /**

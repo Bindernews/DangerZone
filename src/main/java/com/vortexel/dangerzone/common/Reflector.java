@@ -91,6 +91,19 @@ public final class Reflector {
         }
     }
 
+    public static boolean hasField(Object instance, String name) {
+        return hasField(instance.getClass(), name);
+    }
+
+    public static boolean hasField(Class<?> clazz, String name) {
+        try {
+            clazz.getField(name);
+            return true;
+        } catch (NoSuchFieldException e) {
+            return false;
+        }
+    }
+
     public static <T> void setField(Object obj, String name, T value) {
         try {
             val f = obj.getClass().getField(name);

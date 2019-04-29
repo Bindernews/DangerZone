@@ -1,7 +1,8 @@
 package com.vortexel.dangerzone.common.network;
 
 import com.vortexel.dangerzone.DangerZone;
-import com.vortexel.dangerzone.client.Proxy;
+import com.vortexel.dangerzone.client.ClientProxy;
+import com.vortexel.dangerzone.common.Consts;
 import com.vortexel.dangerzone.common.MCUtil;
 import io.netty.buffer.ByteBuf;
 import lombok.val;
@@ -23,14 +24,14 @@ public class PacketDangerLevel implements IMessage {
     public PacketDangerLevel(World worldIn, ChunkPos pos) {
         this.dimID = worldIn.provider.getDimension();
         this.pos = pos;
-        this.levels = new float[MCUtil.CHUNK_SIZE_SQ];
+        this.levels = new float[Consts.CHUNK_SIZE_SQ];
 
         // fill in levels
         if (MCUtil.isWorldLocal(worldIn)) {
             val dMap = DangerZone.proxy.getDifficultyMap(worldIn);
-            for (int z = 0; z < MCUtil.CHUNK_SIZE; z++) {
-                for (int x = 0; x < MCUtil.CHUNK_SIZE; x++) {
-                    levels[(z * MCUtil.CHUNK_SIZE) + x] = (float)dMap.getDifficulty(
+            for (int z = 0; z < Consts.CHUNK_SIZE; z++) {
+                for (int x = 0; x < Consts.CHUNK_SIZE; x++) {
+                    levels[(z * Consts.CHUNK_SIZE) + x] = (float)dMap.getDifficulty(
                             pos.getXStart() + x, pos.getZStart() + z);
                 }
             }
@@ -45,7 +46,7 @@ public class PacketDangerLevel implements IMessage {
         int chunkX = buf.readInt();
         int chunkZ = buf.readInt();
         pos = new ChunkPos(chunkX, chunkZ);
-        levels = new float[MCUtil.CHUNK_SIZE_SQ];
+        levels = new float[Consts.CHUNK_SIZE_SQ];
         for (int i = 0; i < levels.length; i++) {
             levels[i] = buf.readFloat();
         }
@@ -64,8 +65,8 @@ public class PacketDangerLevel implements IMessage {
     public static class Handler implements IMessageHandler<PacketDangerLevel, IMessage> {
         @Override
         public IMessage onMessage(final PacketDangerLevel message, final MessageContext ctx) {
-            if (DangerZone.proxy instanceof Proxy) {
-                val proxy = (Proxy)DangerZone.proxy;
+            if (DangerZone.proxy instanceof ClientProxy) {
+                val proxy = (ClientProxy)DangerZone.proxy;
                 val cache = proxy.getDifficultyMapCache(message.dimID);
                 cache.updateDifficulty(message.pos, message.levels);
             }

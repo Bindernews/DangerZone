@@ -9,6 +9,7 @@ import com.vortexel.dangerzone.common.config.DZConfig;
 import com.vortexel.dangerzone.common.item.ModItems;
 import com.vortexel.dangerzone.common.tile.ModTiles;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.config.Configuration;
@@ -32,8 +33,8 @@ public class DangerZone {
     public static final String NAME = "@MOD_NAME@";
     public static final String VERSION = "@VERSION@";
 
-    public static final String PROXY_CLIENT = "com.vortexel.dangerzone.client.Proxy";
-    public static final String PROXY_SERVER = "com.vortexel.dangerzone.server.Proxy";
+    public static final String PROXY_CLIENT = "com.vortexel.dangerzone.client.ClientProxy";
+    public static final String PROXY_SERVER = "com.vortexel.dangerzone.common.CommonProxy";
 
     // These are all public static values so Forge can inject them and they can be accessed easily
     // by other classes in the mod. Poor design. Big sad.
@@ -95,5 +96,9 @@ public class DangerZone {
     public void postInit(FMLPostInitializationEvent e) {
         proxy.postInit(e);
         log.info("PostInit complete");
+    }
+
+    public static ResourceLocation prefix(String resourcePath) {
+        return new ResourceLocation(DangerZone.MOD_ID, resourcePath);
     }
 }

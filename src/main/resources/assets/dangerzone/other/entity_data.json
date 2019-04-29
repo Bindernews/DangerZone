@@ -1,0 +1,50 @@
+{
+  "generic:creature": {
+    "move_speed": {
+      "max": [3, "*"],
+      "max_level": 15
+    },
+    "fly_speed": {
+      "max": [3, "*"],
+      "max_level": 15
+    },
+    "max_health": {
+      "danger_scale": 0.5,
+      "chance": [0.8, 1.0],
+      "scale": 1.0
+    },
+    "regeneration": {
+      "min_level": 10
+    },
+    "attack_damage": false,
+    "wither": false,
+    "armor": false
+  },
+  "generic:animal": {
+    "inherits": "generic:creature"
+  },
+  "generic:hostile": {
+    "inherits": "generic:creature",
+    "attack_damage": {
+      "chance": [0.4, 1.0],
+      "scale": 0.5
+    },
+    "wither": {
+      "max": [5, "="],
+      "min_level": 12
+    },
+    "attack_speed": {
+      "scale": 0.1
+    }
+  },
+  "minecraft:horse": {
+    "inherits": "generic_peaceful"
+  },
+  "minecraft:creeper": {
+    "inherits": "generic:hostile",
+    "move_speed": {
+      "max": [1.5, "*"]
+    },
+    "explosion_radius": true
+  }
+}

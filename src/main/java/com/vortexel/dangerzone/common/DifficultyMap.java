@@ -20,8 +20,6 @@ import java.util.WeakHashMap;
 public class DifficultyMap {
 
     private static final int NEIGHBOR_SIZE = 5;
-    private static final int CHUNK_SIZE = 16;
-    private static final double NOT_ONE = 1.0 - 1e-20;
 
     private IWorldAdapter world;
     private NoiseGeneratorPerlin generator;
@@ -76,7 +74,7 @@ public class DifficultyMap {
     }
 
     private double adjustClamp(double d, int x, int z) {
-        return MathHelper.clamp(d, 0.0, NOT_ONE);
+        return MathHelper.clamp(d, 0.0, Consts.NOT_ONE);
     }
 
     private double adjustIndividual(double d, int x, int z) {
@@ -98,7 +96,8 @@ public class DifficultyMap {
 
         for (int zo = 0; zo < NEIGHBOR_SIZE; zo++) {
             for (int xo = 0; xo < NEIGHBOR_SIZE; xo++) {
-                final ChunkPos key = new ChunkPos((minX + xo) / CHUNK_SIZE, (minZ + zo) / CHUNK_SIZE);
+                final ChunkPos key = new ChunkPos((minX + xo) / Consts.CHUNK_SIZE,
+                        (minZ + zo) / Consts.CHUNK_SIZE);
                 ChunkDifficultyData cdd = computeChunkInfo(key);
                 if (BiomeComparator.equal(targetBiome, cdd.getBiome())) {
                     sumDifficulty += cdd.getDifficulty();
@@ -124,7 +123,7 @@ public class DifficultyMap {
             DangerZone.log.warn("Noise value outside range " + v);
         }
         // Bind v to [0, 1)
-        v = (MathHelper.clamp(v, -1, NOT_ONE) + 1) / 2.0;
+        v = (MathHelper.clamp(v, -1, Consts.NOT_ONE) + 1) / 2.0;
         // v = v^2 to make lower difficulties more common
         v = Math.pow(v, 1.6);
         return v;

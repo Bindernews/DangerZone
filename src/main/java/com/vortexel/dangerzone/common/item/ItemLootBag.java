@@ -60,7 +60,7 @@ public class ItemLootBag extends BaseItem {
         final int level = getLootBagLevel(stack);
         stack.grow(-1);
         if (level > 0) {
-            val lootIter = DangerZone.proxy.lootManager.getLootBagLoot(world, level).iterator();
+            val lootIter = DangerZone.proxy.getLootManager().getLootBagLoot(world, level).iterator();
             ItemStack unplacedStack = null;
             // Keep going until we run out of items or space in the inventory
             while (lootIter.hasNext() && unplacedStack == null) {

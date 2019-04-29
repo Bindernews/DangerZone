@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.Map;
 
-public class Proxy extends CommonProxy {
+public class ClientProxy extends CommonProxy {
 
     private Map<Integer, DifficultyMapCache> worldDifficultyCaches = Maps.newHashMap();
 

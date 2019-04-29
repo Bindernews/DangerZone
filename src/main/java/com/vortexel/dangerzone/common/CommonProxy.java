@@ -1,16 +1,21 @@
 package com.vortexel.dangerzone.common;
 
 import com.google.common.collect.Maps;
+import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.common.capability.DangerLevelProvider;
 import com.vortexel.dangerzone.common.capability.DangerLevelStorage;
 import com.vortexel.dangerzone.common.capability.IDangerLevel;
 import com.vortexel.dangerzone.common.capability.SimpleDangerLevel;
+import com.vortexel.dangerzone.common.config.EntityConfigManager;
 import com.vortexel.dangerzone.common.network.PacketDangerLevel;
 import com.vortexel.dangerzone.common.network.PacketHandler;
+import lombok.Getter;
 import lombok.val;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraftforge.common.MinecraftForge;
@@ -23,6 +28,8 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Map;
 
 /**
@@ -36,13 +43,18 @@ public class CommonProxy {
      */
     public Map<Integer, DifficultyMap> worldDifficultyMaps;
 
-    public DifficultyAdjuster adjuster;
-    public LootManager lootManager;
+    @Getter
+    protected DifficultyAdjuster adjuster;
+    @Getter
+    protected LootManager lootManager;
+    @Getter
+    protected EntityConfigManager entityConfigManager;
 
     public void preInit(FMLPreInitializationEvent e) {
         // Create our object instances so they exist when other things try to use them.
         adjuster = new DifficultyAdjuster();
         lootManager = new LootManager();
+        entityConfigManager = new EntityConfigManager();
         worldDifficultyMaps = Maps.newHashMap();
 
         // Register the IDangerLevel capability
@@ -56,9 +68,16 @@ public class CommonProxy {
     public void init(FMLInitializationEvent e) {
         MinecraftForge.EVENT_BUS.register(adjuster);
         MinecraftForge.EVENT_BUS.register(lootManager);
+
+        entityConfigManager.addFile(openResource("assets/dangerzone/other/entity_data.json"));
+        entityConfigManager.bake();
     }
 
     public void postInit(FMLPostInitializationEvent e) {
+    }
+
+    private Reader openResource(String path) {
+        return new InputStreamReader(getClass().getClassLoader().getResourceAsStream(path));
     }
 
     public double getDifficulty(World world, int x, int z) {
