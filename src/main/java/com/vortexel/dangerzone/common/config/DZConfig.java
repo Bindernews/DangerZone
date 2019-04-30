@@ -2,6 +2,7 @@ package com.vortexel.dangerzone.common.config;
 
 import com.google.common.collect.Maps;
 import com.vortexel.dangerzone.DangerZone;
+import com.vortexel.dangerzone.common.Consts;
 import lombok.SneakyThrows;
 import lombok.val;
 import net.minecraftforge.common.config.Config;
@@ -24,7 +25,6 @@ public class DZConfig {
      */
     public static class C {
         public static final String WORLDS_PREFIX = "worlds";
-        public static final int REAL_MAX_DANGER_LEVEL = (1 << 15);
     }
 
     @Comment({"General settings which apply to the mod as a whole."})
@@ -60,11 +60,11 @@ public class DZConfig {
 
         @Comment({"The maximum danger level. An enemy's difficulty can be anywhere within its danger level",
                 "so the number of levels should be proportional to the danger multiplier."})
-        @Config.RangeInt(min = 1, max = C.REAL_MAX_DANGER_LEVEL)
+        @Config.RangeInt(min = 1, max = Consts.MAX_DANGER_LEVEL)
         public int maxDangerLevel = 20;
 
         @Comment({"The maximum danger multiplier. Make this higher to make the toughest enemies tougher."})
-        @Config.RangeDouble(min = 1.0, max = C.REAL_MAX_DANGER_LEVEL)
+        @Config.RangeDouble(min = 1.0, max = Consts.MAX_DANGER_LEVEL)
         public double dangerMultiplier = 10.0;
 
         @Comment({"Should the increased looting level be applied even if the mob wasn't killed by a player?"})
@@ -89,24 +89,9 @@ public class DZConfig {
 
     public static class Effects implements ConfigHelper.Loadable {
 
-        @Comment({"How much health is gained for each added difficulty point."})
-        public double healthScaling = 0.5;
-
-        @Comment({"The minimum danger level where enemies can start having haste."})
-        @Config.RangeInt(min = 1, max = C.REAL_MAX_DANGER_LEVEL)
-        public int hasteLevel = 10;
-
-        @Comment({"The chance of applying haste at the maximum danger level. This will scale to lower levels."})
-        @Config.RangeDouble(min = 0.0, max = 1.0)
-        public double hasteChance = 0.6;
-
-        @Comment({"The minimum danger level where enemies can regenerate health."})
-        @Config.RangeInt(min = 1, max = C.REAL_MAX_DANGER_LEVEL)
-        public int regenLevel = 16;
-
-        @Comment({"The chance of applying regeneration at the maximum danger level. This will scale to lower levels."})
-        @Config.RangeDouble(min = 0.0, max = 1.0)
-        public double regenChance = 0.7;
+        @Comment({"The duration (in seconds) of the Wither effect inflicted by decay-touch."})
+        @Config.RangeDouble(min = 0.0)
+        public double decayTouchTime = 4.0;
 
         public void load(ConfigCategory cat) {
             ConfigHelper.loadAllCommented(this, cat);

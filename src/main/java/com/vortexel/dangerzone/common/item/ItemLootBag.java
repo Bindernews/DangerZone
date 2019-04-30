@@ -1,6 +1,7 @@
 package com.vortexel.dangerzone.common.item;
 
 import com.vortexel.dangerzone.DangerZone;
+import com.vortexel.dangerzone.common.Consts;
 import com.vortexel.dangerzone.common.FnUtil;
 import com.vortexel.dangerzone.common.MCUtil;
 import com.vortexel.dangerzone.common.config.DZConfig;
@@ -114,7 +115,7 @@ public class ItemLootBag extends BaseItem {
      */
     public static void setLootBagLevel(ItemStack stack, int level) {
         if (stack.getItem() instanceof ItemLootBag) {
-            Validate.inclusiveBetween(0, DZConfig.C.REAL_MAX_DANGER_LEVEL, level);
+            Validate.inclusiveBetween(0, Consts.MAX_DANGER_LEVEL, level);
             val tag = FnUtil.orElse(stack.getTagCompound(), new NBTTagCompound());
             tag.setInteger(BAG_LEVEL_KEY, level);
             stack.setTagCompound(tag);

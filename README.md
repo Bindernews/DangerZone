@@ -7,6 +7,12 @@ the Minecraft world making normal enemies a real challenge again, even if you ha
 With great risk comes great reward, and the rewards are certainly great. Rare and special loot drops, extra
 normal loot drops, and probably other things I haven't thought of yet.
 
+### Summoning
+When using `/summon` to summon an entity, its level may be modified by adding
+`ForgeCaps:{"dangerzone:level":<LEVEL>}` to your data tag. Replace `<LEVEL>` with the desired
+danger level of the entity.
+
+
 # Status
 This mod is absolutely a Work In Progress. This isn't even alpha. There are a lot of planned features, but
 coding takes time.

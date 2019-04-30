@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 
 public class BlockLootBagExtractor extends BaseBlock {
 
-    public static final PropertyDirection FACING = BlockHorizontal.FACING;
+    public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
 
     public BlockLootBagExtractor() {
         super(BlockInfo.builder("loot_bag_extractor")

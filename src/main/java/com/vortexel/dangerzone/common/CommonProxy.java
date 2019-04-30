@@ -1,21 +1,18 @@
 package com.vortexel.dangerzone.common;
 
 import com.google.common.collect.Maps;
-import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.common.capability.DangerLevelProvider;
 import com.vortexel.dangerzone.common.capability.DangerLevelStorage;
 import com.vortexel.dangerzone.common.capability.IDangerLevel;
-import com.vortexel.dangerzone.common.capability.SimpleDangerLevel;
 import com.vortexel.dangerzone.common.config.EntityConfigManager;
 import com.vortexel.dangerzone.common.network.PacketDangerLevel;
 import com.vortexel.dangerzone.common.network.PacketHandler;
 import lombok.Getter;
 import lombok.val;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraftforge.common.MinecraftForge;
@@ -58,7 +55,7 @@ public class CommonProxy {
         worldDifficultyMaps = Maps.newHashMap();
 
         // Register the IDangerLevel capability
-        CapabilityManager.INSTANCE.register(IDangerLevel.class, new DangerLevelStorage(), SimpleDangerLevel::new);
+        CapabilityManager.INSTANCE.register(IDangerLevel.class, new DangerLevelStorage(), IDangerLevel.Basic::new);
         // Register ourselves so we can receive events.
         MinecraftForge.EVENT_BUS.register(this);
         // Register our ore loot table
@@ -105,8 +102,12 @@ public class CommonProxy {
 
     @SubscribeEvent
     public void onRegisterCapabilities(AttachCapabilitiesEvent<Entity> e) {
-        if (e.getObject() instanceof EntityCreature && !(e.getObject() instanceof EntityPlayer)) {
-            e.addCapability(IDangerLevel.RESOURCE_LOCATION, new DangerLevelProvider());
+        if (e.getObject() instanceof EntityLivingBase) {
+            val eLiving = (EntityLivingBase)e.getObject();
+            if (!(eLiving instanceof EntityPlayer)) {
+                e.addCapability(IDangerLevel.RESOURCE_LOCATION, new DangerLevelProvider());
+            }
+            eLiving.getAttributeMap().registerAttribute(Consts.ATTRIBUTE_DECAY_TOUCH);
         }
     }
 

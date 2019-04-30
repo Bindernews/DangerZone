@@ -1,6 +1,7 @@
 package com.vortexel.dangerzone.common;
 
 import com.vortexel.dangerzone.DangerZone;
+import com.vortexel.dangerzone.common.config.BiomeConfig;
 import com.vortexel.dangerzone.common.config.DZConfig;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -93,13 +94,14 @@ public class DifficultyMap {
         Biome targetBiome = world.getBiome(x, z);
         double sumDifficulty = 0.0;
         int usedCount = 0;
+        final int targetBiomeId = Biome.getIdForBiome(targetBiome);
 
         for (int zo = 0; zo < NEIGHBOR_SIZE; zo++) {
             for (int xo = 0; xo < NEIGHBOR_SIZE; xo++) {
                 final ChunkPos key = new ChunkPos((minX + xo) / Consts.CHUNK_SIZE,
                         (minZ + zo) / Consts.CHUNK_SIZE);
                 ChunkDifficultyData cdd = computeChunkInfo(key);
-                if (BiomeComparator.equal(targetBiome, cdd.getBiome())) {
+                if (BiomeConfig.areGrouped(targetBiomeId, Biome.getIdForBiome(cdd.getBiome()))) {
                     sumDifficulty += cdd.getDifficulty();
                     usedCount += 1;
                 }

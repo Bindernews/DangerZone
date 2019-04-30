@@ -23,8 +23,8 @@ import static com.vortexel.dangerzone.common.DangerMath.randRange;
  */
 public class EntityAdjuster {
 
-    private static final int OP_ADD = 1;
-    private static final int OP_MULTIPLY = 2;
+    private static final int OP_ADD = 0;
+    private static final int OP_MULTIPLY = 1;
     private static final String FIELD_EXPLOSION_RADIUS = "explosionRadius";
     private static final double BAD_MODIFIER = -1;
 
@@ -32,7 +32,6 @@ public class EntityAdjuster {
 
     @Getter
     private int level;
-    private double rawDanger;
 
     public EntityAdjuster(EntityLivingBase entity) {
         this.entity = entity;
@@ -44,15 +43,21 @@ public class EntityAdjuster {
         if (dangerLevelCap == null) {
             return;
         }
+
         // Don't modify an entity that's already been modified
-        if (dangerLevelCap.getDanger() != -1) {
+        if (dangerLevelCap.isModified()) {
             return;
         }
+        // Remind ourselves that we've been modified later on
+        dangerLevelCap.setModified(true);
 
-        // Calculate the danger level for this entity
-        val ePos = entity.getPosition();
-        rawDanger = DangerZone.proxy.getDifficulty(entity.getEntityWorld(), ePos.getX(), ePos.getZ());
-        level = DangerMath.dangerLevel(rawDanger);
+        // Determine the danger level for this entity
+        level = dangerLevelCap.getDanger();
+        // If we don't have a pre-provided value, generate one.
+        if (level == -1) {
+            level = generateDangerLevel();
+        }
+        // Whatever we decided, update the existing danger level.
         dangerLevelCap.setDanger(level);
 
         // If level == 0 then we don't change anything.
@@ -112,7 +117,7 @@ public class EntityAdjuster {
         // If we want the threshold to not account for the minLevel, that would change the math.
         val chanceLevel = DangerMath.divideSub(level, trueMaxLevel, minLevel);
         val threshold = DangerMath.scale(chanceLevel / trueMaxLevel, conf.minChance, conf.maxChance);
-        val chanceRand = randRange(rng, (trueMaxLevel - minLevel) / trueMaxLevel);
+        double chanceRand = randRange(rng, (trueMaxLevel - minLevel) / trueMaxLevel);
         if (chanceRand > threshold) {
             return 0;
         }
@@ -137,6 +142,11 @@ public class EntityAdjuster {
         }
     }
 
+    private int generateDangerLevel() {
+        val ePos = entity.getPosition();
+        val rawDanger = DangerZone.proxy.getDifficulty(entity.getEntityWorld(), ePos.getX(), ePos.getZ());
+        return DangerMath.dangerLevel(rawDanger);
+    }
 
     private Consumer<Double> selectApplicator(ModifierType modifier) {
         switch (modifier) {
@@ -159,6 +169,7 @@ public class EntityAdjuster {
             case EXPLOSION_RADIUS:
                 return this::applyExplosionRadius;
             case WITHER:
+                return this::applyWither;
             default:
                 return null;
         }
@@ -230,6 +241,11 @@ public class EntityAdjuster {
         if (Reflector.hasField(entity, FIELD_EXPLOSION_RADIUS)) {
             Reflector.computeField(entity, FIELD_EXPLOSION_RADIUS, (Integer v) -> v + (int)amount);
         }
+    }
+
+    private void applyWither(double amount) {
+        applyAttributeModifier(Consts.ATTRIBUTE_DECAY_TOUCH, Consts.MODIFIER_DECAY_TOUCH_UUID,
+                "decay-touch", amount, OP_ADD);
     }
 
     //endregion

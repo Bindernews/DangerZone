@@ -10,7 +10,10 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -19,7 +22,9 @@ import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootTable;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.living.LootingLevelEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -54,7 +59,29 @@ public class DifficultyAdjuster {
         adjustEntityDifficulty(e.getEntity());
     }
 
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onEntityAttacked(LivingDamageEvent e) {
+        val source = e.getSource().getTrueSource();
+        if (source instanceof EntityLivingBase) {
+            implementDecayTouch(e.getEntityLiving(), (EntityLivingBase)source);
+        }
+    }
+
     //endregion Event handlers
+
+    /**
+     * Call this to actually implement the effects of Decay Touch. <br/>
+     * @param target the {@link EntityLivingBase} being attacked
+     * @param source the {@link EntityLivingBase} doing the attacking
+     */
+    public void implementDecayTouch(EntityLivingBase target, EntityLivingBase source) {
+        val inst = source.getAttributeMap().getAttributeInstance(Consts.ATTRIBUTE_DECAY_TOUCH);
+        if (inst != null) {
+            val duration = (int)(Consts.TICKS_PER_SECOND * DZConfig.effects.decayTouchTime);
+            target.addPotionEffect(new PotionEffect(MobEffects.WITHER, duration, (int)inst.getAttributeValue(),
+                    false, false));
+        }
+    }
 
     /**
      * Adds additional bonus drops to the entity. This doesn't deal with increasing their default drops

@@ -27,13 +27,15 @@ public class ClientProxy extends CommonProxy {
 
     @SubscribeEvent
     public void onDebugOverlay(RenderGameOverlayEvent.Text e) {
-        EntityPlayerSP ep = Minecraft.getMinecraft().player;
-        BlockPos bp = new BlockPos(ep.posX, 60.0, ep.posZ);
+        if (Minecraft.getMinecraft().gameSettings.showDebugInfo) {
+            EntityPlayerSP ep = Minecraft.getMinecraft().player;
+            BlockPos bp = new BlockPos(ep.posX, 60.0, ep.posZ);
 
-        val danger = getDifficulty(ep.getEntityWorld(), bp.getX(), bp.getZ());
-        e.getLeft().add("Difficulty: " + danger);
-        e.getLeft().add("Level: " + DangerMath.dangerLevel(danger));
-//        e.getLeft().add("Chunk Difficulty: " + dmap.getChunkDifficulty(new ChunkPos(bp)));
+            val danger = getDifficulty(ep.getEntityWorld(), bp.getX(), bp.getZ());
+            e.getLeft().add("Difficulty: " + danger);
+            e.getLeft().add("Level: " + DangerMath.dangerLevel(danger));
+//            e.getLeft().add("Chunk Difficulty: " + dmap.getChunkDifficulty(new ChunkPos(bp)));
+        }
     }
 
     @Override

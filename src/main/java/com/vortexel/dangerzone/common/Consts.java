@@ -1,8 +1,12 @@
 package com.vortexel.dangerzone.common;
 
+import net.minecraft.entity.ai.attributes.RangedAttribute;
+
 import java.util.UUID;
 
 public final class Consts {
+
+    public static final int MAX_DANGER_LEVEL = (1 << 15);
 
     public static final UUID MODIFIER_MAX_HEALTH_UUID = UUID.fromString("6d9f6292-6e4c-42a1-b538-53be07b3b076");
     public static final UUID MODIFIER_MOVE_SPEED_UUID = UUID.fromString("1bb0a9c6-622b-4327-92df-c3811013ea51");
@@ -11,6 +15,14 @@ public final class Consts {
     public static final UUID MODIFIER_ATTACK_SPEED_UUID = UUID.fromString("9c7bd5e9-f98c-4af5-9811-03a5fc4a1da8");
     public static final UUID MODIFIER_ARMOR_UUID = UUID.fromString("6bdc3d1a-6baf-4ece-9ce7-8ed5ce139582");
     public static final UUID MODIFIER_ARMOR_TOUGHNESS_UUID = UUID.fromString("6a5ca8e0-3e1c-4e11-a213-6a9efe516552");
+    public static final UUID MODIFIER_DECAY_TOUCH_UUID = UUID.fromString("91cfb822-be8a-4ba9-adf3-cfae53d77973");
+
+    public static final RangedAttribute ATTRIBUTE_DECAY_TOUCH = new RangedAttribute(null,
+            "effect.decayTouch", 0, 0, 5.0);
+    public static final RangedAttribute ATTRIBUTE_DANGER_LEVEL = new RangedAttribute(null,
+            "dangerzone.level", -1, -1, MAX_DANGER_LEVEL);
+
+    public static final int TICKS_PER_SECOND = 20;
 
     public static final int CHUNK_SIZE = 16;
     public static final int CHUNK_SIZE_SQ = CHUNK_SIZE * CHUNK_SIZE;
