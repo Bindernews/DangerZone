@@ -18,6 +18,18 @@ but wouldn't work with the vision I have.
   armor interesting again, not to turn Minecraft into an RPG
 - 
 
+# Enemy Ideas
+### Lion-Man
+A giant (3.5 blocks tall, 1.5 blocks wide) lion-man. This is absolutely inspired
+by Lynels from Breath of the Wild. Lion-Men are bipedal creatures that have the
+head of a lion and the body of an MMA heavyweight fighter. They wield large swords
+or clubs and powerful, enchanted bows. Also they can break blocks. You should
+be scared. Very scared.
+
+### Harpy
+These flying creatures are skilled at arial combat, but move slowly when on
+the ground. You also will almost never fight one at a time. If you can't fly,
+I would avoid them. 
 
 # Structure Ideas
 ## Harpy Nest
@@ -28,7 +40,7 @@ for players with creative flight.
 A series of "fight rooms" where you have to fight groups of zombies protecting
 the dead and the treasure buried there.
 
-Bosses:
+### Bosses
 - Lich - undead sorcerer who controls zombies and uses magic
 - General - A strong melee fighter with powerful armor and weapons
 
@@ -36,7 +48,7 @@ Bosses:
 A sprawling, above-ground building with many rooms and passageways. Some
 terrible tragedy long ago bound the souls of its inhabitants here forever.
 
-Enemies:
+### Enemies
 - Guard - An undead guard who will protect their lord for eternity.
   Has iron armor and weaponry.
 - Elite Guard - An elite guard for the lord of the castle. Uses diamond
@@ -44,7 +56,7 @@ Enemies:
 - Archer - They make approaching the castle difficult for the unprepared.
 - Servant - A simple servant who wields a knife.
 
-Bosses:
+### Bosses
 - Demon - In the depths of the castle, beneath a hidden passageway, some
   fool tried to summon a demon! To prevent its escape, the castle was cursed
   so none of the inhabitants could leave.
@@ -59,7 +71,7 @@ Bosses:
 
 ## Catacombs
 
-Bosses:
+### Bosses
 - Dead Hand - This is Dead Hand from Ocarina of Time. Not straight up, because that would be
   copyright infringement, but that's the general idea.
 - 
@@ -72,14 +84,14 @@ witches. That's basically it.
 ## Whirlpool
 An, initially small, whirlpool in the ocean. Once you get close a sea monster spawns!
 
-Bosses:
+### Bosses:
 - Whirlpool Kraken
 - 
 
 ## Sunken City
 It's R'leth. 
 
-Bosses:
+### Bosses
 - Cthulhu
 - Azathoh
 
@@ -88,12 +100,12 @@ This is basically Innsmouth. Under the village are caves filled with various non
 horrors. Deep in the caves you can find ritual circles, and potentially a portal to a boss
 fight.
 
-Ideas:
+### Ideas
 - You have a limited amount of time to interrupt a ritual. If you fail, you are immediately
   forced to fight the boss. If you succeed, then you can open a "weakened" portal, and
   the boss fight becomes easier.
 
-Bosses:
+### Bosses
 - Cthulhu
 - Azathoth
 - Kraken

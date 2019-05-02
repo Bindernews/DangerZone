@@ -1,4 +1,4 @@
-package com.vortexel.dangerzone.common;
+package com.vortexel.dangerzone.common.util;
 
 import java.util.function.Supplier;
 

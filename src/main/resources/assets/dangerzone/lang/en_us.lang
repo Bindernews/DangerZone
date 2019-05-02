@@ -1,5 +1,6 @@
 # Items
 item.dangerzone:loot_bag.name=Loot Bag
 item.dangerzone:loot_bag.tooltip=Level %1$s
-
+item.dangerzone:loot_coin_1.name=Loot Coin x1
+item.dangerzone:loot_coin_9.name=Loot Coin x9
 

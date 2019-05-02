@@ -1,4 +1,4 @@
-package com.vortexel.dangerzone.common;
+package com.vortexel.dangerzone.common.util;
 
 import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.common.capability.IDangerLevel;

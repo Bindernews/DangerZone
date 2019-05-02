@@ -10,16 +10,19 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "0.1.0"
-group = "com.vortexel.dangerzone" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+def username = "DangerZone"
+
+version = "${minecraft_version}-${mod_version}"
+group = "com.vortexel.dangerzone"
 archivesBaseName = "dangerzone"
 
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
 minecraft {
-    version = "1.12.2-14.23.5.2768"
+    version = "${minecraft_version}-${forge_version}"
     runDir = "run"
+    clientRunArgs += "--username=${username}"
 
     // This replaces
     replace "@VERSION@", project.version
@@ -32,7 +35,7 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20171003"
+    mappings = mcp_mapping
 }
 
 dependencies {

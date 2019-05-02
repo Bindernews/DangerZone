@@ -23,6 +23,15 @@ public final class Consts {
             "dangerzone.level", -1, -1, MAX_DANGER_LEVEL);
 
     public static final int TICKS_PER_SECOND = 20;
+    public static final int TICKS_PER_DAY = TICKS_PER_SECOND * 60 * 60 * 24;
+    public static final int DAYS_PER_YEAR = 365;
+    public static final int TICKS_PER_YEAR = TICKS_PER_DAY * DAYS_PER_YEAR;
+
+    /**
+     * The duration to use if you want a potion to last effectively forever. Technically this will make a potion
+     * last for 3 years, which is the longest number of years I can get without overflowing an integer.
+     */
+    public static final int POTION_DURATION_FOREVER = TICKS_PER_YEAR * 3;
 
     public static final int CHUNK_SIZE = 16;
     public static final int CHUNK_SIZE_SQ = CHUNK_SIZE * CHUNK_SIZE;

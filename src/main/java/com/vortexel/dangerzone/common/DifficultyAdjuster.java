@@ -2,8 +2,8 @@ package com.vortexel.dangerzone.common;
 
 import com.vortexel.dangerzone.common.capability.IDangerLevel;
 import com.vortexel.dangerzone.common.config.DZConfig;
-import com.vortexel.dangerzone.common.item.ItemLootBag;
 import com.vortexel.dangerzone.common.item.ModItems;
+import com.vortexel.dangerzone.common.util.MCUtil;
 import lombok.val;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
@@ -12,7 +12,6 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
@@ -24,7 +23,6 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.living.LootingLevelEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -94,9 +92,12 @@ public class DifficultyAdjuster {
             val entity = e.getEntity();
             val dangerInfo = MCUtil.getDangerLevelCapability(entity);
             if (dangerInfo != null) {
-                val stack = new ItemStack(ModItems.lootBag, 1, 0);
-                ItemLootBag.setLootBagLevel(stack, dangerInfo.getDanger());
-                e.getDrops().add(MCUtil.makeItemAt(entity, stack));
+                val danger = dangerInfo.getDanger();
+                val amount = (int)DangerMath.randRange(e.getEntityLiving().getRNG(), danger - 4, danger + 1);
+                if (amount > 0) {
+                    val stack = new ItemStack(ModItems.lootCoin_1, amount, 0);
+                    e.getDrops().add(MCUtil.makeItemAt(entity, stack));
+                }
             }
         }
     }

@@ -1,16 +1,17 @@
 package com.vortexel.dangerzone.common;
 
 import com.google.common.collect.Maps;
+import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.common.capability.DangerLevelProvider;
 import com.vortexel.dangerzone.common.capability.DangerLevelStorage;
 import com.vortexel.dangerzone.common.capability.IDangerLevel;
 import com.vortexel.dangerzone.common.config.EntityConfigManager;
 import com.vortexel.dangerzone.common.network.PacketDangerLevel;
 import com.vortexel.dangerzone.common.network.PacketHandler;
+import com.vortexel.dangerzone.common.util.MCUtil;
 import lombok.Getter;
 import lombok.val;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
@@ -25,8 +26,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.util.Map;
 
 /**
@@ -47,7 +47,7 @@ public class CommonProxy {
     @Getter
     protected EntityConfigManager entityConfigManager;
 
-    public void preInit(FMLPreInitializationEvent e) {
+    public void preInit(FMLPreInitializationEvent event) {
         // Create our object instances so they exist when other things try to use them.
         adjuster = new DifficultyAdjuster();
         lootManager = new LootManager();
@@ -62,15 +62,25 @@ public class CommonProxy {
         LootTableList.register(LootManager.ORE_LOOT_TABLE_RESOURCE);
     }
 
-    public void init(FMLInitializationEvent e) {
+    public void init(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(adjuster);
         MinecraftForge.EVENT_BUS.register(lootManager);
 
         entityConfigManager.addFile(openResource("assets/dangerzone/other/entity_data.json"));
+        val entityDataConfig = new File(DangerZone.instance.configDir, "entity_config.json");
+        if (entityDataConfig.isFile()) {
+            try {
+                val reader = new FileReader(entityDataConfig);
+                entityConfigManager.addFile(reader);
+                reader.close();
+            } catch (IOException e) {
+                DangerZone.log.error(e);
+            }
+        }
         entityConfigManager.bake();
     }
 
-    public void postInit(FMLPostInitializationEvent e) {
+    public void postInit(FMLPostInitializationEvent event) {
     }
 
     private Reader openResource(String path) {

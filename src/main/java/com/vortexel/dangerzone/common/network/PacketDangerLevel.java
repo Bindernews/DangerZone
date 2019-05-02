@@ -3,7 +3,7 @@ package com.vortexel.dangerzone.common.network;
 import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.client.ClientProxy;
 import com.vortexel.dangerzone.common.Consts;
-import com.vortexel.dangerzone.common.MCUtil;
+import com.vortexel.dangerzone.common.util.MCUtil;
 import io.netty.buffer.ByteBuf;
 import lombok.val;
 import net.minecraft.util.math.ChunkPos;

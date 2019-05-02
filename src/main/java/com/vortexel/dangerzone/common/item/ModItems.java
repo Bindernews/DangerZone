@@ -13,10 +13,16 @@ public class ModItems {
     public static final Set<Item> ITEMS = Sets.newHashSet();
 
     public static ItemLootBag lootBag;
+    public static Item lootCoin_1;
+    public static Item lootCoin_9;
 
     public static void init() {
         lootBag = new ItemLootBag();
         ITEMS.add(lootBag);
+        lootCoin_1 = new ItemLootCoin(1);
+        ITEMS.add(lootCoin_1);
+        lootCoin_9 = new ItemLootCoin(9);
+        ITEMS.add(lootCoin_9);
 
         MinecraftForge.EVENT_BUS.register(new Registrar());
     }

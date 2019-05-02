@@ -2,7 +2,7 @@ package com.vortexel.dangerzone.client;
 
 import com.google.common.collect.Maps;
 import com.vortexel.dangerzone.common.Consts;
-import com.vortexel.dangerzone.common.MCUtil;
+import com.vortexel.dangerzone.common.util.MCUtil;
 import lombok.val;
 import net.minecraft.util.math.ChunkPos;
 

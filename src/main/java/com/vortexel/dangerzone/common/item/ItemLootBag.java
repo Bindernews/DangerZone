@@ -2,9 +2,8 @@ package com.vortexel.dangerzone.common.item;
 
 import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.common.Consts;
-import com.vortexel.dangerzone.common.FnUtil;
-import com.vortexel.dangerzone.common.MCUtil;
-import com.vortexel.dangerzone.common.config.DZConfig;
+import com.vortexel.dangerzone.common.util.FnUtil;
+import com.vortexel.dangerzone.common.util.MCUtil;
 import lombok.val;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;

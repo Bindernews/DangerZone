@@ -2,7 +2,7 @@ package com.vortexel.dangerzone.common.tile;
 
 import com.google.common.collect.Sets;
 import com.vortexel.dangerzone.DangerZone;
-import com.vortexel.dangerzone.common.MCUtil;
+import com.vortexel.dangerzone.common.util.MCUtil;
 import com.vortexel.dangerzone.common.inventory.SlotConfig;
 import com.vortexel.dangerzone.common.inventory.SlotInventoryHandler;
 import com.vortexel.dangerzone.common.item.ItemLootBag;

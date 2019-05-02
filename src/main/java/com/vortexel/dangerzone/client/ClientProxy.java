@@ -3,7 +3,7 @@ package com.vortexel.dangerzone.client;
 import com.google.common.collect.Maps;
 import com.vortexel.dangerzone.common.CommonProxy;
 import com.vortexel.dangerzone.common.DangerMath;
-import com.vortexel.dangerzone.common.MCUtil;
+import com.vortexel.dangerzone.common.util.MCUtil;
 import com.vortexel.dangerzone.common.block.ModBlocks;
 import com.vortexel.dangerzone.common.item.ModItems;
 import lombok.val;

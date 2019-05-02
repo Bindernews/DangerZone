@@ -2,12 +2,13 @@ package com.vortexel.dangerzone.common;
 
 import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.common.config.ModifierConf;
-import lombok.Getter;
 import lombok.val;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
+import net.minecraft.init.MobEffects;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -25,12 +26,12 @@ public class EntityAdjuster {
 
     private static final int OP_ADD = 0;
     private static final int OP_MULTIPLY = 1;
+    private static final int OP_MULTIPLY_EXTRA = 2;
     private static final String FIELD_EXPLOSION_RADIUS = "explosionRadius";
     private static final double BAD_MODIFIER = -1;
 
     private final EntityLivingBase entity;
 
-    @Getter
     private int level;
 
     public EntityAdjuster(EntityLivingBase entity) {
@@ -208,12 +209,13 @@ public class EntityAdjuster {
 
     private void applyRegeneration(double amount) {
         val realRegen = DangerMath.roundDecimal(amount, 100);
-        entity.setAbsorptionAmount(entity.getAbsorptionAmount() + (float)realRegen);
+        entity.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, Consts.POTION_DURATION_FOREVER,
+                (int)realRegen, false, true));
     }
 
     private void applyMaxHealth(double amount) {
         applyAttributeModifier(SharedMonsterAttributes.MAX_HEALTH, Consts.MODIFIER_MAX_HEALTH_UUID,
-                "health", amount, OP_ADD);
+                "health", amount, OP_MULTIPLY_EXTRA);
         entity.setHealth(entity.getMaxHealth());
     }
 

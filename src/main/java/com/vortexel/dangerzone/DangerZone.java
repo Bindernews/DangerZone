@@ -21,6 +21,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+
 /**
  * This is the entry point for the Danger Zone mod. All it really does is group a couple of singleton
  * instances and pass off all the work to CommonProxy.
@@ -70,14 +72,21 @@ public class DangerZone {
      */
     public static CreativeTabs creativeTab;
 
+    /**
+     * The Forge-recommended configuration directory.
+     */
+    public File configDir;
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
-        // First things first, load the config.
+        // Set the config dir so we know what it is later
+        configDir = new File(e.getModConfigurationDirectory(), MOD_ID);
+        // Initialize some variables that start as null
+        creativeTab = new CreativeTab();
+        // Load the config.
         DZConfig.cfg = new Configuration(e.getSuggestedConfigurationFile());
         DZConfig.loadAll();
-
-        creativeTab = new CreativeTab();
-
+        // Initialize ALL the things
         PacketHandler.init();
         ModBlocks.init();
         ModItems.init();
