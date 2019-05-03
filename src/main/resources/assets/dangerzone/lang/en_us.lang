@@ -1,6 +1,10 @@
 # Items
-item.dangerzone:loot_bag.name=Loot Bag
-item.dangerzone:loot_bag.tooltip=Level %1$s
 item.dangerzone:loot_coin_1.name=Loot Coin x1
-item.dangerzone:loot_coin_9.name=Loot Coin x9
+item.dangerzone:loot_coin_8.name=Loot Coin x8
+item.dangerzone:loot_coin_64.name=Loot Coin x64
+item.dangerzone:loot_coin_512.name=Loot Coin x512
+item.dangerzone:coin_pouch.name=Coin Pouch
+item.dangerzone:coin_pouch.tooltip=Contains %s coins
 
+# GUI
+gui.dangerzone.coins=Coins:

@@ -12,17 +12,23 @@ import java.util.Set;
 public class ModItems {
     public static final Set<Item> ITEMS = Sets.newHashSet();
 
-    public static ItemLootBag lootBag;
-    public static Item lootCoin_1;
-    public static Item lootCoin_9;
+    public static ItemLootCoin lootCoin_1;
+    public static ItemLootCoin lootCoin_8;
+    public static ItemLootCoin lootCoin_64;
+    public static ItemLootCoin lootCoin_512;
+    public static Item coinPouch;
 
     public static void init() {
-        lootBag = new ItemLootBag();
-        ITEMS.add(lootBag);
         lootCoin_1 = new ItemLootCoin(1);
         ITEMS.add(lootCoin_1);
-        lootCoin_9 = new ItemLootCoin(9);
-        ITEMS.add(lootCoin_9);
+        lootCoin_8 = new ItemLootCoin(8);
+        ITEMS.add(lootCoin_8);
+        lootCoin_64 = new ItemLootCoin(64);
+        ITEMS.add(lootCoin_64);
+        lootCoin_512 = new ItemLootCoin(512);
+        ITEMS.add(lootCoin_512);
+        coinPouch = new ItemCoinPouch();
+        ITEMS.add(coinPouch);
 
         MinecraftForge.EVENT_BUS.register(new Registrar());
     }

@@ -7,14 +7,14 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class SlotInventoryHandler extends BaseInventoryHandler {
+public class ConfigInventoryHandler extends BaseInventoryHandler {
 
     public static final int DEFAULT_MAX_STACK_SIZE = 64;
 
     private SlotConfig[] configs;
     private Consumer<Integer> changeListener;
 
-    public SlotInventoryHandler(SlotConfig[] configs, Consumer<Integer> changeListener) {
+    public ConfigInventoryHandler(SlotConfig[] configs, Consumer<Integer> changeListener) {
         this.configs = Objects.requireNonNull(configs);
         this.slots = new ItemStack[configs.length];
         this.changeListener = changeListener;
@@ -27,7 +27,7 @@ public class SlotInventoryHandler extends BaseInventoryHandler {
         if (!configs[slot].allowInsert || !configs[slot].insertFilter.test(stack)) {
             return stack;
         }
-        return bypassInsert(slot, stack, simulate);
+        return bypassInsert(slot, stack, simulate, true);
     }
 
     @Nonnull
@@ -36,7 +36,7 @@ public class SlotInventoryHandler extends BaseInventoryHandler {
         if (!configs[slot].allowExtract) {
             return ItemStack.EMPTY;
         }
-        return bypassExtract(slot, amount, simulate);
+        return bypassExtract(slot, amount, simulate, true);
     }
 
     @Override

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "dangerzone:loot_coin_1" },
+    { "item": "dangerzone:loot_coin_1" },
+    { "item": "dangerzone:loot_coin_1" },
+    { "item": "dangerzone:loot_coin_1" },
+    { "item": "dangerzone:loot_coin_1" },
+    { "item": "dangerzone:loot_coin_1" },
+    { "item": "dangerzone:loot_coin_1" },
+    { "item": "dangerzone:loot_coin_1" }
+  ],
+  "result": {
+    "item": "dangerzone:loot_coin_8",
+    "count": 1
+  }
+}

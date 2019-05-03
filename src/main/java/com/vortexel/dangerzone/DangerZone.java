@@ -2,6 +2,7 @@ package com.vortexel.dangerzone;
 
 import com.vortexel.dangerzone.common.CommonProxy;
 import com.vortexel.dangerzone.common.CreativeTab;
+import com.vortexel.dangerzone.common.gui.GuiHandler;
 import com.vortexel.dangerzone.common.network.PacketHandler;
 import com.vortexel.dangerzone.common.block.ModBlocks;
 import com.vortexel.dangerzone.common.capability.IDangerLevel;
@@ -18,6 +19,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -86,6 +88,8 @@ public class DangerZone {
         // Load the config.
         DZConfig.cfg = new Configuration(e.getSuggestedConfigurationFile());
         DZConfig.loadAll();
+        // Make it so we can display GUIs
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
         // Initialize ALL the things
         PacketHandler.init();
         ModBlocks.init();

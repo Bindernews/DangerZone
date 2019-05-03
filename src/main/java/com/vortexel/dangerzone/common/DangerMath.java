@@ -79,6 +79,14 @@ public class DangerMath {
         return randRange(rng, 0, max);
     }
 
+    public static long clamp(long num, long min, long max) {
+        if (num < min) {
+            return min;
+        } else {
+            return num > max ? max : num;
+        }
+    }
+
     /**
      * Each danger level increases the danger by {@code multiplierStep}. This value is as arbitrary as
      * dangerMultipier is in the config.

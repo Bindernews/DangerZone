@@ -37,7 +37,7 @@ public abstract class BaseInventoryHandler implements IItemHandler, IItemHandler
      * @return the remaining ItemStack that wasn't inserted or ItemStack.EMPTY.
      */
     @Nonnull
-    public ItemStack bypassInsert(int slot, @Nonnull ItemStack stack, boolean simulate) {
+    public ItemStack bypassInsert(int slot, @Nonnull ItemStack stack, boolean simulate, boolean sendChange) {
         if (stack.isEmpty()) {
             return ItemStack.EMPTY;
         }
@@ -65,8 +65,10 @@ public abstract class BaseInventoryHandler implements IItemHandler, IItemHandler
                 slots[slot] = stack.copy();
             }
             slots[slot].setCount(nextCount);
+            if (sendChange) {
+                onChange(slot);
+            }
         }
-        onChange(slot);
         return totalCount > nextCount
                 ? ItemHandlerHelper.copyStackWithSize(stack, totalCount - nextCount)
                 : ItemStack.EMPTY;
@@ -80,7 +82,7 @@ public abstract class BaseInventoryHandler implements IItemHandler, IItemHandler
      * @return the ItemStack that was extracted or ItemStack.EMPTY.
      */
     @Nonnull
-    public ItemStack bypassExtract(int slot, int amount, boolean simulate) {
+    public ItemStack bypassExtract(int slot, int amount, boolean simulate, boolean sendChange) {
         val current = slots[slot];
         if (amount == 0 || current.isEmpty()) {
             return ItemStack.EMPTY;
@@ -93,8 +95,10 @@ public abstract class BaseInventoryHandler implements IItemHandler, IItemHandler
             if (current.isEmpty()) {
                 slots[slot] = ItemStack.EMPTY;
             }
+            if (sendChange) {
+                onChange(slot);
+            }
         }
-        onChange(slot);
         return result;
     }
 
@@ -106,6 +110,11 @@ public abstract class BaseInventoryHandler implements IItemHandler, IItemHandler
 
     @Override
     public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
+        slots[slot] = stack;
+        onChange(slot);
+    }
+
+    public void setStackNoChange(int slot, @Nonnull ItemStack stack) {
         slots[slot] = stack;
     }
 

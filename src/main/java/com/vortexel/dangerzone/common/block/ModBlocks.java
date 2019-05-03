@@ -1,10 +1,8 @@
 package com.vortexel.dangerzone.common.block;
 
 import com.google.common.collect.Sets;
-import com.vortexel.dangerzone.common.tile.TileLootBagExtractor;
 import lombok.val;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraftforge.common.MinecraftForge;
@@ -17,11 +15,7 @@ public class ModBlocks {
 
     public static final Set<Block> BLOCKS = Sets.newHashSet();
 
-    public static BaseBlock lootBagExtractor;
-
     public static void init() {
-        lootBagExtractor = new BlockLootBagExtractor();
-        BLOCKS.add(lootBagExtractor);
 
         MinecraftForge.EVENT_BUS.register(new Registrar());
     }

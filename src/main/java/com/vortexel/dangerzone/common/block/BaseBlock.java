@@ -2,7 +2,6 @@ package com.vortexel.dangerzone.common.block;
 
 import com.vortexel.dangerzone.DangerZone;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;

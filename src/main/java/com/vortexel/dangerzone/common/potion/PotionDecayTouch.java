@@ -8,7 +8,7 @@ import net.minecraft.potion.Potion;
 public class PotionDecayTouch extends Potion {
 
     protected PotionDecayTouch() {
-        super(false, 0x681860);
+        super(false, 0x5E4B91);
         setPotionName("effect.decayTouch");
     }
 
