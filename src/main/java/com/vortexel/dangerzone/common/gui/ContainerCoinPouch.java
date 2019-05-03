@@ -1,16 +1,21 @@
 package com.vortexel.dangerzone.common.gui;
 
+import com.vortexel.dangerzone.common.gui.slot.SlotControlled;
+import com.vortexel.dangerzone.common.gui.slot.SlotImmutable;
 import com.vortexel.dangerzone.common.inventory.SlotConfig;
 import com.vortexel.dangerzone.common.inventory.ConfigInventoryHandler;
 import com.vortexel.dangerzone.common.item.ItemCoinPouch;
 import com.vortexel.dangerzone.common.item.ItemLootCoin;
 import com.vortexel.dangerzone.common.item.ModItems;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 public class ContainerCoinPouch extends BaseContainer {
 
@@ -27,6 +32,8 @@ public class ContainerCoinPouch extends BaseContainer {
     private SlotImmutable coinPouchSlot;
     private SlotItemHandler inputSlot;
     private SlotItemHandler outputSlot;
+
+    @Getter
     private ItemLootCoin outputType;
 
     public ContainerCoinPouch(EntityPlayer player, ItemStack coinPouch) {
@@ -55,7 +62,7 @@ public class ContainerCoinPouch extends BaseContainer {
         };
 
         // We override this so that when things are taken from the output, it updates the coinPouch.
-        outputSlot = new SlotControlled(backingInventory, 1, 143, 34) {
+        outputSlot = new SlotControlled(backingInventory, 1, 141, 34) {
             @Override
             public ItemStack onTake(EntityPlayer thePlayer, ItemStack stack) {
                 ItemStack result = super.onTake(thePlayer, stack);
@@ -138,5 +145,11 @@ public class ContainerCoinPouch extends BaseContainer {
 
     public ItemStack getCoinPouch() {
         return coinPouchSlot.getRealStack();
+    }
+
+    public void setOutputType(ItemLootCoin outputType) {
+        Objects.requireNonNull(outputType);
+        this.outputType = outputType;
+        updateOutputSlot();
     }
 }

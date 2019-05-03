@@ -19,13 +19,13 @@ public class ModItems {
     public static Item coinPouch;
 
     public static void init() {
-        lootCoin_1 = new ItemLootCoin(1);
+        lootCoin_1 = new ItemLootCoin(ItemLootCoin.AMOUNTS[0]);
         ITEMS.add(lootCoin_1);
-        lootCoin_8 = new ItemLootCoin(8);
+        lootCoin_8 = new ItemLootCoin(ItemLootCoin.AMOUNTS[1]);
         ITEMS.add(lootCoin_8);
-        lootCoin_64 = new ItemLootCoin(64);
+        lootCoin_64 = new ItemLootCoin(ItemLootCoin.AMOUNTS[2]);
         ITEMS.add(lootCoin_64);
-        lootCoin_512 = new ItemLootCoin(512);
+        lootCoin_512 = new ItemLootCoin(ItemLootCoin.AMOUNTS[3]);
         ITEMS.add(lootCoin_512);
         coinPouch = new ItemCoinPouch();
         ITEMS.add(coinPouch);

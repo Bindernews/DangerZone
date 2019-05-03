@@ -1,4 +1,4 @@
-package com.vortexel.dangerzone.common.gui;
+package com.vortexel.dangerzone.common.gui.slot;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
