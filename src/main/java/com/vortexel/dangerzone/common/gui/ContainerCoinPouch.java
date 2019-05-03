@@ -6,7 +6,6 @@ import com.vortexel.dangerzone.common.item.ItemCoinPouch;
 import com.vortexel.dangerzone.common.item.ItemLootCoin;
 import com.vortexel.dangerzone.common.item.ModItems;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
@@ -21,8 +20,6 @@ public class ContainerCoinPouch extends BaseContainer {
         SLOTS[1] = SlotConfig.builder().index(1).allowInsert(false).allowExtract(true).build();
     }
 
-    public static final ItemStack NOT_EMPTY = new ItemStack(Blocks.STONE, 1);
-
     private ConfigInventoryHandler backingInventory;
     private EntityPlayer openingPlayer;
     private int coinPouchPlayerIndex;
@@ -31,7 +28,6 @@ public class ContainerCoinPouch extends BaseContainer {
     private SlotItemHandler inputSlot;
     private SlotItemHandler outputSlot;
     private ItemLootCoin outputType;
-    private boolean wasDecrCalled = false;
 
     public ContainerCoinPouch(EntityPlayer player, ItemStack coinPouch) {
         this.backingInventory = new ConfigInventoryHandler(SLOTS, null);
@@ -59,31 +55,19 @@ public class ContainerCoinPouch extends BaseContainer {
         };
 
         // We override this so that when things are taken from the output, it updates the coinPouch.
-        outputSlot = new SlotItemHandler(backingInventory, 1, 143, 34) {
-            /**
-             * Called any time things are taken from this slot, INCLUDING when shift-clicked.
-             */
+        outputSlot = new SlotControlled(backingInventory, 1, 143, 34) {
             @Override
             public ItemStack onTake(EntityPlayer thePlayer, ItemStack stack) {
-                if (!wasDecrCalled) {
-                    addAmount(outputType, -stack.getCount());
-                }
-                wasDecrCalled = false;
+                ItemStack result = super.onTake(thePlayer, stack);
                 updateOutputSlot();
-                // We do this so the player only gets 1 stack at a time
-                return ItemStack.EMPTY;
+                return result;
             }
 
-            /**
-             * Called when the slot is clicked normally, but NOT when it's shift-clicked.
-             */
-            @Nonnull
             @Override
-            public ItemStack decrStackSize(int amount) {
-                addAmount(outputType, -amount);
-                // We do this so that onTake does NOT call addAmount
-                wasDecrCalled = true;
-                return super.decrStackSize(amount);
+            public ItemStack onTaken(@Nonnull ItemStack stack) {
+                addAmount(outputType, -stack.getCount());
+                // We do this so the player only gets 1 stack at a time
+                return ItemStack.EMPTY;
             }
 
             @Override
@@ -103,6 +87,8 @@ public class ContainerCoinPouch extends BaseContainer {
 
         addSlotToContainer(inputSlot);
         addSlotToContainer(outputSlot);
+        // We return a normal Slot EXCEPT for when it's the slot with the Coin Pouch. Then we return an
+        // immutable slot so we can modify it, but the player cannot. This is how we sync the inventory information.
         GuiUtil.addPlayerInventory(this, player.inventory, 8, 84, 4, (index, x, y) -> {
             if (index == coinPouchPlayerIndex) {
                 coinPouchSlot = new SlotImmutable(player.inventory, index, x, y);
