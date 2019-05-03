@@ -65,11 +65,16 @@ public class GuiCoinPouch extends BaseGuiContainer {
                 hoverYOffset, BACKGROUND_TEXTURE);
     }
 
+    int xCenter = 149;
+
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         val amount = ItemCoinPouch.getAmount(getContainer().getCoinPouch());
+        val coinValueStr = Integer.toString(getContainer().getOutputType().amount);
+        val coinValueX = xCenter - (fontRenderer.getStringWidth(coinValueStr) / 2);
         fontRenderer.drawString(I18n.format("gui.dangerzone.coins"), 66, 22, Consts.COLOR_BLACK);
         fontRenderer.drawString(Long.toString(amount), 66, 38, Consts.COLOR_BLACK);
+        fontRenderer.drawString(coinValueStr, coinValueX, 22, Consts.COLOR_BLACK);
     }
 
     public ContainerCoinPouch getContainer() {
