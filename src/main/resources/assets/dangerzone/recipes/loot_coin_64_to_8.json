@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "dangerzone:loot_coin_64"
+    }
+  ],
+  "result": {
+    "item": "dangerzone:loot_coin_8",
+    "count": 8
+  }
+}
