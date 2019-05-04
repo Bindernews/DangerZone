@@ -105,14 +105,14 @@ public class DZConfig {
         @Comment({"Controls whether or not Danger Zone is enabled for this dimension."})
         public boolean enabled = false;
 
-        @Comment({"The radius around spawn where difficulty is always 0. No mobs will spawn here."})
+        @Comment({"The radius around spawn where difficulty is always 0."})
         @Config.RangeInt(min = 0)
-        public int spawnRadius = 16;
+        public int spawnRadius = 128;
 
         @Comment({"The radius around spawnRadius where the difficulty transitions from 0 to its real value.",
                 "This acts as a safety buffer where mobs can spawn, but you won't be dumped into super-hard mode."})
         @Config.RangeInt(min = 0)
-        public int spawnTransitionRadius = 128;
+        public int spawnTransitionRadius = 896;
 
         public void load(ConfigCategory cat) {
             ConfigHelper.loadAllCommented(this, cat);
