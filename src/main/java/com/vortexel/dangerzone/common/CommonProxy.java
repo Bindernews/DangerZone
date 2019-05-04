@@ -66,25 +66,10 @@ public class CommonProxy {
         MinecraftForge.EVENT_BUS.register(adjuster);
         MinecraftForge.EVENT_BUS.register(lootManager);
 
-        entityConfigManager.addFile(openResource("assets/dangerzone/other/entity_data.json"));
-        val entityDataConfig = new File(DangerZone.instance.configDir, "entity_config.json");
-        if (entityDataConfig.isFile()) {
-            try {
-                val reader = new FileReader(entityDataConfig);
-                entityConfigManager.addFile(reader);
-                reader.close();
-            } catch (IOException e) {
-                DangerZone.log.error(e);
-            }
-        }
-        entityConfigManager.bake();
+        reloadEntityConfig();
     }
 
     public void postInit(FMLPostInitializationEvent event) {
-    }
-
-    private Reader openResource(String path) {
-        return new InputStreamReader(getClass().getClassLoader().getResourceAsStream(path));
     }
 
     public double getDifficulty(World world, int x, int z) {
@@ -108,6 +93,26 @@ public class CommonProxy {
         } else {
             return null;
         }
+    }
+
+    public void reloadEntityConfig() {
+        entityConfigManager = new EntityConfigManager();
+        entityConfigManager.addFile(openResource("assets/dangerzone/other/entity_data.json"));
+        val entityDataConfig = new File(DangerZone.instance.configDir, "entity_config.json");
+        if (entityDataConfig.isFile()) {
+            try {
+                val reader = new FileReader(entityDataConfig);
+                entityConfigManager.addFile(reader);
+                reader.close();
+            } catch (IOException e) {
+                DangerZone.log.error(e);
+            }
+        }
+        entityConfigManager.bake();
+    }
+
+    private Reader openResource(String path) {
+        return new InputStreamReader(getClass().getClassLoader().getResourceAsStream(path));
     }
 
     @SubscribeEvent

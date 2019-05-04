@@ -8,7 +8,6 @@ import com.vortexel.dangerzone.common.item.ItemCoinPouch;
 import com.vortexel.dangerzone.common.item.ItemLootCoin;
 import com.vortexel.dangerzone.common.item.ModItems;
 import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -36,10 +35,10 @@ public class ContainerCoinPouch extends BaseContainer {
     @Getter
     private ItemLootCoin outputType;
 
-    public ContainerCoinPouch(EntityPlayer player, ItemStack coinPouch) {
+    public ContainerCoinPouch(EntityPlayer player) {
         this.backingInventory = new ConfigInventoryHandler(SLOTS, null);
         this.openingPlayer = player;
-        coinPouchPlayerIndex = GuiUtil.getPlayerInventoryIndex(player.inventory, coinPouch);
+        coinPouchPlayerIndex = player.inventory.currentItem;
         outputType = ModItems.lootCoin_1;
 
         inputSlot = new SlotItemHandler(backingInventory, 0, 17, 34) {

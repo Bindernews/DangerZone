@@ -74,8 +74,8 @@ public class DifficultyAdjuster {
      */
     public void implementDecayTouch(EntityLivingBase target, EntityLivingBase source) {
         val inst = source.getAttributeMap().getAttributeInstance(Consts.ATTRIBUTE_DECAY_TOUCH);
-        if (inst != null) {
-            val duration = (int)(Consts.TICKS_PER_SECOND * DZConfig.effects.decayTouchTime);
+        if (inst != null && inst.getAttributeValue() > 0) {
+            val duration = (int)(Consts.TICKS_PER_SECOND * DZConfig.effects.decayTouchTime * inst.getAttributeValue());
             target.addPotionEffect(new PotionEffect(MobEffects.WITHER, duration, (int)inst.getAttributeValue(),
                     false, false));
         }

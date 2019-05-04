@@ -9,14 +9,14 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import static com.vortexel.dangerzone.common.DangerMath.randRange;
+import static com.vortexel.dangerzone.common.DangerMath.lerp;
+import static com.vortexel.dangerzone.common.DangerMath.unlerpClamp;
 
 /**
  * Adjusts a newly-spawning entity based on its difficulty. <br/>
@@ -84,7 +84,9 @@ public class EntityAdjuster {
             } else {
                 // Calculate the value for this modifier
                 amounts[i] = calculateInitialAmount(modifier, conf);
-                totalDanger += amounts[i] * conf.dangerScale;
+                if (amounts[i] != BAD_MODIFIER) {
+                    totalDanger += amounts[i] * conf.dangerScale;
+                }
             }
         }
         // Finally we actually apply the modifiers. We also adjust the modifiers to make sure we're not
@@ -97,7 +99,9 @@ public class EntityAdjuster {
         val ratio = maxDanger / totalDanger;
         for (int i = 0; i < amounts.length; i++) {
             if (amounts[i] != BAD_MODIFIER) {
-                applyModifier(modTypes[i], amounts[i] * ratio, selectApplicator(modTypes[i]));
+                val conf = eConfig.modifiers.get(modTypes[i]);
+                val realAmount = DangerMath.clamp(amounts[i] * ratio, conf.min, conf.max);
+                applyModifier(modTypes[i], realAmount, selectApplicator(modTypes[i]));
             }
         }
     }
@@ -107,26 +111,27 @@ public class EntityAdjuster {
      */
     private double calculateInitialAmount(@Nonnull ModifierType modifier, @Nonnull ModifierConf conf) {
         if (level < conf.minLevel) {
-            return 0;
+            return BAD_MODIFIER;
         }
         val rng = entity.getRNG();
-        val trueMaxLevel = DangerMath.maxDangerLevel();
-        val maxLevel = conf.maxLevel == -1 ? trueMaxLevel : conf.maxLevel;
-        val minLevel = conf.minLevel;
+        val plusMinus = DangerMath.levelRange();
+        val maxLevel = conf.maxLevel == -1 ? DangerMath.maxDangerLevel() + 1 : conf.maxLevel;
+        val minLevel = conf.minLevel == -1 ? 0 : conf.minLevel;
         // Determine if we should apply the modifier. Chances decrease as the level decreases.
         // Currently the threshold = ((level - minLevel) / (trueMaxLevel - minLevel)) * chance
         // If we want the threshold to not account for the minLevel, that would change the math.
-        val chanceLevel = DangerMath.divideSub(level, trueMaxLevel, minLevel);
-        val threshold = DangerMath.scale(chanceLevel / trueMaxLevel, conf.minChance, conf.maxChance);
-        double chanceRand = randRange(rng, (trueMaxLevel - minLevel) / trueMaxLevel);
+        // Also note that I use the term "unit" to refer to a value in the range [0-1).
+        val levelUnit = unlerpClamp(level, minLevel, maxLevel);
+        val threshold = lerp(levelUnit, conf.minChance, conf.maxChance);
+        val chanceRand = rng.nextDouble();
         if (chanceRand > threshold) {
-            return 0;
+            return BAD_MODIFIER;
         }
         // Now that we know we're going to try to get a value, let's generate one.
         // We cap our level at "max level".
-        val calcLevel = Math.min(level, maxLevel);
-        val baseAmount = randRange(rng, calcLevel - minLevel - 1, calcLevel + 1 - minLevel);
-        return MathHelper.clamp(baseAmount * conf.scale, 0, conf.max);
+        val randLevel = DangerMath.randRange(rng, level - plusMinus, level + plusMinus);
+        val randUnit = unlerpClamp(randLevel, minLevel, maxLevel);
+        return lerp(randUnit, conf.min, conf.max);
     }
 
     /**
@@ -199,12 +204,12 @@ public class EntityAdjuster {
 
     private void applyMovementSpeed(double amount) {
         applyAttributeModifier(SharedMonsterAttributes.MOVEMENT_SPEED, Consts.MODIFIER_MOVE_SPEED_UUID,
-                "haste", amount, OP_ADD);
+                "haste", amount, OP_MULTIPLY);
     }
 
     private void applyFlySpeed(double amount) {
         applyAttributeModifier(SharedMonsterAttributes.FLYING_SPEED, Consts.MODIFIER_FLY_SPEED_UUID,
-                "fly-speed", amount, OP_ADD);
+                "fly-speed", amount, OP_MULTIPLY);
     }
 
     private void applyRegeneration(double amount) {
@@ -215,7 +220,7 @@ public class EntityAdjuster {
 
     private void applyMaxHealth(double amount) {
         applyAttributeModifier(SharedMonsterAttributes.MAX_HEALTH, Consts.MODIFIER_MAX_HEALTH_UUID,
-                "health", amount, OP_MULTIPLY_EXTRA);
+                "health", amount, OP_MULTIPLY);
         entity.setHealth(entity.getMaxHealth());
     }
 
@@ -231,12 +236,12 @@ public class EntityAdjuster {
 
     private void applyArmor(double amount) {
         applyAttributeModifier(SharedMonsterAttributes.ARMOR, Consts.MODIFIER_ARMOR_UUID,
-                "armor", amount, OP_ADD);
+                "armor", amount, OP_MULTIPLY);
     }
 
     private void applyArmorToughness(double amount) {
         applyAttributeModifier(SharedMonsterAttributes.ARMOR_TOUGHNESS, Consts.MODIFIER_ARMOR_TOUGHNESS_UUID,
-                "armor-toughness", amount, OP_ADD);
+                "armor-toughness", amount, OP_MULTIPLY);
     }
 
     private void applyExplosionRadius(double amount) {

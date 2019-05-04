@@ -38,7 +38,7 @@ public class GuiHandler implements IGuiHandler {
             case GUI_COIN_POUCH:
                 val stack = player.getHeldItem(EnumHand.MAIN_HAND);
                 if (stack.getItem() == ModItems.coinPouch) {
-                    return new ContainerCoinPouch(player, stack);
+                    return new ContainerCoinPouch(player);
                 }
                 return null;
             default:

@@ -61,11 +61,11 @@ public class DZConfig {
         @Comment({"The maximum danger level. An enemy's difficulty can be anywhere within its danger level",
                 "so the number of levels should be proportional to the danger multiplier."})
         @Config.RangeInt(min = 1, max = Consts.MAX_DANGER_LEVEL)
-        public int maxDangerLevel = 20;
+        public int maxDangerLevel = 100;
 
         @Comment({"The maximum danger multiplier. Make this higher to make the toughest enemies tougher."})
         @Config.RangeDouble(min = 1.0, max = Consts.MAX_DANGER_LEVEL)
-        public double dangerMultiplier = 10.0;
+        public double dangerMultiplier = 100.0;
 
         @Comment({"Should the increased looting level be applied even if the mob wasn't killed by a player?"})
         public boolean lootingOnNonPlayerKills = true;
@@ -77,10 +77,13 @@ public class DZConfig {
                 "If this is true, then players can build a mob grinder and get ores from it. Be careful."})
         public boolean doFakePlayersDropLoot = false;
 
+        @Comment({"Numbers will generate using the entity's danger level +/- this value."})
+        public int levelRange = 4;
+
         @Comment({"The stretch factor used to influence how the difficulty map is generated.",
                 "DO NOT change this unless you really know what you are doing!"})
         @Config.RangeDouble(min = 0.000000001, max = 0.01)
-        public double stretchFactor = 0.001;
+        public double stretchFactor = 0.0005;
 
         public void load(ConfigCategory cat) {
             ConfigHelper.loadAllCommented(this, cat);
@@ -109,7 +112,7 @@ public class DZConfig {
         @Comment({"The radius around spawnRadius where the difficulty transitions from 0 to its real value.",
                 "This acts as a safety buffer where mobs can spawn, but you won't be dumped into super-hard mode."})
         @Config.RangeInt(min = 0)
-        public int spawnTransitionRadius = 64;
+        public int spawnTransitionRadius = 128;
 
         public void load(ConfigCategory cat) {
             ConfigHelper.loadAllCommented(this, cat);

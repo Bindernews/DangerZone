@@ -35,29 +35,29 @@ public class DangerMath {
         return randRange(rng, min, max);
     }
 
-    public static double scale(double v, double min, double max) {
+    /**
+     * Interpolates {@code v} (usually in range [0-1]) into a value between {@code min} and {@code max}.
+     */
+    public static double lerp(double v, double min, double max) {
         return (v * (max - min)) + min;
     }
 
-    /**
-     * Returns a value greater than 0 if the effect should be applied, which should be used as it's "amount". <br/>
-     * If the returned value is 0, then the effect shouldn't be applied.
-     * @param level the current danger level
-     * @param minCutoff the minimum level at which the effect can be applied
-     * @param effectChance the chance of the effect being applied at maximum level
-     * @param rng RNJesus
-     */
-    public static double getEffectAmount(int level, int minCutoff, double effectChance, Random rng) {
-        if (level < minCutoff) {
-            return 0;
-        }
-        val min = dangerDouble(minCutoff);
-        val max = dangerDouble(maxDangerLevel() + 1);
-        val threshold = dangerDouble(level);
-        val amount = randRange(rng, min, max) * effectChance;
-        return amount <= threshold ? amount : 0;
+    public static double lerpClamp(double v, double min, double max) {
+        val t = clamp(v, 0, 1);
+        return lerp(t, min, max);
     }
 
+    /**
+     * Takes {@code v} which is range {@code [min, max]} and puts it in the range {@code [0-1]}.
+     */
+    public static double unlerp(double v, double min, double max) {
+        return (v - min) / (max - min);
+    }
+
+    public static double unlerpClamp(double v, double min, double max) {
+        val t = clamp(v, min, max);
+        return unlerp(t, min, max);
+    }
 
     /**
      * Rounds {@code d} by doing {@code floor(d * multiplier) / multiplier}. That's it. <br/>
@@ -72,7 +72,7 @@ public class DangerMath {
     }
 
     public static double randRange(@Nonnull Random rng, double min, double max) {
-        return scale(rng.nextDouble(), min, max);
+        return lerp(rng.nextDouble(), min, max);
     }
 
     public static double randRange(@Nonnull Random rng, double max) {
@@ -80,6 +80,14 @@ public class DangerMath {
     }
 
     public static long clamp(long num, long min, long max) {
+        if (num < min) {
+            return min;
+        } else {
+            return num > max ? max : num;
+        }
+    }
+
+    public static double clamp(double num, double min, double max) {
         if (num < min) {
             return min;
         } else {
@@ -107,5 +115,9 @@ public class DangerMath {
      */
     public static double dangerMultiplier() {
         return DZConfig.general.dangerMultiplier;
+    }
+
+    public static double levelRange() {
+        return DZConfig.general.levelRange;
     }
 }
