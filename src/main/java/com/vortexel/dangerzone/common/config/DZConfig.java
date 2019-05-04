@@ -70,7 +70,7 @@ public class DZConfig {
         @Comment({"Should the increased looting level be applied even if the mob wasn't killed by a player?"})
         public boolean lootingOnNonPlayerKills = true;
 
-        @Comment({"Should mobs drop loot bags even if they weren't killed by a player?"})
+        @Comment({"Should mobs drop loot coins even if they weren't killed by a player?"})
         public boolean lootCoinsOnNonPlayerKills = false;
 
         @Comment({"Should Fake Players (e.g. Draconic Evolution mob_grinder) count as player kills?",
