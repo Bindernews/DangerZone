@@ -13,9 +13,5 @@ public class PacketHandler {
     public static void init() {
         int id = 0;
         NETWORK.registerMessage(PacketDangerLevel.Handler.class, PacketDangerLevel.class, id++, Side.CLIENT);
-        NETWORK.registerMessage(PacketCoinPouchCoinType.Handler.class, PacketCoinPouchCoinType.class, id++,
-                Side.SERVER);
-        NETWORK.registerMessage(PacketCoinPouchCoinType.Handler.class, PacketCoinPouchCoinType.class, id++,
-                Side.CLIENT);
     }
 }

@@ -7,4 +7,4 @@ item.dangerzone:coin_pouch.name=Coin Pouch
 item.dangerzone:coin_pouch.tooltip=Contains %s coins
 
 # GUI
-gui.dangerzone.coins=Coins:
+gui.dangerzone.coins=Coins: %d

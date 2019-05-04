@@ -7,21 +7,23 @@ import com.vortexel.dangerzone.common.inventory.ConfigInventoryHandler;
 import com.vortexel.dangerzone.common.item.ItemCoinPouch;
 import com.vortexel.dangerzone.common.item.ItemLootCoin;
 import com.vortexel.dangerzone.common.item.ModItems;
-import lombok.Getter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
-import java.util.Objects;
 
 public class ContainerCoinPouch extends BaseContainer {
 
-    public static final SlotConfig[] SLOTS = new SlotConfig[2];
+    public static final SlotConfig[] SLOTS = new SlotConfig[5];
     static {
         SLOTS[0] = SlotConfig.builder().index(0).allowInsert(true).allowExtract(false).build();
         SLOTS[1] = SlotConfig.builder().index(1).allowInsert(false).allowExtract(true).build();
+        SLOTS[2] = SlotConfig.builder().index(2).allowInsert(false).allowExtract(true).build();
+        SLOTS[3] = SlotConfig.builder().index(3).allowInsert(false).allowExtract(true).build();
+        SLOTS[4] = SlotConfig.builder().index(4).allowInsert(false).allowExtract(true).build();
     }
 
     private ConfigInventoryHandler backingInventory;
@@ -29,24 +31,18 @@ public class ContainerCoinPouch extends BaseContainer {
     private int coinPouchPlayerIndex;
 
     private SlotImmutable coinPouchSlot;
-    private SlotItemHandler inputSlot;
-    private SlotItemHandler outputSlot;
-
-    @Getter
-    private ItemLootCoin outputType;
 
     public ContainerCoinPouch(EntityPlayer player) {
         this.backingInventory = new ConfigInventoryHandler(SLOTS, null);
         this.openingPlayer = player;
         coinPouchPlayerIndex = player.inventory.currentItem;
-        outputType = ModItems.lootCoin_1;
 
-        inputSlot = new SlotItemHandler(backingInventory, 0, 17, 34) {
+        addSlotToContainer(new SlotItemHandler(backingInventory, 0, 34, 28) {
             @Override
             public void putStack(@Nonnull ItemStack stack) {
                 if (stack.getItem() instanceof ItemLootCoin) {
                     addAmount(((ItemLootCoin) stack.getItem()), stack.getCount());
-                    updateOutputSlot();
+                    updateAllOutputSlots();
                 }
                 onSlotChanged();
             }
@@ -58,41 +54,14 @@ public class ContainerCoinPouch extends BaseContainer {
                 }
                 return stack.getItem() instanceof ItemLootCoin;
             }
-        };
+        });
 
-        // We override this so that when things are taken from the output, it updates the coinPouch.
-        outputSlot = new SlotControlled(backingInventory, 1, 141, 34) {
-            @Override
-            public ItemStack onTake(EntityPlayer thePlayer, ItemStack stack) {
-                ItemStack result = super.onTake(thePlayer, stack);
-                updateOutputSlot();
-                return result;
-            }
+        // These are the output slots.
+        addSlotToContainer(new OutputSlot(backingInventory, 1, 70, 28, ModItems.lootCoin_1));
+        addSlotToContainer(new OutputSlot(backingInventory, 2, 88, 28, ModItems.lootCoin_8));
+        addSlotToContainer(new OutputSlot(backingInventory, 3, 106, 28, ModItems.lootCoin_64));
+        addSlotToContainer(new OutputSlot(backingInventory, 4, 124, 28, ModItems.lootCoin_512));
 
-            @Override
-            public ItemStack onTaken(@Nonnull ItemStack stack) {
-                addAmount(outputType, -stack.getCount());
-                // We do this so the player only gets 1 stack at a time
-                return ItemStack.EMPTY;
-            }
-
-            @Override
-            public boolean isItemValid(@Nonnull ItemStack stack) {
-                return false;
-            }
-
-            /**
-             * Make is so that shift-clicking won't combine the output stack with any others.
-             * @return
-             */
-            @Override
-            public int getSlotStackLimit() {
-                return getStack().getCount();
-            }
-        };
-
-        addSlotToContainer(inputSlot);
-        addSlotToContainer(outputSlot);
         // We return a normal Slot EXCEPT for when it's the slot with the Coin Pouch. Then we return an
         // immutable slot so we can modify it, but the player cannot. This is how we sync the inventory information.
         GuiUtil.addPlayerInventory(this, player.inventory, 8, 84, 4, (index, x, y) -> {
@@ -104,21 +73,17 @@ public class ContainerCoinPouch extends BaseContainer {
             }
         });
 
-        updateOutputSlot();
+        updateAllOutputSlots();
     }
 
-    /**
-     * Update the output slot to show a single item of the output type, or be empty
-     * if you don't have enough coins.
-     */
-    protected void updateOutputSlot() {
-        long amount = ItemCoinPouch.getAmount(getCoinPouch());
-        if (amount >= outputType.amount) {
-            backingInventory.setStackInSlot(outputSlot.getSlotIndex(), new ItemStack(outputType, 1));
-        } else {
-            backingInventory.setStackInSlot(outputSlot.getSlotIndex(), ItemStack.EMPTY);
+    protected void updateAllOutputSlots() {
+        // Make sure all of our output slots are updated properly
+        for (int i = 1; i < 5; i++) {
+            Slot inventorySlot = inventorySlots.get(i);
+            if (inventorySlot instanceof OutputSlot) {
+                ((OutputSlot) inventorySlot).updateOutputSlot();
+            }
         }
-        outputSlot.onSlotChanged();
     }
 
     protected void addAmount(ItemLootCoin coinType, int count) {
@@ -134,10 +99,13 @@ public class ContainerCoinPouch extends BaseContainer {
 
     @Override
     protected ItemStack getShiftClickStack(EntityPlayer player, int index) {
-        if (index == outputSlot.getSlotIndex()) {
-            long maxCoins = ItemCoinPouch.getAmount(getCoinPouch()) / outputType.amount;
+        Slot slot = inventorySlots.get(index);
+        if (slot instanceof OutputSlot) {
+            OutputSlot oSlot = (OutputSlot)slot;
+            // This determines the maximum number of coins the player can take.
+            long maxCoins = ItemCoinPouch.getAmount(getCoinPouch()) / oSlot.outputType.amount;
             int stackSize = (int)Math.min(maxCoins, 64);
-            outputSlot.putStack(new ItemStack(outputType, stackSize));
+            oSlot.putStack(new ItemStack(oSlot.outputType, stackSize));
         }
         return super.getShiftClickStack(player, index);
     }
@@ -146,9 +114,53 @@ public class ContainerCoinPouch extends BaseContainer {
         return coinPouchSlot.getRealStack();
     }
 
-    public void setOutputType(ItemLootCoin outputType) {
-        Objects.requireNonNull(outputType);
-        this.outputType = outputType;
-        updateOutputSlot();
+    protected class OutputSlot extends SlotControlled {
+        ItemLootCoin outputType;
+
+        public OutputSlot(IItemHandler itemHandler, int index, int xPosition, int yPosition, ItemLootCoin outputType) {
+            super(itemHandler, index, xPosition, yPosition);
+            this.outputType = outputType;
+        }
+
+        @Override
+        public ItemStack onTake(EntityPlayer thePlayer, ItemStack stack) {
+            ItemStack result = super.onTake(thePlayer, stack);
+            updateOutputSlot();
+            return result;
+        }
+
+        /**
+         * Update the output slot to show a single item of the output type, or be empty
+         * if you don't have enough coins.
+         */
+        protected void updateOutputSlot() {
+            long amount = ItemCoinPouch.getAmount(getCoinPouch());
+            if (amount >= outputType.amount) {
+                backingInventory.setStackInSlot(getSlotIndex(), new ItemStack(outputType, 1));
+            } else {
+                backingInventory.setStackInSlot(getSlotIndex(), ItemStack.EMPTY);
+            }
+            onSlotChanged();
+        }
+
+        @Override
+        public ItemStack onTaken(@Nonnull ItemStack stack) {
+            addAmount(outputType, -stack.getCount());
+            // We do this so the player only gets 1 stack at a time
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public boolean isItemValid(@Nonnull ItemStack stack) {
+            return false;
+        }
+
+        /**
+         * Make is so that shift-clicking won't combine the output stack with any others.
+         */
+        @Override
+        public int getSlotStackLimit() {
+            return getStack().getCount();
+        }
     }
 }
