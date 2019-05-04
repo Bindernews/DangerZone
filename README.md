@@ -17,6 +17,10 @@ danger level of the entity.
 This mod is absolutely a Work In Progress. This isn't even alpha. There are a lot of planned features, but
 coding takes time.
 
+# Modpack
+Currently you may NOT use this mod in a modpack without explicit permission. I don't want people contacting
+me about it until I've made an official release. Sorry about that.
+
 # Copying
 If you're looking at this mod because you want to learn how to make Minecraft mods, read on. This mod
 is licensed under the GPLv3, meaning if you want to copy it then your code must be GPLv3 as well.
@@ -27,6 +31,7 @@ You can license your own code however you want.
 If you flat out copy my code and all you do is rename some variables, that's not okay, unless you
 also release your code as GPLv3.
 
-# Modpack
-Currently you may NOT use this mod in a modpack without explicit permission. I don't want people contacting
-me about it until I've made an official release. Sorry about that.
+# Contributing
+By submitting code or assets to Danger Zone, you agree to release your contributions under the terms
+of the GNU Lesser General Public License (version 3).
+ 
