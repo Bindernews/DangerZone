@@ -5,6 +5,7 @@ item.dangerzone:loot_coin_64.name=Loot Coin x64
 item.dangerzone:loot_coin_512.name=Loot Coin x512
 item.dangerzone:coin_pouch.name=Coin Pouch
 item.dangerzone:coin_pouch.tooltip=Contains %s coins
+item.dangerzone:coin_pump_shotgun.name=The Incredible Coin Pump Shotgun!
 
 # GUI
 gui.dangerzone.coins=Coins: %d
