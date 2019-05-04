@@ -2,6 +2,7 @@ package com.vortexel.dangerzone.common.gui;
 
 import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.client.gui.GuiCoinPouch;
+import com.vortexel.dangerzone.client.gui.GuiCoinPumpShotgun;
 import com.vortexel.dangerzone.common.item.ModItems;
 import lombok.val;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,6 +16,7 @@ import javax.annotation.Nullable;
 public class GuiHandler implements IGuiHandler {
 
     public static final int GUI_COIN_POUCH = 1;
+    public static final int GUI_COIN_PUMP_SHOTGUN = 2;
 
     @Nullable
     @Override
@@ -26,6 +28,8 @@ public class GuiHandler implements IGuiHandler {
         switch (ID) {
             case GUI_COIN_POUCH:
                 return new GuiCoinPouch(container);
+            case GUI_COIN_PUMP_SHOTGUN:
+                return new GuiCoinPumpShotgun(container);
             default:
                 return null;
         }
@@ -34,13 +38,19 @@ public class GuiHandler implements IGuiHandler {
     @Nullable
     @Override
     public Container getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+        val stack = player.getHeldItem(EnumHand.MAIN_HAND);
         switch (ID) {
             case GUI_COIN_POUCH:
-                val stack = player.getHeldItem(EnumHand.MAIN_HAND);
                 if (stack.getItem() == ModItems.coinPouch) {
                     return new ContainerCoinPouch(player);
                 }
                 return null;
+            case GUI_COIN_PUMP_SHOTGUN:
+                if (stack.getItem() == ModItems.coinPumpShotgun) {
+                    return new ContainerCoinPumpShotgun(player);
+                }
+                return null;
+
             default:
                 return null;
         }
