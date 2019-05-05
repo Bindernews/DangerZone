@@ -3,6 +3,7 @@ package com.vortexel.dangerzone.common.item;
 import com.google.common.base.Predicates;
 import com.vortexel.dangerzone.common.entity.EntityCoinProjectile;
 import com.vortexel.dangerzone.common.gui.GuiHandler;
+import com.vortexel.dangerzone.common.sound.ModSounds;
 import com.vortexel.dangerzone.common.util.FnUtil;
 import com.vortexel.dangerzone.common.util.Hitscan;
 import com.vortexel.dangerzone.common.util.MCUtil;
@@ -63,14 +64,17 @@ public class ItemCoinPumpShotgun extends BaseItem {
             val ammo = getContents(shotgun);
             val world = player.getEntityWorld();
             if (ammo.isEmpty()) {
-                world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.2F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+                player.playSound(ModSounds.shotgunFire, 0.75f, 1);
+//                world.playSound(null, player.posX, player.posY, player.posZ, ModSounds.shotgunFire,
+//                        SoundCategory.BLOCKS, 0.2F,
+//                        ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
                 return;
             } else { //Go ahead and fire the shotgun
                 val ammoType = ((ItemLootCoin) ammo.getItem());
                 ammo.grow(-1);
                 setContents(shotgun, ammo);
                 //Actual firing of weapon
-                fireShot(player, player.getLookVec(), 2f, ammoType, 4);
+                fireShot(player, player.getLookVec(), 0.5f, ammoType, 4);
                 // Set cooldown timer
                 player.getCooldownTracker().setCooldown(this, 40);
             }
