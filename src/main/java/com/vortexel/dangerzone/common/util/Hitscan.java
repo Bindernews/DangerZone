@@ -14,29 +14,36 @@ import java.util.List;
 public class Hitscan {
 
     private final World world;
-    private final Vec3d start;
-    private final Vec3d end;
     private final Predicate<? super Entity> filter;
     private final double rayRadius;
-
-    private final Vec3d motion;
-    private final List<Entity> entities;
+    private Vec3d end;
+    private Vec3d motion;
+    private List<Entity> entities;
     private Vec3d pos;
     private AxisAlignedBB endBox;
     private final double rayRadiusSq;
 
-    public Hitscan(World world, Vec3d start, Vec3d end, double rayRadius, Predicate<? super Entity> filter) {
+    public Hitscan(World world, Vec3d start, Vec3d end, RayTraceResult blockRayTrace, double rayRadius,
+                   Predicate<? super Entity> filter) {
         this.world = world;
-        this.start = start;
-        this.end = end;
         this.filter = filter;
         this.rayRadius = rayRadius;
+        this.end = end;
 
-        this.motion = end.subtract(start).normalize();
+        // If we're including blocks, then do an initial ray-trace to find the first block
+        if (blockRayTrace != null) {
+            this.end = blockRayTrace.hitVec;
+        }
+
+        this.motion = this.end.subtract(start).normalize();
         this.entities = Lists.newArrayList();
         this.pos = start;
-        this.endBox = new AxisAlignedBB(end, end.add(motion.scale(2)));
+        this.endBox = new AxisAlignedBB(this.end, this.end.add(motion.scale(2)));
         this.rayRadiusSq = rayRadius * rayRadius;
+    }
+
+    public Vec3d getEnd() {
+        return this.end;
     }
 
     @Nullable

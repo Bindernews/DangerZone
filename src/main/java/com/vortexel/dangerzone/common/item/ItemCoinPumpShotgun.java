@@ -10,6 +10,7 @@ import com.vortexel.dangerzone.common.util.MCUtil;
 import lombok.val;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.projectile.EntityTippedArrow;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -111,10 +112,15 @@ public class ItemCoinPumpShotgun extends BaseItem {
         for (int i = 0; i < bullets; i++) {
             val motion = towards.add(inaccuracyVec(world.rand, inaccuracy));
             val end = start.add(motion.scale(SHOT_DISTANCE));
-            val scan = new Hitscan(entity.getEntityWorld(), start, end, RAY_RADIUS, hitscanFilter);
+            val rayTrace = world.rayTraceBlocks(start, end, false, true, false);
+            val scan = new Hitscan(entity.getEntityWorld(), start, end, rayTrace, RAY_RADIUS, hitscanFilter);
             val entityHit = scan.findFirstNot(entity);
             if (entityHit != null) {
                 spawnCoinBulletAt(entity, (EntityLivingBase)entityHit, coinType, damage);
+            } else {
+                val endPos = scan.getEnd();
+                val marker = new EntityTippedArrow(world, endPos.x, endPos.y, endPos.z);
+                world.spawnEntity(marker);
             }
         }
     }
