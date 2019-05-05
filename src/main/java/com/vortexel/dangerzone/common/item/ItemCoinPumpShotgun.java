@@ -1,6 +1,5 @@
 package com.vortexel.dangerzone.common.item;
 
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.vortexel.dangerzone.common.entity.EntityCoinProjectile;
 import com.vortexel.dangerzone.common.gui.GuiHandler;
@@ -8,22 +7,16 @@ import com.vortexel.dangerzone.common.util.FnUtil;
 import com.vortexel.dangerzone.common.util.Hitscan;
 import com.vortexel.dangerzone.common.util.MCUtil;
 import lombok.val;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
-import org.apache.commons.lang3.Validate;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Random;
 
 public class ItemCoinPumpShotgun extends BaseItem {
@@ -70,7 +63,7 @@ public class ItemCoinPumpShotgun extends BaseItem {
             val ammo = getContents(shotgun);
             val world = player.getEntityWorld();
             if (ammo.isEmpty()) {
-                //Play click sound
+                world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.2F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
                 return;
             } else { //Go ahead and fire the shotgun
                 val ammoType = ((ItemLootCoin) ammo.getItem());
@@ -78,7 +71,8 @@ public class ItemCoinPumpShotgun extends BaseItem {
                 setContents(shotgun, ammo);
                 //Actual firing of weapon
                 fireShot(player, player.getLookVec(), 2f, ammoType, 4);
-                //Create cooldown timer (look at enderpearls or chorus fruit
+                // Set cooldown timer
+                player.getCooldownTracker().setCooldown(this, 40);
             }
         }
     }
@@ -108,7 +102,7 @@ public class ItemCoinPumpShotgun extends BaseItem {
     private void spawnCoinBulletAt(EntityLivingBase attacker, EntityLivingBase victim, ItemLootCoin coinType,
                                    float damage) {
         val world = victim.getEntityWorld();
-        val coin = new EntityCoinProjectile(world, attacker, coinType, damage);
+        val coin = new EntityCoinProjectile(world, attacker, coinType);
         coin.setPosition(victim.posX, victim.posY, victim.posZ);
         world.spawnEntity(coin);
         victim.attackEntityFrom(DamageSource.causeThrownDamage(coin, attacker), damage);

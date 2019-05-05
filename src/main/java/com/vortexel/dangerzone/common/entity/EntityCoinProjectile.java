@@ -14,12 +14,10 @@ import net.minecraft.world.World;
 public class EntityCoinProjectile extends EntityThrowable {
 
     private ItemLootCoin coinType;
-    private float damage;
 
-    public EntityCoinProjectile(World world, EntityLivingBase attacker, ItemLootCoin coinType, float damage) {
+    public EntityCoinProjectile(World world, EntityLivingBase attacker, ItemLootCoin coinType) {
         super(world, attacker);
         this.coinType = coinType;
-        this.damage = damage;
     }
 
     @Override
@@ -35,11 +33,6 @@ public class EntityCoinProjectile extends EntityThrowable {
     protected void onImpact(RayTraceResult result) {
         if (MCUtil.isWorldLocal(world))
         {
-//            if(result.entityHit != null)
-//            {
-//                val damageSource = DamageSource.causeThrownDamage(this, this.getThrower());
-//                result.entityHit.attackEntityFrom(damageSource, damage);
-//            }
             this.setDead();
         }
     }
