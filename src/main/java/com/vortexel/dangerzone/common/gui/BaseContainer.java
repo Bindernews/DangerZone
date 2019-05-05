@@ -102,7 +102,7 @@ public abstract class BaseContainer extends Container {
             delta = -1;
         }
         for (int i = realStart; i != realEnd; i += delta) {
-            if (testMergeStack(stack, getSlot(i))) {
+            if (testMergeStack(stack, getSlot(i), true)) {
                 return i;
             }
         }
@@ -118,7 +118,7 @@ public abstract class BaseContainer extends Container {
      */
     protected ItemStack insertStack(@Nonnull ItemStack stack, int slotIndex) {
         val slot = getSlot(slotIndex);
-        if (!testMergeStack(stack, slot)) {
+        if (!testMergeStack(stack, slot, true)) {
             return stack;
         }
         val current = slot.getStack();
@@ -133,15 +133,11 @@ public abstract class BaseContainer extends Container {
      * This takes into account empty slots, {@code slot.isItemValid()}, {@code canMergeSlot()},
      * and stack limits.
      */
-    protected boolean testMergeStack(@Nonnull ItemStack stack, Slot slot) {
+    protected boolean testMergeStack(@Nonnull ItemStack stack, Slot slot, boolean stackSizeMatters) {
         if (!canMergeSlot(stack, slot)) {
             return false;
         }
-        val current = slot.getStack();
-        val canMerge = current.isEmpty()
-                || (ItemHandlerHelper.canItemStacksStack(current, stack)
-                    && current.getCount() < getStackLimit(current, slot));
-        return canMerge && slot.isItemValid(stack);
+        return Container.canAddItemToSlot(slot, stack, stackSizeMatters) && slot.isItemValid(stack);
     }
 
     /**

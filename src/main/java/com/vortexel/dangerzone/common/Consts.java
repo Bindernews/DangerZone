@@ -7,6 +7,7 @@ import java.util.UUID;
 public final class Consts {
 
     public static final int MAX_DANGER_LEVEL = (1 << 15);
+    public static final int STACK_SIZE = 64;
 
     //region modifier UUIDs
 
