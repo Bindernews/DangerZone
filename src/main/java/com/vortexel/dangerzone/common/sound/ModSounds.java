@@ -11,6 +11,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 public class ModSounds {
 
     public static final SoundEvent shotgunFire = makeSound("shotgun_fire");
+    public static final SoundEvent shotgunDryFire = makeSound("shotgun_dry_fire");
 
     public static void init() {
         MinecraftForge.EVENT_BUS.register(new Registrar());
@@ -21,6 +22,7 @@ public class ModSounds {
         public void register(RegistryEvent.Register<SoundEvent> event) {
             IForgeRegistry<SoundEvent> r = event.getRegistry();
             r.register(shotgunFire);
+            r.register(shotgunDryFire);
         }
     }
 

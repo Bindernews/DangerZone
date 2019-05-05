@@ -23,8 +23,9 @@ import java.util.Random;
 public class ItemCoinPumpShotgun extends BaseItem {
 
     private static final String KEY_CONTENTS = "contents";
-    private static final double SHOT_DISTANCE = 20;
+    private static final double SHOT_DISTANCE = 200;
     private static final float RAY_RADIUS = 0.5f;
+    public static final float INACCURACY = 2;
 
     public ItemCoinPumpShotgun() {
         super("coin_pump_shotgun");
@@ -64,30 +65,45 @@ public class ItemCoinPumpShotgun extends BaseItem {
             val ammo = getContents(shotgun);
             val world = player.getEntityWorld();
             if (ammo.isEmpty()) {
-                player.playSound(ModSounds.shotgunFire, 0.75f, 1);
-//                world.playSound(null, player.posX, player.posY, player.posZ, ModSounds.shotgunFire,
-//                        SoundCategory.BLOCKS, 0.2F,
-//                        ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+                world.playSound(null, player.posX, player.posY, player.posZ, ModSounds.shotgunDryFire,
+                        SoundCategory.PLAYERS, 0.75f, 1f);
+                player.getCooldownTracker().setCooldown(this, 10);
                 return;
             } else { //Go ahead and fire the shotgun
+                world.playSound(null, player.posX, player.posY, player.posZ, ModSounds.shotgunFire,
+                        SoundCategory.PLAYERS, 1f, 1f);
                 val ammoType = ((ItemLootCoin) ammo.getItem());
                 ammo.grow(-1);
                 setContents(shotgun, ammo);
                 //Actual firing of weapon
-                fireShot(player, player.getLookVec(), 0.5f, ammoType, 4);
+                fireShot(player, player.getLookVec(), INACCURACY, ammoType);
                 // Set cooldown timer
-                player.getCooldownTracker().setCooldown(this, 40);
+                player.getCooldownTracker().setCooldown(this, 25);
             }
         }
     }
 
-    public void fireShot(EntityLivingBase entity, Vec3d towards, float inaccuracy, ItemLootCoin coinType, int bullets) {
+    public void fireShot(EntityLivingBase entity, Vec3d towards, float inaccuracy, ItemLootCoin coinType) {
         val world = entity.getEntityWorld();
-        val start = entity.getPositionVector();
-        // Calculate the actual damage
-        float realDamage = (float)coinType.amount / bullets;
-        if (realDamage < 1f) {
-            realDamage = 1f;
+        val start = entity.getPositionVector().addVector(0, entity.getEyeHeight() - 0.1, 0);
+        float damage = 0f;
+        int bullets = 0;
+        switch (coinType.amount){
+            case 1:
+                damage = 2;
+                bullets = 1;
+                break;
+            case 8:
+                damage = 4;
+                bullets = 4;
+                break;
+            case 64:
+                damage = 16;
+                bullets = 4;
+                break;
+            case 512:
+                damage = 128;
+                bullets = 6;
         }
         // Create the filter for the hitscan to use so we only get the entities we want.
         val hitscanFilter = Predicates.and(EntitySelectors.NOT_SPECTATING, EntitySelectors.IS_ALIVE,
@@ -98,7 +114,7 @@ public class ItemCoinPumpShotgun extends BaseItem {
             val scan = new Hitscan(entity.getEntityWorld(), start, end, RAY_RADIUS, hitscanFilter);
             val entityHit = scan.findFirstNot(entity);
             if (entityHit != null) {
-                spawnCoinBulletAt(entity, (EntityLivingBase)entityHit, coinType, realDamage);
+                spawnCoinBulletAt(entity, (EntityLivingBase)entityHit, coinType, damage);
             }
         }
     }
