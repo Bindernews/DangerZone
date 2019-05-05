@@ -1,6 +1,7 @@
 package com.vortexel.dangerzone.common.item;
 
 import com.google.common.base.Predicates;
+import com.google.common.collect.Lists;
 import com.vortexel.dangerzone.common.entity.EntityCoinProjectile;
 import com.vortexel.dangerzone.common.gui.GuiHandler;
 import com.vortexel.dangerzone.common.sound.ModSounds;
@@ -11,7 +12,6 @@ import lombok.val;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityTippedArrow;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
@@ -19,14 +19,15 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 import java.util.Random;
 
 public class ItemCoinPumpShotgun extends BaseItem {
 
     private static final String KEY_CONTENTS = "contents";
     private static final double SHOT_DISTANCE = 200;
-    private static final float RAY_RADIUS = 0.5f;
-    public static final float INACCURACY = 2;
+    private static final float RAY_RADIUS = 1f;
+    private static float INACCURACY = 20f;
 
     public ItemCoinPumpShotgun() {
         super("coin_pump_shotgun");
@@ -109,6 +110,9 @@ public class ItemCoinPumpShotgun extends BaseItem {
         // Create the filter for the hitscan to use so we only get the entities we want.
         val hitscanFilter = Predicates.and(EntitySelectors.NOT_SPECTATING, EntitySelectors.IS_ALIVE,
                 (e) -> e instanceof EntityLivingBase);
+
+        // List of entities that we hit.
+        List<EntityLivingBase> hitEntities = Lists.newArrayListWithCapacity(bullets);
         for (int i = 0; i < bullets; i++) {
             val motion = towards.add(inaccuracyVec(world.rand, inaccuracy));
             val end = start.add(motion.scale(SHOT_DISTANCE));
@@ -116,11 +120,27 @@ public class ItemCoinPumpShotgun extends BaseItem {
             val scan = new Hitscan(entity.getEntityWorld(), start, end, rayTrace, RAY_RADIUS, hitscanFilter);
             val entityHit = scan.findFirstNot(entity);
             if (entityHit != null) {
-                spawnCoinBulletAt(entity, (EntityLivingBase)entityHit, coinType, damage);
+                // If we hit something, put it in the list of things we hit
+                hitEntities.add((EntityLivingBase)entityHit);
             } else {
                 val endPos = scan.getEnd();
                 val marker = new EntityTippedArrow(world, endPos.x, endPos.y, endPos.z);
                 world.spawnEntity(marker);
+            }
+        }
+        // Spawn the bullets. If an entity is hit multiple times, then they take more damage.
+        for (int i = 0; i < hitEntities.size(); i++) {
+            if (hitEntities.get(i) != null) {
+                int bulletCount = 1;
+                // Loop through hitEntities and find all other instances of this entity.
+                // For each, increment the number of bullets and then make sure we don't process it twice.
+                for (int j = i + 1; j < hitEntities.size(); j++) {
+                    if (hitEntities.get(i) == hitEntities.get(j)) {
+                        bulletCount++;
+                        hitEntities.set(j, null);
+                    }
+                }
+                spawnCoinBulletAt(entity, hitEntities.get(i), coinType, damage * bulletCount);
             }
         }
     }
