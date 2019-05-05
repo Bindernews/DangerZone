@@ -32,9 +32,8 @@ public class EntityCoinProjectile extends EntityThrowable {
     protected void onImpact(RayTraceResult result) {
         if (MCUtil.isWorldLocal(world))
         {
-            val arrow = new EntityTippedArrow(world, this.posX, this.posY, this.posZ);
-            world.spawnEntity(arrow);
-
+            //val arrow = new EntityTippedArrow(world, this.posX, this.posY, this.posZ);
+            //world.spawnEntity(arrow);
             this.setDead();
         }
     }

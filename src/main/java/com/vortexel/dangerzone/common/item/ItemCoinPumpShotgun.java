@@ -27,7 +27,7 @@ public class ItemCoinPumpShotgun extends BaseItem {
     private static final String KEY_CONTENTS = "contents";
     private static final double SHOT_DISTANCE = 200;
     private static final float RAY_RADIUS = 1f;
-    private static float INACCURACY = 20f;
+    private static float INACCURACY = 10f;
 
     public ItemCoinPumpShotgun() {
         super("coin_pump_shotgun");
