@@ -34,8 +34,13 @@ public class EntityCoinProjectile extends EntityThrowable {
         {
             if(result.entityHit != null)
             {
+                int amount = coinType.amount / 8;
+                if (amount == 0)
+                {
+                    amount ++;
+                }
                 val damage = DamageSource.causeThrownDamage(this, this.getThrower());
-                result.entityHit.attackEntityFrom(damage, coinType.amount / 8);
+                result.entityHit.attackEntityFrom(damage, amount);
             }
             this.setDead();
         }

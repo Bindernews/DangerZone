@@ -1,0 +1,6 @@
+{
+  "shotgun_fire": {
+    "category": "block",
+    "sounds": [ "dangerzone/src/main/resources/sounds/shotgun_fire.ogg" ]
+  }
+}
