@@ -1,24 +1,36 @@
 package com.vortexel.dangerzone.common.item;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.vortexel.dangerzone.common.entity.EntityCoinProjectile;
 import com.vortexel.dangerzone.common.gui.GuiHandler;
 import com.vortexel.dangerzone.common.util.FnUtil;
+import com.vortexel.dangerzone.common.util.Hitscan;
 import com.vortexel.dangerzone.common.util.MCUtil;
 import lombok.val;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.*;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Random;
 
 public class ItemCoinPumpShotgun extends BaseItem {
 
     private static final String KEY_CONTENTS = "contents";
+    private static final double SHOT_DISTANCE = 20;
+    private static final float RAY_RADIUS = 0.5f;
 
     public ItemCoinPumpShotgun() {
         super("coin_pump_shotgun");
@@ -65,13 +77,47 @@ public class ItemCoinPumpShotgun extends BaseItem {
                 ammo.grow(-1);
                 setContents(shotgun, ammo);
                 //Actual firing of weapon
-                for (int i = 0; i < 8; i++) {
-                    val coin = new EntityCoinProjectile(world, player, ammoType);
-                    coin.shoot(player, player.rotationPitch, player.rotationYaw, 0, 5F, 2);
-                    world.spawnEntity(coin);
-                }
+                fireShot(player, player.getLookVec(), 2f, ammoType, 4);
                 //Create cooldown timer (look at enderpearls or chorus fruit
             }
         }
+    }
+
+    public void fireShot(EntityLivingBase entity, Vec3d towards, float inaccuracy, ItemLootCoin coinType, int bullets) {
+        val world = entity.getEntityWorld();
+        val start = entity.getPositionVector();
+        // Calculate the actual damage
+        float realDamage = (float)coinType.amount / bullets;
+        if (realDamage < 1f) {
+            realDamage = 1f;
+        }
+        // Create the filter for the hitscan to use so we only get the entities we want.
+        val hitscanFilter = Predicates.and(EntitySelectors.NOT_SPECTATING, EntitySelectors.IS_ALIVE,
+                (e) -> e instanceof EntityLivingBase);
+        for (int i = 0; i < bullets; i++) {
+            val motion = towards.add(inaccuracyVec(world.rand, inaccuracy));
+            val end = start.add(motion.scale(SHOT_DISTANCE));
+            val scan = new Hitscan(entity.getEntityWorld(), start, end, RAY_RADIUS, hitscanFilter);
+            val entityHit = scan.findFirstNot(entity);
+            if (entityHit != null) {
+                spawnCoinBulletAt(entity, (EntityLivingBase)entityHit, coinType, realDamage);
+            }
+        }
+    }
+
+    private void spawnCoinBulletAt(EntityLivingBase attacker, EntityLivingBase victim, ItemLootCoin coinType,
+                                   float damage) {
+        val world = victim.getEntityWorld();
+        val coin = new EntityCoinProjectile(world, attacker, coinType, damage);
+        coin.setPosition(victim.posX, victim.posY, victim.posZ);
+        world.spawnEntity(coin);
+        victim.attackEntityFrom(DamageSource.causeThrownDamage(coin, attacker), damage);
+    }
+
+    private static Vec3d inaccuracyVec(Random rand, float inaccuracy) {
+        val x = rand.nextGaussian() * 0.007499999832361937D * (double)inaccuracy;
+        val y = rand.nextGaussian() * 0.007499999832361937D * (double)inaccuracy;
+        val z = rand.nextGaussian() * 0.007499999832361937D * (double)inaccuracy;
+        return new Vec3d(x, y, z);
     }
 }
