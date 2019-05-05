@@ -64,10 +64,12 @@ public class ItemCoinPumpShotgun extends BaseItem {
                 val ammoType = ((ItemLootCoin) ammo.getItem());
                 ammo.grow(-1);
                 setContents(shotgun, ammo);
-
-                val coin = new EntityCoinProjectile(world, player, ammoType);
-                coin.shoot(player, player.rotationPitch, player.rotationYaw, 0, 5F, 0);
-                world.spawnEntity(coin);
+                //Actual firing of weapon
+                for (int i = 0; i < 8; i++) {
+                    val coin = new EntityCoinProjectile(world, player, ammoType);
+                    coin.shoot(player, player.rotationPitch, player.rotationYaw, 0, 5F, 2);
+                    world.spawnEntity(coin);
+                }
                 //Create cooldown timer (look at enderpearls or chorus fruit
             }
         }
