@@ -27,7 +27,7 @@ public class ItemCoinPumpShotgun extends BaseItem {
     private static final String KEY_CONTENTS = "contents";
     private static final double SHOT_DISTANCE = 200;
     private static final float RAY_RADIUS = 1f;
-    private static float INACCURACY = 20f;
+    private static float INACCURACY = 10f;
 
     public ItemCoinPumpShotgun() {
         super("coin_pump_shotgun");
@@ -123,9 +123,9 @@ public class ItemCoinPumpShotgun extends BaseItem {
                 // If we hit something, put it in the list of things we hit
                 hitEntities.add((EntityLivingBase)entityHit);
             } else {
-                val endPos = scan.getEnd();
-                val marker = new EntityTippedArrow(world, endPos.x, endPos.y, endPos.z);
-                world.spawnEntity(marker);
+                //val endPos = scan.getEnd();
+                //val marker = new EntityTippedArrow(world, endPos.x, endPos.y, endPos.z);
+                //world.spawnEntity(marker);
             }
         }
         // Spawn the bullets. If an entity is hit multiple times, then they take more damage.
