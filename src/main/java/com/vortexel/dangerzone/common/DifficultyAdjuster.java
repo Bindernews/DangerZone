@@ -86,7 +86,7 @@ public class DifficultyAdjuster {
      * (that's taken care of in {@link DifficultyAdjuster#modifyLootingLevel}).
      */
     public void modifyDrops(LivingDropsEvent e) {
-        val canLoot = DZConfig.general.lootBagOnNonPlayerKills
+        val canLoot = DZConfig.general.lootCoinsOnNonPlayerKills
                 || shouldLoot(e.getSource().getTrueSource());
         if (shouldModifyWorld(e.getEntity()) && canLoot) {
             val entity = e.getEntity();
