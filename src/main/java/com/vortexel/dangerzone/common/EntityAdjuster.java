@@ -1,6 +1,8 @@
 package com.vortexel.dangerzone.common;
 
+import com.google.common.collect.Lists;
 import com.vortexel.dangerzone.DangerZone;
+import com.vortexel.dangerzone.common.config.EntityConfig;
 import com.vortexel.dangerzone.common.config.ModifierConf;
 import lombok.val;
 import net.minecraft.entity.EntityLivingBase;
@@ -10,13 +12,15 @@ import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.common.MinecraftForge;
+import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nonnull;
+import java.util.Random;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.DoubleStream;
 
-import static com.vortexel.dangerzone.common.DangerMath.lerp;
-import static com.vortexel.dangerzone.common.DangerMath.unlerpClamp;
+import static com.vortexel.dangerzone.common.DangerMath.*;
 
 /**
  * Adjusts a newly-spawning entity based on its difficulty. <br/>
@@ -28,9 +32,11 @@ public class EntityAdjuster {
     private static final int OP_MULTIPLY = 1;
     private static final int OP_MULTIPLY_EXTRA = 2;
     private static final String FIELD_EXPLOSION_RADIUS = "explosionRadius";
-    private static final double BAD_MODIFIER = -1;
+    private static final int TOTAL_MODIFIER_COUNT = ModifierType.values().length;
+    private static final double POINT_MODIFIER_SCALE = 1 / 3D;
 
     private final EntityLivingBase entity;
+    private EntityConfig eConfig;
 
     private int level;
 
@@ -39,15 +45,22 @@ public class EntityAdjuster {
     }
 
     public void adjust() {
+        if (!precheck()) {
+            return;
+        }
+        actuallyAdjust();
+    }
+
+    private boolean precheck() {
         // Set the danger level on the entity
         val dangerLevelCap = entity.getCapability(DangerZone.CAP_DANGER_LEVEL, null);
         if (dangerLevelCap == null) {
-            return;
+            return false;
         }
 
         // Don't modify an entity that's already been modified
         if (dangerLevelCap.isModified()) {
-            return;
+            return false;
         }
         // Remind ourselves that we've been modified later on
         dangerLevelCap.setModified(true);
@@ -63,75 +76,112 @@ public class EntityAdjuster {
 
         // If level == 0 then we don't change anything.
         if (level == 0) {
-            return;
+            return false;
         }
 
-        val eConfig = DangerZone.proxy.getEntityConfigManager().getConfigDynamic(entity.getClass());
+        eConfig = DangerZone.proxy.getEntityConfigManager().getConfigDynamic(entity.getClass());
         if (eConfig == null) {
             DangerZone.log.warn("Failed to get entity config for {}", entity.getClass().getName());
-            return;
+            return false;
         }
+        return true;
+    }
 
-        val modTypes = ModifierType.values();
-        val amounts = new double[modTypes.length];
-        double totalDanger = 0;
-        for (int i = 0; i < modTypes.length; i++) {
-            val modifier = modTypes[i];
-            val conf = eConfig.modifiers.get(modifier);
-            // If there's no configuration for this value, then assume it's not being applied
-            if (conf == null || !conf.enabled) {
-                amounts[i] = BAD_MODIFIER;
-            } else {
-                // Calculate the value for this modifier
-                amounts[i] = calculateInitialAmount(modifier, conf);
-                if (amounts[i] != BAD_MODIFIER) {
-                    totalDanger += amounts[i] * conf.dangerScale;
+    private boolean actuallyAdjust() {
+        // List of enabled modifier types
+        val modifierTypes = new ModifierType[TOTAL_MODIFIER_COUNT];
+        // Chance of applying each modifier, plus the chance of the previous modifier.
+        val chanceValues = new double[TOTAL_MODIFIER_COUNT];
+        // The number of modifiers we're actually using
+        int modCount = 0;
+        // The running sum of all chances
+        double totalChance = 0;
+        // Determine which modifiers we're using and our chance to apply each of them
+        for (val modType : ModifierType.values()) {
+            val conf = getConf(modType);
+            if (conf != null && conf.enabled) {
+                val modChance = calculateChance(modType, conf);
+                if (modChance > Consts.EPSILON) {
+                    modifierTypes[modCount] = modType;
+                    totalChance += modChance;
+                    chanceValues[modCount] = totalChance;
+                    modCount++;
                 }
             }
         }
-        // Finally we actually apply the modifiers. We also adjust the modifiers to make sure we're not
-        // too dangerous on the whole.
-        val maxDanger = DangerMath.randomDanger(entity.getRNG(), level - 1, level + 1);
-        // If we don't check this then it might cause a divide-by-zero.
-        if (totalDanger == 0) {
-            return;
+
+        // Failsafe for if we don't apply any modifiers. This happens with low-level entities.
+        if (totalChance == 0) {
+            return false;
         }
-        val ratio = maxDanger / totalDanger;
-        for (int i = 0; i < amounts.length; i++) {
-            if (amounts[i] != BAD_MODIFIER) {
-                val conf = eConfig.modifiers.get(modTypes[i]);
-                val realAmount = DangerMath.clamp(amounts[i] * ratio, conf.min, conf.max);
-                applyModifier(modTypes[i], realAmount, selectApplicator(modTypes[i]));
+
+        // The total number of points we can use to modify the entity
+        double points = DangerMath.randomDanger(getRNG(), level - (int)DangerMath.levelRange(),
+                level + (int)DangerMath.levelRange()) * POINT_MODIFIER_SCALE * modCount;
+        // How many points to put into each modifier
+        val modPoints = new double[TOTAL_MODIFIER_COUNT];
+        // Give points to each modifier
+        while (points > Consts.EPSILON) {
+            // How many points to put towards the next level: 1-3 or the remaining points.
+            val deltaPoints = Math.min(points, randRange(getRNG(), 1, 3));
+            val chance = randRange(getRNG(), 0, totalChance);
+            // Find which slot our random value fits in
+            int i = 0;
+            while (i < modCount && chance > chanceValues[i]) {
+                i++;
             }
+            val scale = getConf(modifierTypes[i]).dangerScale;
+            modPoints[i] += (deltaPoints / scale);
+            points -= (deltaPoints * scale);
         }
+
+        // Now turn those points into actual modifier values
+        for (int i = 0; i < modCount; i++) {
+            val conf = getConf(modifierTypes[i]);
+            val amount = pointsToModifier(conf, modPoints[i]);
+            applyModifier(modifierTypes[i], amount, selectApplicator(modifierTypes[i]));
+        }
+
+        return true;
+    }
+
+    private double pointsToModifier(@Nonnull ModifierConf conf, double points) {
+        val minLevel = calcMinLevel(conf);
+        val maxLevel = calcMaxLevel(conf);
+        val pointsUnit = unlerpClamp(points, 0, maxLevel - minLevel);
+        return lerp(pointsUnit, conf.min, conf.max);
+    }
+
+    private ModifierConf getConf(ModifierType type) {
+        return eConfig.modifiers.get(type);
     }
 
     /**
-     * Calculate the initial, randomized, value for the modifier. <br/>
+     * Return the chance [0 - 1) that this modifier will be applied.
      */
-    private double calculateInitialAmount(@Nonnull ModifierType modifier, @Nonnull ModifierConf conf) {
-        if (level < conf.minLevel) {
-            return BAD_MODIFIER;
+    private double calculateChance(@Nonnull ModifierType modifierType, @Nonnull ModifierConf conf) {
+        val minLevel = calcMinLevel(conf);
+        if (level < minLevel) {
+            return 0.0;
         }
-        val rng = entity.getRNG();
-        val plusMinus = DangerMath.levelRange();
-        val maxLevel = conf.maxLevel == -1 ? DangerMath.maxDangerLevel() + 1 : conf.maxLevel;
-        val minLevel = conf.minLevel == -1 ? 0 : conf.minLevel;
         // Determine if we should apply the modifier. Chances decrease as the level decreases.
         // Currently the threshold = ((level - minLevel) / (trueMaxLevel - minLevel)) * chance
         // If we want the threshold to not account for the minLevel, that would change the math.
         // Also note that I use the term "unit" to refer to a value in the range [0-1).
-        val levelUnit = unlerpClamp(level, minLevel, maxLevel);
-        val threshold = lerp(levelUnit, conf.minChance, conf.maxChance);
-        val chanceRand = rng.nextDouble();
-        if (chanceRand > threshold) {
-            return BAD_MODIFIER;
-        }
-        // Now that we know we're going to try to get a value, let's generate one.
-        // We cap our level at "max level".
-        val randLevel = DangerMath.randRange(rng, level - plusMinus, level + plusMinus);
-        val randUnit = unlerpClamp(randLevel, minLevel, maxLevel);
-        return lerp(randUnit, conf.min, conf.max);
+        val levelUnit = unlerpClamp(level, minLevel, calcMaxLevel(conf));
+        return lerp(levelUnit, conf.minChance, conf.maxChance);
+    }
+
+    private double calcMinLevel(@Nonnull ModifierConf conf) {
+        return conf.minLevel == -1 ? 0 : conf.minLevel;
+    }
+
+    private double calcMaxLevel(@Nonnull ModifierConf conf) {
+        return conf.maxLevel == -1 ? DangerMath.maxDangerLevel() + 1 : conf.maxLevel;
+    }
+
+    private Random getRNG() {
+        return entity.getRNG();
     }
 
     /**
