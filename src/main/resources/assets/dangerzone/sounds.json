@@ -1,0 +1,12 @@
+{
+  "shotgun_fire": {
+    "category": "block",
+    "subtitle": "dangerzone.shotgun_fire",
+    "sounds": [ "dangerzone:shotgun_fire" ]
+  },
+  "shotgun_dry_fire": {
+    "category": "block",
+    "subtitle": "dangerzone.shotgun_dry_fire",
+    "sounds": [ "dangerzone:shotgun_dry_fire" ]
+  }
+}

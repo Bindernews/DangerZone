@@ -8,6 +8,7 @@ import com.vortexel.dangerzone.common.block.ModBlocks;
 import com.vortexel.dangerzone.common.capability.IDangerLevel;
 import com.vortexel.dangerzone.common.config.DZConfig;
 import com.vortexel.dangerzone.common.item.ModItems;
+import com.vortexel.dangerzone.common.sound.ModSounds;
 import com.vortexel.dangerzone.common.tile.ModTiles;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.ResourceLocation;
@@ -95,6 +96,7 @@ public class DangerZone {
         ModBlocks.init();
         ModItems.init();
         ModTiles.init();
+        ModSounds.init();
         proxy.preInit(e);
         log.info("PreInit complete");
     }
