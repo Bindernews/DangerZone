@@ -123,9 +123,9 @@ public class ItemCoinPumpShotgun extends BaseItem {
                 // If we hit something, put it in the list of things we hit
                 hitEntities.add((EntityLivingBase)entityHit);
             } else {
-                val endPos = scan.getEnd();
-                val marker = new EntityTippedArrow(world, endPos.x, endPos.y, endPos.z);
-                world.spawnEntity(marker);
+                //val endPos = scan.getEnd();
+                //val marker = new EntityTippedArrow(world, endPos.x, endPos.y, endPos.z);
+                //world.spawnEntity(marker);
             }
         }
         // Spawn the bullets. If an entity is hit multiple times, then they take more damage.

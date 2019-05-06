@@ -3,10 +3,8 @@ package com.vortexel.dangerzone.common.entity;
 import com.vortexel.dangerzone.common.Consts;
 import com.vortexel.dangerzone.common.item.ItemLootCoin;
 import com.vortexel.dangerzone.common.util.MCUtil;
-import lombok.val;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityThrowable;
-import net.minecraft.entity.projectile.EntityTippedArrow;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
