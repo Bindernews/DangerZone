@@ -1,5 +1,8 @@
-package com.vortexel.dangerzone.common;
+package com.vortexel.dangerzone.common.difficulty;
 
+import com.vortexel.dangerzone.common.Consts;
+import com.vortexel.dangerzone.common.DangerMath;
+import com.vortexel.dangerzone.common.Reflector;
 import com.vortexel.dangerzone.common.capability.IDangerLevel;
 import com.vortexel.dangerzone.common.config.DZConfig;
 import com.vortexel.dangerzone.common.item.ModItems;
@@ -93,7 +96,7 @@ public class DifficultyAdjuster {
             val dangerInfo = MCUtil.getDangerLevelCapability(entity);
             if (dangerInfo != null) {
                 val danger = dangerInfo.getDanger();
-                val amount = (int)DangerMath.randRange(e.getEntityLiving().getRNG(), danger - 4, danger + 1);
+                val amount = (int) DangerMath.randRange(e.getEntityLiving().getRNG(), danger - 4, danger + 1);
                 if (amount > 0) {
                     val stack = new ItemStack(ModItems.lootCoin_1, amount, 0);
                     e.getDrops().add(MCUtil.makeItemAt(entity, stack));
@@ -135,7 +138,7 @@ public class DifficultyAdjuster {
     public void adjustEntityDifficulty(Entity e) {
         // We farm out all the work to EntityAdjuster, because it's enough code for its own class.
         if (shouldModifyWorld(e) && e instanceof EntityCreature) {
-            new EntityAdjuster((EntityLivingBase)e).adjust();
+            new EntityAdjuster(new ForgeEntityModifier((EntityLivingBase)e)).adjust();
         }
     }
 

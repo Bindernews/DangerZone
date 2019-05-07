@@ -1,4 +1,4 @@
-package com.vortexel.dangerzone.common;
+package com.vortexel.dangerzone.common.difficulty;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
