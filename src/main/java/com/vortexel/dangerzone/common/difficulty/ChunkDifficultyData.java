@@ -1,9 +1,7 @@
-package com.vortexel.dangerzone.common;
+package com.vortexel.dangerzone.common.difficulty;
 
 import lombok.Value;
-import lombok.val;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 import java.util.HashMap;

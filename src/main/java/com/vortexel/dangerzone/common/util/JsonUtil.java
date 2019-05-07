@@ -1,5 +1,6 @@
 package com.vortexel.dangerzone.common.util;
 
+import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -7,7 +8,11 @@ import com.google.gson.JsonPrimitive;
 import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.List;
+
 public class JsonUtil {
+
+    private static final String ERR_EXPECTED = "Expected \"$1%s\" to be $2%s but it was not!";
 
     //region getOrDefault
 
@@ -49,18 +54,41 @@ public class JsonUtil {
         return sub != null && sub.isJsonPrimitive() ? sub.getAsJsonPrimitive() : null;
     }
 
-    public static Pair<Float, Float> readPair(JsonObject obj, String field, float defaultMin, float defaultMax,
-                                              SingleValue singleValueResponse) {
-        val result = readPair(obj, field, singleValueResponse);
-        return Pair.of(nullOrDefault(result.getLeft(), defaultMin), nullOrDefault(result.getRight(), defaultMax));
+    public static List<String> readStringList(JsonObject obj, String member) {
+        List<String> r = Lists.newArrayList();
+        val sub = obj.get(member);
+        if (sub == null) {
+            return r;
+        } else if (sub.isJsonPrimitive()) {
+            r.add(sub.getAsString());
+        } else if (sub.isJsonArray()) {
+            val arr = sub.getAsJsonArray();
+            for (int i = 0; i < arr.size(); i++) {
+                r.add(arr.get(i).getAsString());
+            }
+        } else if (sub.isJsonObject() || sub.isJsonNull()) {
+            throw new UnsupportedOperationException(
+                    String.format(ERR_EXPECTED, member, "a string or array of strings"));
+        }
+        return r;
     }
 
+    /**
+     * Returns a JsonArray of {@code values}.
+     * @param values list of numeric values
+     */
     public static JsonArray arrayOf(Number... values) {
         val arr = new JsonArray();
         for (val num : values) {
             arr.add(num);
         }
         return arr;
+    }
+
+    public static Pair<Float, Float> readPair(JsonObject obj, String field, float defaultMin, float defaultMax,
+                                              SingleValue singleValueResponse) {
+        val result = readPair(obj, field, singleValueResponse);
+        return Pair.of(nullOrDefault(result.getLeft(), defaultMin), nullOrDefault(result.getRight(), defaultMax));
     }
 
     /**

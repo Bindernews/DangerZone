@@ -6,6 +6,9 @@ import com.vortexel.dangerzone.common.capability.DangerLevelProvider;
 import com.vortexel.dangerzone.common.capability.DangerLevelStorage;
 import com.vortexel.dangerzone.common.capability.IDangerLevel;
 import com.vortexel.dangerzone.common.config.EntityConfigManager;
+import com.vortexel.dangerzone.common.difficulty.DifficultyAdjuster;
+import com.vortexel.dangerzone.common.difficulty.DifficultyMap;
+import com.vortexel.dangerzone.common.difficulty.ForgeWorldAdapter;
 import com.vortexel.dangerzone.common.network.PacketDangerLevel;
 import com.vortexel.dangerzone.common.network.PacketHandler;
 import com.vortexel.dangerzone.common.util.MCUtil;
@@ -43,14 +46,11 @@ public class CommonProxy {
     @Getter
     protected DifficultyAdjuster adjuster;
     @Getter
-    protected LootManager lootManager;
-    @Getter
     protected EntityConfigManager entityConfigManager;
 
     public void preInit(FMLPreInitializationEvent event) {
         // Create our object instances so they exist when other things try to use them.
         adjuster = new DifficultyAdjuster();
-        lootManager = new LootManager();
         entityConfigManager = new EntityConfigManager();
         worldDifficultyMaps = Maps.newHashMap();
 
@@ -58,13 +58,10 @@ public class CommonProxy {
         CapabilityManager.INSTANCE.register(IDangerLevel.class, new DangerLevelStorage(), IDangerLevel.Basic::new);
         // Register ourselves so we can receive events.
         MinecraftForge.EVENT_BUS.register(this);
-        // Register our ore loot table
-        LootTableList.register(LootManager.ORE_LOOT_TABLE_RESOURCE);
     }
 
     public void init(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(adjuster);
-        MinecraftForge.EVENT_BUS.register(lootManager);
 
         reloadEntityConfig();
     }

@@ -3,14 +3,7 @@
     "move_speed": {
       "range": [1, 2],
       "chance": [0.2, 0.8],
-      "min_level": 30,
-      "clamp": [0, 1]
-    },
-    "fly_speed": {
-      "range": [1, 5],
-      "chance": [0.2, 0.8],
-      "min_level": 30,
-      "clamp": [0, 1]
+      "min_level": 30
     },
     "max_health": {
       "range": [1, 10],
@@ -26,9 +19,6 @@
     "attack_damage": false,
     "wither": false,
     "armor": false
-  },
-  "generic:animal": {
-    "inherits": "generic:creature"
   },
   "generic:hostile": {
     "inherits": "generic:creature",
@@ -47,6 +37,16 @@
       "min_level": 30,
       "chance": [0.2, 0.8]
     }
+  },
+  "mixin:flying": {
+    "fly_speed": {
+      "range": [1, 2],
+      "chance": [0.2, 0.8],
+      "min_level": 30
+    }
+  },
+  "generic:animal": {
+    "inherits": "generic:creature"
   },
   "minecraft:horse": {
     "inherits": "generic:animal"
