@@ -3,37 +3,27 @@
     "move_speed": {
       "range": [1, 2],
       "chance": [0.2, 0.8],
-      "min_level": 30,
-      "clamp": [0, 1]
-    },
-    "fly_speed": {
-      "range": [1, 5],
-      "chance": [0.2, 0.8],
-      "min_level": 30,
-      "clamp": [0, 1]
+      "min_level": 30
     },
     "max_health": {
       "range": [1, 10],
-      "danger_scale": 1.0,
-      "chance": [0.8, 1.0],
-      "min_level": 10
+      "danger_scale": 0.75,
+      "chance": [0.8, 1.2],
+      "min_level": 5
     },
     "regeneration": {
       "range": [0, 6],
-      "chance": [0, 1],
+      "chance": [0, 0.9],
       "min_level": 50
     },
     "attack_damage": false,
     "wither": false,
     "armor": false
   },
-  "generic:animal": {
-    "inherits": "generic:creature"
-  },
   "generic:hostile": {
     "inherits": "generic:creature",
     "attack_damage": {
-      "chance": [0.4, 1.0],
+      "chance": [0.7, 1.0],
       "range": [1, 20],
       "min_level": 10
     },
@@ -48,8 +38,18 @@
       "chance": [0.2, 0.8]
     }
   },
+  "mixin:flying": {
+    "fly_speed": {
+      "range": [1, 2],
+      "chance": [0.2, 0.8],
+      "min_level": 30
+    }
+  },
+  "generic:animal": {
+    "inherits": "generic:creature"
+  },
   "minecraft:horse": {
-    "inherits": "generic_peaceful"
+    "inherits": "generic:animal"
   },
   "minecraft:creeper": {
     "inherits": "generic:hostile",

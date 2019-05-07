@@ -1,6 +1,7 @@
-package com.vortexel.dangerzone.common;
+package com.vortexel.dangerzone.common.difficulty;
 
 import com.vortexel.dangerzone.DangerZone;
+import com.vortexel.dangerzone.common.Consts;
 import com.vortexel.dangerzone.common.config.BiomeConfig;
 import com.vortexel.dangerzone.common.config.DZConfig;
 import net.minecraft.util.math.BlockPos;

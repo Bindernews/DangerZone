@@ -1,6 +1,6 @@
 package com.vortexel.dangerzone;
 
-import com.vortexel.dangerzone.common.IWorldAdapter;
+import com.vortexel.dangerzone.common.difficulty.IWorldAdapter;
 import lombok.AllArgsConstructor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;

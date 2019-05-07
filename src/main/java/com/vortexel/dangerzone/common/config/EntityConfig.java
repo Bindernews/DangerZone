@@ -1,27 +1,32 @@
 package com.vortexel.dangerzone.common.config;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.*;
-import com.vortexel.dangerzone.common.ModifierType;
+import com.vortexel.dangerzone.common.difficulty.ModifierType;
+import com.vortexel.dangerzone.common.util.JsonUtil;
 import lombok.val;
 import net.minecraft.util.ResourceLocation;
 
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EntityConfig {
     private static final String INHERITS = "inherits";
 
-    public ResourceLocation inherits;
+    public List<ResourceLocation> inherits;
     public Map<ModifierType, ModifierConf> modifiers;
 
-    public EntityConfig() {
-        this(null);
+    public EntityConfig(ResourceLocation... inherits) {
+        this.inherits = Lists.newArrayList(inherits);
+        this.modifiers = Maps.newEnumMap(ModifierType.class);
     }
 
-    public EntityConfig(ResourceLocation inherits) {
-        this.inherits = inherits;
+    public EntityConfig(List<ResourceLocation> inherits) {
+        this.inherits = Lists.newArrayList(inherits);
         this.modifiers = Maps.newEnumMap(ModifierType.class);
     }
 
@@ -46,9 +51,8 @@ public class EntityConfig {
             }
             val obj = json.getAsJsonObject();
             val result = new EntityConfig();
-            if (obj.has(INHERITS)) {
-                result.inherits = new ResourceLocation(obj.getAsJsonPrimitive(INHERITS).getAsString());
-            }
+            result.inherits = JsonUtil.readStringList(obj, INHERITS)
+                    .stream().map(ResourceLocation::new).collect(Collectors.toList());
             for (val entry : obj.entrySet()) {
                 val modifier = Stream.of(ModifierType.values())
                         .filter((v) -> v.name().equalsIgnoreCase(entry.getKey())).findAny();

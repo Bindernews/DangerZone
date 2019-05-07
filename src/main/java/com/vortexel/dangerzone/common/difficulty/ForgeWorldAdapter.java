@@ -1,4 +1,4 @@
-package com.vortexel.dangerzone.common;
+package com.vortexel.dangerzone.common.difficulty;
 
 import lombok.AllArgsConstructor;
 import lombok.val;

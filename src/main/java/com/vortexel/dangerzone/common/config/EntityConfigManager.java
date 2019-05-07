@@ -6,7 +6,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.vortexel.dangerzone.common.ModifierType;
+import com.vortexel.dangerzone.common.difficulty.ModifierType;
 import lombok.val;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
@@ -15,6 +15,7 @@ import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.GameData;
 
+import javax.annotation.Nonnull;
 import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -97,7 +98,7 @@ public class EntityConfigManager {
 
     private void mergeConfig(Map<ResourceLocation, EntityConfig> configMap) {
         for (val entry : configMap.entrySet()) {
-            val eConfig = tempConfig.getOrDefault(entry.getKey(), new EntityConfig(null));
+            val eConfig = tempConfig.getOrDefault(entry.getKey(), new EntityConfig());
             eConfig.merge(entry.getValue());
             tempConfig.put(entry.getKey(), eConfig);
         }
@@ -156,8 +157,16 @@ public class EntityConfigManager {
         bakedConfig.put(name, eConfig);
     }
 
-    private ModifierConf resolveModifier(ResourceLocation parent, ModifierType modifier) {
-        val entityCfg = tempConfig.get(parent);
+    /**
+     * Determine the {@link ModifierConf} for type {@code modifier} for the referenced {@link EntityConfig}.
+     * This handles modifier inheritance as well.
+     *
+     * @param location name of the {@link EntityConfig} to resolve for
+     * @param modifier type of modifier to be resolved
+     * @return the configuration for this modifier, for this {@link EntityConfig} or {@code null}
+     */
+    private ModifierConf resolveModifier(@Nonnull ResourceLocation location, ModifierType modifier) {
+        val entityCfg = tempConfig.get(location);
         if (entityCfg == null) {
             return null;
         }
@@ -165,8 +174,14 @@ public class EntityConfigManager {
             return entityCfg.modifiers.get(modifier);
         }
         if (entityCfg.inherits != null) {
-            bakeName(entityCfg.inherits);
-            return resolveModifier(entityCfg.inherits, modifier);
+            for (val name : entityCfg.inherits) {
+                bakeName(name);
+            }
+            ModifierConf resolved = null;
+            for (int i = entityCfg.inherits.size() - 1; i >= 0 && resolved == null; i--) {
+                resolved = resolveModifier(entityCfg.inherits.get(i), modifier);
+            }
+            return resolved;
         }
         return null;
     }
