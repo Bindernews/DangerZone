@@ -59,6 +59,14 @@ public class DangerMath {
         return unlerp(t, min, max);
     }
 
+    public static double changeRange(double v, double inMin, double inMax, double outMin, double outMax) {
+        return unlerp(lerp(v, inMin, inMax), outMin, outMax);
+    }
+
+    public static double changeRangeClamp(double v, double inMin, double inMax, double outMin, double outMax) {
+        return lerp(unlerpClamp(v, inMin, inMax), outMin, outMax);
+    }
+
     /**
      * Rounds {@code d} by doing {@code floor(d * multiplier) / multiplier}. That's it. <br/>
      * If you want to round to 2 decimal places, multiplier should be 100. <br/>

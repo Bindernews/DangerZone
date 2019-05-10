@@ -3,6 +3,7 @@ package com.vortexel.dangerzone.common.gui;
 import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.client.gui.GuiCoinPouch;
 import com.vortexel.dangerzone.client.gui.GuiCoinPumpShotgun;
+import com.vortexel.dangerzone.client.gui.GuiTradeVillager;
 import com.vortexel.dangerzone.common.item.ModItems;
 import lombok.val;
 import net.minecraft.entity.player.EntityPlayer;
@@ -33,7 +34,7 @@ public class GuiHandler implements IGuiHandler {
             case GUI_COIN_PUMP_SHOTGUN:
                 return new GuiCoinPumpShotgun(container);
             case GUI_TRADER:
-                return null;
+                return new GuiTradeVillager(container);
             default:
                 return null;
         }

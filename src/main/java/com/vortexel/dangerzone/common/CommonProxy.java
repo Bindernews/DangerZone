@@ -11,6 +11,7 @@ import com.vortexel.dangerzone.common.difficulty.DifficultyMap;
 import com.vortexel.dangerzone.common.difficulty.ForgeWorldAdapter;
 import com.vortexel.dangerzone.common.network.PacketDangerLevel;
 import com.vortexel.dangerzone.common.network.PacketHandler;
+import com.vortexel.dangerzone.common.trade.MerchandiseManager;
 import com.vortexel.dangerzone.common.util.MCUtil;
 import lombok.Getter;
 import lombok.val;
@@ -18,7 +19,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -47,23 +47,28 @@ public class CommonProxy {
     protected DifficultyAdjuster adjuster;
     @Getter
     protected EntityConfigManager entityConfigManager;
+    @Getter
+    protected MerchandiseManager merchandise;
 
     public void preInit(FMLPreInitializationEvent event) {
         // Create our object instances so they exist when other things try to use them.
         adjuster = new DifficultyAdjuster();
         entityConfigManager = new EntityConfigManager();
+        merchandise = new MerchandiseManager();
         worldDifficultyMaps = Maps.newHashMap();
 
         // Register the IDangerLevel capability
         CapabilityManager.INSTANCE.register(IDangerLevel.class, new DangerLevelStorage(), IDangerLevel.Basic::new);
-        // Register ourselves so we can receive events.
+        // Register our event handlers (including this)
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(adjuster);
     }
 
     public void init(FMLInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(adjuster);
-
+        // Load entity config
         reloadEntityConfig();
+        // Load merchandise list
+        merchandise.addFromReader(openResource("assets/dangerzone/other/merchandise.json"));
     }
 
     public void postInit(FMLPostInitializationEvent event) {

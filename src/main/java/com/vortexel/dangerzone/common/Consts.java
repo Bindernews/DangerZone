@@ -9,6 +9,12 @@ public final class Consts {
     public static final int MAX_DANGER_LEVEL = (1 << 15);
     public static final int STACK_SIZE = 64;
 
+    /**
+     * Mouse button left
+     */
+    public static final int MOUSE_LEFT = 0;
+    public static final int MOUSE_RIGHT = 1;
+
     //region modifier UUIDs
 
     public static final UUID MODIFIER_MAX_HEALTH_UUID = UUID.fromString("6d9f6292-6e4c-42a1-b538-53be07b3b076");

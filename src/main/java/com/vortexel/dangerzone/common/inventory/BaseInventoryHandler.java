@@ -57,7 +57,7 @@ public abstract class BaseInventoryHandler implements IItemHandler, IItemHandler
         }
 
         val totalCount = size + stack.getCount();
-        val nextCount = Math.min(totalCount, limit);
+        val nextCount = Math.min(totalCount, limit + size);
 
         if (!simulate) {
             // If the current stack is empty, then we can safely replace it

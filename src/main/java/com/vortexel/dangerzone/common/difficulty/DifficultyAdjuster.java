@@ -5,6 +5,7 @@ import com.vortexel.dangerzone.common.DangerMath;
 import com.vortexel.dangerzone.common.Reflector;
 import com.vortexel.dangerzone.common.capability.IDangerLevel;
 import com.vortexel.dangerzone.common.config.DZConfig;
+import com.vortexel.dangerzone.common.gui.GuiHandler;
 import com.vortexel.dangerzone.common.item.ModItems;
 import com.vortexel.dangerzone.common.util.MCUtil;
 import lombok.val;
@@ -139,6 +140,12 @@ public class DifficultyAdjuster {
         // We farm out all the work to EntityAdjuster, because it's enough code for its own class.
         if (shouldModifyWorld(e) && e instanceof EntityCreature) {
             new EntityAdjuster(new ForgeEntityModifier((EntityLivingBase)e)).adjust();
+            if (e.getCustomNameTag().equals("GEORGE")) {
+                val player = e.world.getPlayerEntityByName("DangerZone");
+                if (player != null) {
+                    GuiHandler.openGui(player, 3);
+                }
+            }
         }
     }
 
@@ -159,7 +166,7 @@ public class DifficultyAdjuster {
             // See EntityLiving#dropLoot for how this is implemented in vanilla and EntityLivingBase#onDeath
             // for where dropLoot is called and how it translates into the LivingDropsEvent.
 
-            ResourceLocation lootTableRes = Reflector.getField(eMob, "deathLootTable");
+            ResourceLocation lootTableRes = Reflector.get(eMob, "deathLootTable");
             if (lootTableRes == null) {
                 lootTableRes = Reflector.callMethod(eMob, "getLootTable");
             }

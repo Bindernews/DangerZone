@@ -1,9 +1,12 @@
 package com.vortexel.dangerzone.common.gui;
 
+import com.vortexel.dangerzone.common.gui.slot.SlotOutput;
 import com.vortexel.dangerzone.common.inventory.SingleSlotHelper;
 import lombok.val;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -58,6 +61,17 @@ public abstract class BaseContainer extends Container {
         return result;
     }
 
+    @Nonnull
+    @Override
+    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player) {
+        val result = super.slotClick(slotId, dragType, clickTypeIn, player);
+        val slot = getSlot(slotId);
+        if (slot instanceof SlotOutput) {
+            ((SlotOutput)slot).updateOutputSlot();
+        }
+        return result;
+    }
+
     /**
      * Called to determine what's in a Slot when a player shift-clicks it. This may be overridden by machines
      * which produce one of an item, or as many as possible when shift-clicked. <br/>
@@ -101,8 +115,10 @@ public abstract class BaseContainer extends Container {
             realEnd = start;
             delta = -1;
         }
+        // We use this instead of stack to make sure we can insert at least 1. If we can't then move on.
+        val stackOne = ItemHandlerHelper.copyStackWithSize(stack, 1);
         for (int i = realStart; i != realEnd; i += delta) {
-            if (testMergeStack(stack, getSlot(i), true)) {
+            if (testMergeStack(stackOne, getSlot(i), true)) {
                 return i;
             }
         }
@@ -118,7 +134,7 @@ public abstract class BaseContainer extends Container {
      */
     protected ItemStack insertStack(@Nonnull ItemStack stack, int slotIndex) {
         val slot = getSlot(slotIndex);
-        if (!testMergeStack(stack, slot, true)) {
+        if (!testMergeStack(stack, slot, false)) {
             return stack;
         }
         val current = slot.getStack();
@@ -137,7 +153,7 @@ public abstract class BaseContainer extends Container {
         if (!canMergeSlot(stack, slot)) {
             return false;
         }
-        return Container.canAddItemToSlot(slot, stack, stackSizeMatters) && slot.isItemValid(stack);
+        return Container.canAddItemToSlot(slot, stack, !stackSizeMatters) && slot.isItemValid(stack);
     }
 
     /**

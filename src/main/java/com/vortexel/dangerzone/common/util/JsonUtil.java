@@ -1,11 +1,10 @@
 package com.vortexel.dangerzone.common.util;
 
 import com.google.common.collect.Lists;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
 import lombok.val;
+import net.minecraft.nbt.*;
+import net.minecraftforge.common.util.Constants;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
@@ -85,6 +84,30 @@ public class JsonUtil {
         return arr;
     }
 
+    public static JsonArray arrayOf(byte... values) {
+        val arr = new JsonArray();
+        for (val num : values) {
+            arr.add(num);
+        }
+        return arr;
+    }
+
+    public static JsonArray arrayOf(int... values) {
+        val arr = new JsonArray();
+        for (val num : values) {
+            arr.add(num);
+        }
+        return arr;
+    }
+
+    public static JsonArray arrayOf(long... values) {
+        val arr = new JsonArray();
+        for (val num : values) {
+            arr.add(num);
+        }
+        return arr;
+    }
+
     public static Pair<Float, Float> readPair(JsonObject obj, String field, float defaultMin, float defaultMax,
                                               SingleValue singleValueResponse) {
         val result = readPair(obj, field, singleValueResponse);
@@ -146,6 +169,42 @@ public class JsonUtil {
 
     public static float nullOrDefault(JsonElement p, float defaultValue) {
         return (p == null || p.isJsonNull()) ? defaultValue : p.getAsFloat();
+    }
+
+    public static JsonElement nbtToJson(NBTBase tag) {
+        switch (tag.getId()) {
+            case Constants.NBT.TAG_BYTE:
+            case Constants.NBT.TAG_SHORT:
+            case Constants.NBT.TAG_INT:
+            case Constants.NBT.TAG_LONG:
+                return new JsonPrimitive(((NBTPrimitive)tag).getLong());
+            case Constants.NBT.TAG_FLOAT:
+            case Constants.NBT.TAG_DOUBLE:
+                return new JsonPrimitive(((NBTPrimitive)tag).getDouble());
+            case Constants.NBT.TAG_BYTE_ARRAY:
+                return arrayOf(((NBTTagByteArray)tag).getByteArray());
+            case Constants.NBT.TAG_STRING:
+                return new JsonPrimitive(((NBTTagString)tag).getString());
+            case Constants.NBT.TAG_LIST: {
+                val ar = new JsonArray();
+                for (val tagSub : ((NBTTagList)tag)) {
+                    ar.add(nbtToJson(tagSub));
+                }
+                return ar;
+            }
+            case Constants.NBT.TAG_COMPOUND: {
+                val obj = new JsonObject();
+                val tagCompound = ((NBTTagCompound) tag);
+                for (val key : tagCompound.getKeySet()) {
+                    obj.add(key, nbtToJson(tagCompound.getTag(key)));
+                }
+                return obj;
+            }
+            case Constants.NBT.TAG_INT_ARRAY:
+                return arrayOf(((NBTTagIntArray)tag).getIntArray());
+            default:
+                return JsonNull.INSTANCE;
+        }
     }
 
     public enum SingleValue {

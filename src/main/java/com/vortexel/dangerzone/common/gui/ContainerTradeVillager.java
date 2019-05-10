@@ -1,7 +1,8 @@
 package com.vortexel.dangerzone.common.gui;
 
-import com.vortexel.dangerzone.common.MerchandiseManager;
-import com.vortexel.dangerzone.common.gui.slot.SlotControlled;
+import com.vortexel.dangerzone.DangerZone;
+import com.vortexel.dangerzone.common.gui.slot.SlotOutput;
+import com.vortexel.dangerzone.common.trade.MerchandiseManager;
 import com.vortexel.dangerzone.common.inventory.ConfigInventoryHandler;
 import com.vortexel.dangerzone.common.inventory.SlotConfig;
 import com.vortexel.dangerzone.common.item.ItemCoinPouch;
@@ -20,27 +21,29 @@ import java.util.List;
 
 public class ContainerTradeVillager extends BaseContainer {
 
-    private static final int ROWS = 3;
-    private static final int COLS = 9;
+    public static final int ROWS = 4;
+    public static final int COLS = 9;
+    public static final int VISIBLE_SLOTS = ROWS * COLS;
 
-    private static final SlotConfig[] INVENTORY_CONFIG = (SlotConfig[])SlotConfig.buildSeveral(
-            SlotConfig.builder().allowExtract(true).allowInsert(false), 0, ROWS * COLS).toArray();
+    private static final SlotConfig[] INVENTORY_CONFIG = SlotConfig.buildSeveral(
+            SlotConfig.builder().allowExtract(true).allowInsert(false), 0, ROWS * COLS)
+            .toArray(new SlotConfig[0]);
 
     protected ConfigInventoryHandler backingInventory;
     protected EntityPlayer player;
     protected long playerMoney;
     protected boolean playerHasMoreMoney;
-    protected int offerPage;
+    protected int scrollRow;
 
     public ContainerTradeVillager(EntityPlayer player) {
         backingInventory = new ConfigInventoryHandler(INVENTORY_CONFIG, null);
-        GuiUtil.addInventory(this, backingInventory, 8, 20, ROWS, COLS, (s) ->
+        GuiUtil.addInventory(this, backingInventory, 8, 18, COLS, ROWS, (s) ->
                 new OutputSlot(backingInventory, s.index, s.x, s.y));
 
-        GuiUtil.addPlayerInventory(this, player.inventory, 8, 84, 4,
+        GuiUtil.addPlayerInventory(this, player.inventory, 8, 104, 4,
                 (index, x, y) -> new Slot(player.inventory, index, x, y));
 
-        offerPage = 0;
+        scrollRow = 0;
         updatePlayerMoney();
         for (int i = 0; i < firstPlayerSlot(); i++) {
             ((OutputSlot) getSlot(i)).updateOutputSlot();
@@ -49,17 +52,23 @@ public class ContainerTradeVillager extends BaseContainer {
 
     @Override
     protected ItemStack getShiftClickStack(EntityPlayer player, int index) {
-        if (index < firstPlayerSlot()) {
-            val perItemCost = getCostForSlot(index);
-            val merchandise = getMerchandiseForSlot(index, 1);
-            // The maximum number of items they can take is either (money / perItemCost),
-            // or (max stack size / items per sale).
-            val maxItems = (int)Math.min(playerMoney / perItemCost,
-                    merchandise.getMaxStackSize() / merchandise.getCount());
-            if (maxItems == 0) {
-                return ItemStack.EMPTY;
+        if (getSlot(index) instanceof OutputSlot) {
+            val slot = (OutputSlot)getSlot(index);
+            // If we don't check, then we reset the number of items in the inventory even if part of a stack is
+            // already there. This will end up giving the player an extra stack.
+            if (!slot.isTaking) {
+                val merchandise = getMerchandiseForSlot(index, 1);
+                val perItemCost = getCostForSlot(index);
+                // The maximum number of items they can take is either (money / perItemCost),
+                // or (max stack size / items per sale).
+                val maxItems = (int)Math.min(playerMoney / perItemCost,
+                        merchandise.getMaxStackSize() / merchandise.getCount());
+                if (maxItems == 0) {
+                    return ItemStack.EMPTY;
+                }
+                backingInventory.setStackInSlot(index, getMerchandiseForSlot(index, maxItems));
+                slot.isTaking = true;
             }
-            backingInventory.setStackInSlot(index, getMerchandiseForSlot(index, maxItems));
             return getSlot(index).getStack();
         } else {
             return ItemStack.EMPTY;
@@ -70,11 +79,11 @@ public class ContainerTradeVillager extends BaseContainer {
      * Get the loot coin cost of the item in slot {@code index}.
      */
     protected long getCostForSlot(int index) {
-        return MerchandiseManager.instance.getCost(index + (ROWS * COLS * offerPage));
+        return getMerchandise().getCost(index + (COLS * scrollRow));
     }
 
     protected ItemStack getMerchandiseForSlot(int index, int count) {
-        val stack = MerchandiseManager.instance.getItemStack(index + (ROWS * COLS * offerPage));
+        val stack = getMerchandise().getItemStack(index + (COLS * scrollRow));
         return ItemHandlerHelper.copyStackWithSize(stack, count * stack.getCount());
     }
 
@@ -96,7 +105,7 @@ public class ContainerTradeVillager extends BaseContainer {
             if (amount > 0) {
                 remainingCost -= amount;
                 putStackInSlot(i, stack);
-                if (remainingCost < 0) {
+                if (remainingCost <= 0) {
                     break;
                 }
             }
@@ -154,11 +163,18 @@ public class ContainerTradeVillager extends BaseContainer {
         }
     }
 
-    protected int firstPlayerSlot() {
+    public void scrollTo(int row) {
+        scrollRow = row;
+        for (int i = 0; i < ContainerTradeVillager.VISIBLE_SLOTS; i++) {
+            ((OutputSlot)getSlot(i)).updateOutputSlot();
+        }
+    }
+
+    public int firstPlayerSlot() {
         return ROWS * COLS;
     }
 
-    protected int lastPlayerSlot() {
+    public int lastPlayerSlot() {
         return inventorySlots.size();
     }
 
@@ -185,43 +201,51 @@ public class ContainerTradeVillager extends BaseContainer {
         }
     }
 
-    protected class OutputSlot extends SlotControlled {
+    @Override
+    public boolean canInteractWith(EntityPlayer playerIn) {
+        return true;
+    }
+
+    protected class OutputSlot extends SlotOutput {
+        public boolean isTaking;
+
         public OutputSlot(IItemHandler itemHandler, int index, int xPosition, int yPosition) {
             super(itemHandler, index, xPosition, yPosition);
+            isTaking = false;
         }
 
         /**
          * Update the output slot to show a single item of the output type.
          */
-        protected void updateOutputSlot() {
-            backingInventory.setStackInSlot(this.getSlotIndex(), getMerchandiseForSlot(getSlotIndex(), 1));
-            onSlotChanged();
+        @Override
+        public void updateOutputSlot() {
+            isTaking = false;
+            super.putStack(getMerchandiseForSlot(getSlotIndex(), 1));
         }
 
         @Override
         public ItemStack onTaken(@Nonnull ItemStack stack) {
-            takeMoney(CoinUtil.getStackValue(stack));
-            updateOutputSlot();
+            // If we can't return all the player's money to them, close the GUI
+            if (!takeMoney(getCostForSlot(slotNumber) * stack.getCount())) {
+                player.closeScreen();
+            }
             // We do this so the player only gets 1 stack at a time
             return ItemStack.EMPTY;
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return !getMerchandiseForSlot(getSlotIndex(), 1).isEmpty();
         }
 
         @Override
         public boolean canTakeStack(EntityPlayer playerIn) {
             return playerMoney >= getCostForSlot(getSlotIndex());
         }
+    }
 
-        @Override
-        public boolean isItemValid(@Nonnull ItemStack stack) {
-            return false;
-        }
 
-        /**
-         * Make is so that shift-clicking won't combine the output stack with any others.
-         */
-        @Override
-        public int getSlotStackLimit() {
-            return getStack().getCount();
-        }
+    public static MerchandiseManager getMerchandise() {
+        return DangerZone.proxy.getMerchandise();
     }
 }

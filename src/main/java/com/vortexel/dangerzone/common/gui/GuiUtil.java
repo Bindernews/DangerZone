@@ -15,7 +15,7 @@ public class GuiUtil {
 
     public static final int ITEM_SLOT_SIZE = 18;
 
-    public static void addInventory(BaseContainer container, IItemHandler inventory, int x, int y, int rows, int cols,
+    public static void addInventory(BaseContainer container, IItemHandler inventory, int x, int y, int cols, int rows,
                                     Function<InventoryPos, Slot> slotProducer) {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {

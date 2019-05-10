@@ -41,7 +41,7 @@ public class GuiCoinPouch extends BaseGuiContainer {
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+    public void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         renderItem(STACK_COIN_1, 70, 28);
         renderItem(STACK_COIN_8, 88, 28);
@@ -53,14 +53,8 @@ public class GuiCoinPouch extends BaseGuiContainer {
         itemRender.renderItemIntoGUI(stack, x + guiLeft, y + guiTop);
     }
 
-    private GuiButtonImage makeImageButton(int id, int x, int y, int width, int height, int texX, int texY,
-                                           int hoverYOffset) {
-        return new GuiButtonImage(id, guiLeft + x, guiTop + y, width, height, texX, texY,
-                hoverYOffset, BACKGROUND_TEXTURE);
-    }
-
     @Override
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+    public void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         val amount = ItemCoinPouch.getAmount(getContainer().getCoinPouch());
         val coinText = I18n.format("gui.dangerzone.coins", amount);
         fontRenderer.drawString(coinText, 12, 64, Consts.COLOR_BLACK);

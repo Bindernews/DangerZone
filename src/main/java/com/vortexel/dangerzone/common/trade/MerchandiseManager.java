@@ -1,14 +1,21 @@
-package com.vortexel.dangerzone.common;
+package com.vortexel.dangerzone.common.trade;
 
 import com.google.common.collect.Lists;
-import lombok.AllArgsConstructor;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nonnull;
+import java.io.Reader;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MerchandiseManager {
+    public static Gson GSON = new GsonBuilder()
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .registerTypeAdapter(Offer.class, new Offer.Serializer())
+            .create();
 
-    public static MerchandiseManager instance;
 
     private List<Offer> offers;
 
@@ -16,6 +23,9 @@ public class MerchandiseManager {
         offers = Lists.newArrayList();
     }
 
+    public void register(@Nonnull Offer offer) {
+        offers.add(offer);
+    }
 
     public int getTotalOffers() {
         return offers.size();
@@ -37,9 +47,7 @@ public class MerchandiseManager {
         }
     }
 
-    @AllArgsConstructor
-    protected static class Offer {
-        public final int cost;
-        public final ItemStack stack;
+    public void addFromReader(Reader r) {
+        this.offers.addAll(GSON.fromJson(r, new TypeToken<ArrayList<Offer>>(){}.getType()));
     }
 }

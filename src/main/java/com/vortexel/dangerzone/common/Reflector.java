@@ -14,29 +14,36 @@ public final class Reflector {
 
     private static Map<Class<?>, Map<String, Map<Integer, Method>>> methodCache = Maps.newIdentityHashMap();
 
-    public static <T> T callMethod(Object obj, String name, Class<?>[] paramTypes, Object... params) {
+
+    public static <T> Method getMethod(Class<T> clazz, String name, Class<?>... paramTypes) {
         try {
-            val m = obj.getClass().getMethod(name, paramTypes);
-            methodCachePut(m);
-            return invokeMethod(obj, m, params);
+            val m = clazz.getDeclaredMethod(name, paramTypes);
+            m.setAccessible(true);
+            return m;
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }
 
+    public static <T> T callMethod(Object obj, String name, Class<?>[] paramTypes, Object... params) {
+        val m = getMethod(obj.getClass(), name, paramTypes);
+        methodCachePut(m);
+        return callMethod(obj, m, params);
+    }
+
     public static <T> T callMethod(Object obj, String name, Object... params) {
         try {
             val m = findMethod(obj.getClass(), name, params.length);
-            return invokeMethod(obj, m, params);
+            m.setAccessible(true);
+            return callMethod(obj, m, params);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T invokeMethod(Object obj, Method m, Object... params) {
+    public static <T> T callMethod(Object obj, Method m, Object... params) {
         try {
-            m.setAccessible(true);
             return (T)m.invoke(obj, params);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
@@ -50,7 +57,7 @@ public final class Reflector {
             return cacheHit;
         }
 
-        for (Method m : clazz.getMethods()) {
+        for (Method m : clazz.getDeclaredMethods()) {
             if (m.getName().equals(name) && m.getParameterCount() == paramCount) {
                 methodCachePut(m);
                 return m;
@@ -70,10 +77,19 @@ public final class Reflector {
         methodCache.get(clazz).putIfAbsent(name, Maps.newHashMap());
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> T getField(Object instance, Field field) {
+    public static Field getField(Class<?> clazz, String fieldName) {
         try {
-            field.setAccessible(true);
+            val f = clazz.getDeclaredField(fieldName);
+            f.setAccessible(true);
+            return f;
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T get(Object instance, Field field) {
+        try {
             return (T)field.get(instance);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -81,12 +97,11 @@ public final class Reflector {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T getField(Object obj, String name) {
+    public static <T> T get(Object obj, String fieldName) {
         try {
-            val f = obj.getClass().getField(name);
-            f.setAccessible(true);
+            val f = getField(obj.getClass(), fieldName);
             return (T)f.get(obj);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
@@ -97,25 +112,32 @@ public final class Reflector {
 
     public static boolean hasField(Class<?> clazz, String name) {
         try {
-            clazz.getField(name);
+            clazz.getDeclaredField(name);
             return true;
         } catch (NoSuchFieldException e) {
             return false;
         }
     }
 
-    public static <T> void setField(Object obj, String name, T value) {
+    public static <T> void set(Object obj, String fieldName, T value) {
         try {
-            val f = obj.getClass().getField(name);
-            f.setAccessible(true);
+            val f = getField(obj.getClass(), fieldName);
             f.set(obj, value);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> void set(Object obj, Field field, T value) {
+        try {
+            field.set(obj, value);
+        } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
     public static <T> void computeField(Object obj, String name, Function<T, T> func) {
-        setField(obj, name, func.apply(getField(obj, name)));
+        set(obj, name, func.apply(get(obj, name)));
     }
 
     // You won't make any instances of this class.
