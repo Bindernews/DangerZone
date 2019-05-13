@@ -1,12 +1,11 @@
 package com.vortexel.dangerzone.common.entity;
 
-import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.common.entity.ai.AITaskTradePlayer;
 import com.vortexel.dangerzone.common.entity.ai.IVillager;
+import com.vortexel.dangerzone.common.gui.ContainerTradeVillager;
 import com.vortexel.dangerzone.common.gui.GuiHandler;
 import com.vortexel.dangerzone.common.util.MCUtil;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.val;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
@@ -16,14 +15,17 @@ import net.minecraft.entity.monster.EntityEvoker;
 import net.minecraft.entity.monster.EntityVex;
 import net.minecraft.entity.monster.EntityVindicator;
 import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 
-public class EntityTraderVillager extends EntityCreature implements IVillager {
+import javax.annotation.Nullable;
 
-    @Getter @Setter
+public class EntityTraderVillager extends EntityVillager implements IVillager {
+
+    @Getter
     protected EntityPlayer customer;
 
     public EntityTraderVillager(World worldIn) {
@@ -58,7 +60,7 @@ public class EntityTraderVillager extends EntityCreature implements IVillager {
     }
 
     @Override
-    protected boolean processInteract(EntityPlayer player, EnumHand hand) {
+    public boolean processInteract(EntityPlayer player, EnumHand hand) {
         val inHand = player.getHeldItem(hand);
         val isNameTag = inHand.getItem() == Items.NAME_TAG;
 
@@ -66,15 +68,16 @@ public class EntityTraderVillager extends EntityCreature implements IVillager {
             inHand.interactWithEntity(player, this, hand);
             return true;
         } else if (isEntityAlive() && !isTrading() && !player.isSneaking() && MCUtil.isWorldLocal(world)) {
-            GuiHandler.openGui(player, GuiHandler.GUI_TRADER, getPosition());
+            startTrading(player);
             return true;
         } else {
             return super.processInteract(player, hand);
         }
     }
 
-    protected void startTrading() {
-
+    public void startTrading(EntityPlayer player) {
+        setCustomer(player);
+        GuiHandler.openGui(player, GuiHandler.GUI_TRADER, getPosition());
     }
 
     @Override
@@ -85,5 +88,14 @@ public class EntityTraderVillager extends EntityCreature implements IVillager {
     @Override
     public boolean isTrading() {
         return getCustomer() != null;
+    }
+
+    @Override
+    public void setCustomer(@Nullable EntityPlayer player) {
+        // Make sure the current customer is no longer interacting if we're trading with someone else.
+        if (customer != null && customer.openContainer instanceof ContainerTradeVillager) {
+            customer.closeScreen();
+        }
+        customer = player;
     }
 }

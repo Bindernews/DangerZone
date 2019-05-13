@@ -140,12 +140,6 @@ public class DifficultyAdjuster {
         // We farm out all the work to EntityAdjuster, because it's enough code for its own class.
         if (shouldModifyWorld(e) && e instanceof EntityCreature) {
             new EntityAdjuster(new ForgeEntityModifier((EntityLivingBase)e)).adjust();
-            if (e.getCustomNameTag().equals("GEORGE")) {
-                val player = e.world.getPlayerEntityByName("DangerZone");
-                if (player != null) {
-                    GuiHandler.openGui(player, 3);
-                }
-            }
         }
     }
 

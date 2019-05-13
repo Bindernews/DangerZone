@@ -7,5 +7,8 @@ item.dangerzone:coin_pouch.name=Coin Pouch
 item.dangerzone:coin_pouch.tooltip=Contains %s coins
 item.dangerzone:coin_pump_shotgun.name=The Incredible Coin Pump Shotgun!
 
+# Entities
+entity.trader_villager.name=Loot Coin Trader
+
 # GUI
 gui.dangerzone.coins=Coins: %d
