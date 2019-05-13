@@ -1,6 +1,5 @@
 package com.vortexel.dangerzone.client.gui;
 
-import akka.util.Reflect;
 import com.google.common.collect.Lists;
 import com.vortexel.dangerzone.client.gui.component.IGuiComponent;
 import com.vortexel.dangerzone.common.Reflector;

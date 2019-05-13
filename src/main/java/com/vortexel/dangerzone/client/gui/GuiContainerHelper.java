@@ -163,8 +163,9 @@ public class GuiContainerHelper {
      */
     public void drawItemStack(ItemStack stack, int x, int y, String altText)
     {
-        GlStateManager.translate(0.0F, 0.0F, 32.0F);
-        int yPos = y - (stack.isEmpty() ? 0 : 8);
+        GlStateManager.translate(0.0F, 0.0F, 1.0F);
+//        int yPos = y - (stack.isEmpty() ? 0 : 8);
+        int yPos = y - (gui.getDraggedStack().isEmpty() ? 0 : 8);
         RenderItem ri = gui.getItemRender();
         ri.zLevel = 200.0F;
         ri.renderItemAndEffectIntoGUI(stack, x, y);

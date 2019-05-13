@@ -1,6 +1,5 @@
 package com.vortexel.dangerzone.common.gui;
 
-import com.vortexel.dangerzone.common.gui.slot.SlotControlled;
 import com.vortexel.dangerzone.common.gui.slot.SlotImmutable;
 import com.vortexel.dangerzone.common.gui.slot.SlotOutput;
 import com.vortexel.dangerzone.common.inventory.SlotConfig;

@@ -65,6 +65,10 @@ public abstract class BaseContainer extends Container {
     @Override
     public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player) {
         val result = super.slotClick(slotId, dragType, clickTypeIn, player);
+        // For merging stacks, throwing out stuff, etc. the slotId is invalid
+        if (slotId < 0 || slotId >= inventorySlots.size()) {
+            return result;
+        }
         val slot = getSlot(slotId);
         if (slot instanceof SlotOutput) {
             ((SlotOutput)slot).updateOutputSlot();
