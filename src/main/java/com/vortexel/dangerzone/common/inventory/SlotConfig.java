@@ -1,9 +1,11 @@
 package com.vortexel.dangerzone.common.inventory;
 
+import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import net.minecraft.item.ItemStack;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 @AllArgsConstructor
@@ -24,4 +26,12 @@ public class SlotConfig {
 
     @Builder.Default
     public final Predicate<ItemStack> insertFilter = (s) -> true;
+
+    public static List<SlotConfig> buildSeveral(SlotConfigBuilder builderIn, int index, int count) {
+        List<SlotConfig> slots = Lists.newArrayListWithCapacity(count);
+        for (int i = 0; i < count; i++) {
+            slots.add(builderIn.index(index + i).build());
+        }
+        return slots;
+    }
 }

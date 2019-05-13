@@ -7,6 +7,13 @@ import java.util.UUID;
 public final class Consts {
 
     public static final int MAX_DANGER_LEVEL = (1 << 15);
+    public static final int STACK_SIZE = 64;
+
+    /**
+     * Mouse button left
+     */
+    public static final int MOUSE_LEFT = 0;
+    public static final int MOUSE_RIGHT = 1;
 
     //region modifier UUIDs
 

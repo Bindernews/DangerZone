@@ -2,6 +2,7 @@ package com.vortexel.dangerzone;
 
 import com.vortexel.dangerzone.common.CommonProxy;
 import com.vortexel.dangerzone.common.CreativeTab;
+import com.vortexel.dangerzone.common.entity.ModEntities;
 import com.vortexel.dangerzone.common.gui.GuiHandler;
 import com.vortexel.dangerzone.common.network.PacketHandler;
 import com.vortexel.dangerzone.common.block.ModBlocks;
@@ -96,6 +97,7 @@ public class DangerZone {
         ModBlocks.init();
         ModItems.init();
         ModTiles.init();
+        ModEntities.init();
         ModSounds.init();
         proxy.preInit(e);
         log.info("PreInit complete");

@@ -1,7 +1,7 @@
 package com.vortexel.dangerzone.common.gui;
 
-import com.vortexel.dangerzone.common.gui.slot.SlotControlled;
 import com.vortexel.dangerzone.common.gui.slot.SlotImmutable;
+import com.vortexel.dangerzone.common.gui.slot.SlotOutput;
 import com.vortexel.dangerzone.common.inventory.SlotConfig;
 import com.vortexel.dangerzone.common.inventory.ConfigInventoryHandler;
 import com.vortexel.dangerzone.common.item.ItemCoinPouch;
@@ -100,12 +100,13 @@ public class ContainerCoinPouch extends BaseContainer {
     @Override
     protected ItemStack getShiftClickStack(EntityPlayer player, int index) {
         Slot slot = inventorySlots.get(index);
-        if (slot instanceof OutputSlot) {
+        if (slot instanceof OutputSlot && !((OutputSlot)slot).isTaking) {
             OutputSlot oSlot = (OutputSlot)slot;
             // This determines the maximum number of coins the player can take.
             long maxCoins = ItemCoinPouch.getAmount(getCoinPouch()) / oSlot.outputType.amount;
             int stackSize = (int)Math.min(maxCoins, 64);
             oSlot.putStack(new ItemStack(oSlot.outputType, stackSize));
+            oSlot.isTaking = true;
         }
         return super.getShiftClickStack(player, index);
     }
@@ -114,31 +115,28 @@ public class ContainerCoinPouch extends BaseContainer {
         return coinPouchSlot.getRealStack();
     }
 
-    protected class OutputSlot extends SlotControlled {
+    protected class OutputSlot extends SlotOutput {
         ItemLootCoin outputType;
+        boolean isTaking;
 
         public OutputSlot(IItemHandler itemHandler, int index, int xPosition, int yPosition, ItemLootCoin outputType) {
             super(itemHandler, index, xPosition, yPosition);
             this.outputType = outputType;
-        }
-
-        @Override
-        public ItemStack onTake(EntityPlayer thePlayer, ItemStack stack) {
-            ItemStack result = super.onTake(thePlayer, stack);
-            updateOutputSlot();
-            return result;
+            this.isTaking = false;
         }
 
         /**
          * Update the output slot to show a single item of the output type, or be empty
          * if you don't have enough coins.
          */
-        protected void updateOutputSlot() {
+        @Override
+        public void updateOutputSlot() {
+            isTaking = false;
             long amount = ItemCoinPouch.getAmount(getCoinPouch());
             if (amount >= outputType.amount) {
-                backingInventory.setStackInSlot(getSlotIndex(), new ItemStack(outputType, 1));
+                putStack(new ItemStack(outputType, 1));
             } else {
-                backingInventory.setStackInSlot(getSlotIndex(), ItemStack.EMPTY);
+                putStack(ItemStack.EMPTY);
             }
             onSlotChanged();
         }
@@ -146,21 +144,7 @@ public class ContainerCoinPouch extends BaseContainer {
         @Override
         public ItemStack onTaken(@Nonnull ItemStack stack) {
             addAmount(outputType, -stack.getCount());
-            // We do this so the player only gets 1 stack at a time
             return ItemStack.EMPTY;
-        }
-
-        @Override
-        public boolean isItemValid(@Nonnull ItemStack stack) {
-            return false;
-        }
-
-        /**
-         * Make is so that shift-clicking won't combine the output stack with any others.
-         */
-        @Override
-        public int getSlotStackLimit() {
-            return getStack().getCount();
         }
     }
 }

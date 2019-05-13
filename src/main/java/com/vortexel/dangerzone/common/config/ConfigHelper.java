@@ -77,8 +77,8 @@ public class ConfigHelper {
             }
         }
         // If the field implements Loadable then load it
-        else if (Reflector.getField(obj, field) instanceof Loadable) {
-            ((Loadable) Reflector.getField(obj, field)).load(cfg);
+        else if (Reflector.get(obj, field) instanceof Loadable) {
+            ((Loadable) Reflector.get(obj, field)).load(cfg);
         } else {
             throw new RuntimeException("No handler for class " + field.getType().getName());
         }
