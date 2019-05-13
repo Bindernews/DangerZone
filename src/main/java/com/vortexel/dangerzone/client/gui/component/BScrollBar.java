@@ -26,6 +26,7 @@ public class BScrollBar implements IGuiComponent {
     protected float stepValue;
     protected boolean isDragging;
     protected Sprite scrollBarSprite;
+    protected  boolean renderInBetweenSteps;
 
     public final List<Consumer<Float>> scrollListeners;
     public final BaseGuiContainer container;
@@ -39,6 +40,7 @@ public class BScrollBar implements IGuiComponent {
         this.scrollBarSprite = scrollBarSprite;
         scrollListeners = Lists.newArrayList();
         setRange(0, 1, 0);
+        renderInBetweenSteps = false;
     }
 
     public void setRange(float min, float max) {
@@ -113,6 +115,7 @@ public class BScrollBar implements IGuiComponent {
     }
 
     public float getValueFromMouseY(int mouseY) {
+        mouseY -= container.getGuiTop();
         return (float)DangerMath.changeRangeClamp(mouseY, calcMinY(), calcMaxY(), minValue, maxValue);
     }
 
@@ -123,12 +126,25 @@ public class BScrollBar implements IGuiComponent {
 
     @Override
     public void draw() {
-        int drawY = getDrawYFromValue(getValue());
+        int drawY = 0;
+        if (renderInBetweenSteps) {
+            drawY = getDrawYFromValue(realValue);
+        } else {
+            drawY = getDrawYFromValue(stepValue);
+        }
         Minecraft.getMinecraft().getTextureManager().bindTexture(scrollBarSprite.texture);
         container.drawTexturedModalRect(area.x, drawY, scrollBarSprite.x, scrollBarSprite.y, area.width,
                 scrollBarSprite.height);
 //        GLUtil.drawTexturedRect(area.x, drawY, 0, scrollBarSprite.x, scrollBarSprite.y, scrollBarSprite.width,
 //                scrollBarSprite.height, scrollBarSprite.texW, scrollBarSprite.texH);
+    }
+
+    public boolean isRenderInBetweenSteps() {
+        return renderInBetweenSteps;
+    }
+
+    public void setRenderInBetweenSteps(boolean v) {
+        renderInBetweenSteps = v;
     }
 
     @Override
