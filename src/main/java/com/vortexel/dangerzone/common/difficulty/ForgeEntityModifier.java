@@ -4,7 +4,7 @@ import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.common.Consts;
 import com.vortexel.dangerzone.common.DangerMath;
 import com.vortexel.dangerzone.common.Reflector;
-import com.vortexel.dangerzone.common.capability.IDangerLevel;
+import com.vortexel.dangerzone.api.IDangerLevel;
 import com.vortexel.dangerzone.common.config.EntityConfig;
 import lombok.val;
 import net.minecraft.entity.EntityLivingBase;

@@ -1,12 +1,15 @@
 package com.vortexel.dangerzone;
 
+import com.vortexel.dangerzone.api.DangerZoneAPI;
 import com.vortexel.dangerzone.common.CommonProxy;
 import com.vortexel.dangerzone.common.CreativeTab;
+import com.vortexel.dangerzone.common.api.IMCHandler;
+import com.vortexel.dangerzone.common.api.ImplDangerZoneAPI;
 import com.vortexel.dangerzone.common.entity.ModEntities;
 import com.vortexel.dangerzone.common.gui.GuiHandler;
 import com.vortexel.dangerzone.common.network.PacketHandler;
 import com.vortexel.dangerzone.common.block.ModBlocks;
-import com.vortexel.dangerzone.common.capability.IDangerLevel;
+import com.vortexel.dangerzone.api.IDangerLevel;
 import com.vortexel.dangerzone.common.config.DZConfig;
 import com.vortexel.dangerzone.common.item.ModItems;
 import com.vortexel.dangerzone.common.sound.ModSounds;
@@ -99,6 +102,7 @@ public class DangerZone {
         ModTiles.init();
         ModEntities.init();
         ModSounds.init();
+        IMCHandler.init();
         proxy.preInit(e);
         log.info("PreInit complete");
     }

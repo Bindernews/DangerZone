@@ -29,6 +29,7 @@ minecraft {
     replace "@MOD_ID@", project.mod_id
     replace "@MOD_NAME@", project.mod_name
     replaceIn "DangerZone.java"
+    replaceIn "com/vortexel/dangerzone/api/package-info.java"
     
     // the mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   snapshot are built nightly.
@@ -39,20 +40,8 @@ minecraft {
 }
 
 dependencies {
-    // you may put jars on which you depend on in ./libs
     compile "org.projectlombok:lombok:1.18.6"
 //    annotationProcessor "org.projectlombok:lombok:1.18.6"
-      
-    // real examples
-    //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
-
-    // the 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
-    //provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-
-    // the deobf configurations:  'deobfCompile' and 'deobfProvided' are the same as the normal compile and provided,
-    // except that these dependencies get remapped to your current MCP mappings
-    //deobfCompile 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-    //deobfProvided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
 
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
@@ -80,4 +69,21 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+}
+
+jar {
+    from sourceSets.main.output
+    from sourceSets.api.output
+}
+
+task apiJar(type: Jar) {
+    classifier = 'api'
+    from sourceSets.main.output     // save .class files
+    from sourceSets.main.allJava    // save .java files
+    from sourceSets.api.allJava
+    include 'com/vortexel/dangerzone/api/**/*'  // Only include API and subdirectories
+}
+
+artifacts {
+    archives apiJar
 }
