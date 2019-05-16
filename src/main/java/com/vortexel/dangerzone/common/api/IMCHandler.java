@@ -5,7 +5,6 @@ import com.vortexel.dangerzone.DangerZone;
 import lombok.val;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.Validate;
 
 import java.io.StringReader;
@@ -31,7 +30,6 @@ public class IMCHandler {
         MinecraftForge.EVENT_BUS.register(IMCHandler.class);
     }
 
-    @SubscribeEvent
     public static void onIMCEvent(FMLInterModComms.IMCEvent event) {
         for (val msg : event.getMessages()) {
             val handler = HANDLERS.get(msg.key);
