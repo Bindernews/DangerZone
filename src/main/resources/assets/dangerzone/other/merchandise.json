@@ -10,6 +10,11 @@
     "cost": 50
   },
   {
+    "item": "minecraft:rotten_flesh",
+    "count": 3,
+    "cost": 2
+  },
+  {
     "item": "minecraft:ender_pearl",
     "count": 1,
     "cost": 50

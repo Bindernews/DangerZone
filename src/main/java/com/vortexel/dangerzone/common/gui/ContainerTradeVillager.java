@@ -220,13 +220,21 @@ public class ContainerTradeVillager extends BaseContainer {
         @Override
         public void updateOutputSlot() {
             isTaking = false;
-            super.putStack(getMerchandiseForSlot(getSlotIndex(), 1));
+            super.putStack(getMerch(1));
+        }
+
+        protected ItemStack getMerch(int count) {
+            return getMerchandiseForSlot(getSlotIndex(), 1);
         }
 
         @Override
         public ItemStack onTaken(@Nonnull ItemStack stack) {
+            // Determine how much to take. If we would have to take a partial-coin, round up. Yes it takes more,
+            // but rounding down potentially allows for exploits.
+            val countTaken = (float)stack.getCount() / getMerch(1).getCount();
+            val cost = (long)Math.ceil(getCostForSlot(slotNumber) * countTaken);
             // If we can't return all the player's money to them, close the GUI
-            if (!takeMoney(getCostForSlot(slotNumber) * stack.getCount())) {
+            if (!takeMoney(cost)) {
                 player.closeScreen();
             }
             // We do this so the player only gets 1 stack at a time
