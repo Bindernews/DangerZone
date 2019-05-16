@@ -2,9 +2,11 @@ package com.vortexel.dangerzone.common;
 
 import com.google.common.collect.Maps;
 import com.vortexel.dangerzone.DangerZone;
+import com.vortexel.dangerzone.api.DangerZoneAPI;
+import com.vortexel.dangerzone.common.api.ImplDangerZoneAPI;
 import com.vortexel.dangerzone.common.capability.DangerLevelProvider;
 import com.vortexel.dangerzone.common.capability.DangerLevelStorage;
-import com.vortexel.dangerzone.common.capability.IDangerLevel;
+import com.vortexel.dangerzone.api.IDangerLevel;
 import com.vortexel.dangerzone.common.config.EntityConfigManager;
 import com.vortexel.dangerzone.common.difficulty.DifficultyAdjuster;
 import com.vortexel.dangerzone.common.difficulty.DifficultyMap;
@@ -38,6 +40,11 @@ import java.util.Map;
  */
 public class CommonProxy {
 
+    public static final String DEFAULT_ENTITY_CONFIG_PATH = "assets/dangerzone/other/entity_data.json";
+    public static final String DEFAULT_MERCHANDISE_PATH = "assets/dangerzone/other/merchandise.json";
+    public static final String ENTITY_CONFIG_FILE = "entity_config.json";
+    public static final String MERCHANDISE_FILE = "merchandise.json";
+
     /**
      * Map dimension ID to the DifficultyMap.
      */
@@ -50,30 +57,48 @@ public class CommonProxy {
     @Getter
     protected MerchandiseManager merchandise;
 
+    protected ImplDangerZoneAPI apiImpl;
+
     public void preInit(FMLPreInitializationEvent event) {
         // Create our object instances so they exist when other things try to use them.
         adjuster = new DifficultyAdjuster();
         entityConfigManager = new EntityConfigManager();
         merchandise = new MerchandiseManager();
         worldDifficultyMaps = Maps.newHashMap();
+        apiImpl = new ImplDangerZoneAPI();
+
+        // Other mods must be able to access the API during init
+        DangerZoneAPI.setupAPI(apiImpl);
+        // Load default entity config
+        entityConfigManager.addFile(openResource(DEFAULT_ENTITY_CONFIG_PATH));
+        // Load the default (or overridden) merchandise data
+        loadMerchandise();
 
         // Register the IDangerLevel capability
-        CapabilityManager.INSTANCE.register(IDangerLevel.class, new DangerLevelStorage(), IDangerLevel.Basic::new);
+        CapabilityManager.INSTANCE.register(IDangerLevel.class, new DangerLevelStorage(),
+                DangerLevelStorage.Basic::new);
         // Register our event handlers (including this)
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(adjuster);
     }
 
     public void init(FMLInitializationEvent event) {
-        // Load entity config
-        reloadEntityConfig();
-        // Load merchandise list
-        merchandise.addFromReader(openResource("assets/dangerzone/other/merchandise.json"));
     }
 
     public void postInit(FMLPostInitializationEvent event) {
+        // Freeze the API so nobody can try to add more entity data
+        apiImpl.setFrozen(true);
+        // Load the user config file(s) last so they override any mod-provided data
+        loadUserEntityConfig();
+        // Optimize the config data for performance
+        entityConfigManager.bake();
     }
 
+    /**
+     * Get the RAW difficulty value in world {@code world} at {@code (x, z)}. <br/>
+     * On the server this always works, but on the client this will return either a cached value from
+     * the server, or 0 if the difficulty is unknown.
+     */
     public double getDifficulty(World world, int x, int z) {
         if (MCUtil.isWorldLocal(world)) {
             return getDifficultyMap(world).getDifficulty(x, z);
@@ -97,10 +122,8 @@ public class CommonProxy {
         }
     }
 
-    public void reloadEntityConfig() {
-        entityConfigManager = new EntityConfigManager();
-        entityConfigManager.addFile(openResource("assets/dangerzone/other/entity_data.json"));
-        val entityDataConfig = new File(DangerZone.instance.configDir, "entity_config.json");
+    public void loadUserEntityConfig() {
+        val entityDataConfig = new File(DangerZone.instance.configDir, ENTITY_CONFIG_FILE);
         if (entityDataConfig.isFile()) {
             try {
                 val reader = new FileReader(entityDataConfig);
@@ -110,11 +133,36 @@ public class CommonProxy {
                 DangerZone.log.error(e);
             }
         }
-        entityConfigManager.bake();
+    }
+
+    public void loadMerchandise() {
+        boolean shouldAddDefaults = true;
+        val merchandiseConfigFile = new File(DangerZone.instance.configDir, MERCHANDISE_FILE);
+        if (merchandiseConfigFile.isFile()) {
+            try {
+                val reader = new FileReader(merchandiseConfigFile);
+                merchandise.addFromReader(reader);
+                reader.close();
+                shouldAddDefaults = false;
+            } catch (IOException e) {
+                DangerZone.log.error(e);
+            }
+        }
+        if (shouldAddDefaults) {
+            merchandise.addFromReader(openResource(DEFAULT_MERCHANDISE_PATH));
+        }
     }
 
     private Reader openResource(String path) {
-        return new InputStreamReader(getClass().getClassLoader().getResourceAsStream(path));
+        val resource = getClass().getClassLoader().getResource(path);
+        if (resource == null) {
+            throw new IllegalArgumentException("Unknown resource \"" + path + "\"");
+        }
+        try {
+            return new InputStreamReader(resource.openStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @SubscribeEvent
@@ -122,7 +170,7 @@ public class CommonProxy {
         if (e.getObject() instanceof EntityLivingBase) {
             val eLiving = (EntityLivingBase)e.getObject();
             if (!(eLiving instanceof EntityPlayer)) {
-                e.addCapability(IDangerLevel.RESOURCE_LOCATION, new DangerLevelProvider());
+                e.addCapability(DangerLevelStorage.RESOURCE_LOCATION, new DangerLevelProvider());
             }
             eLiving.getAttributeMap().registerAttribute(Consts.ATTRIBUTE_DECAY_TOUCH);
         }

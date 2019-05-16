@@ -2,11 +2,12 @@ package com.vortexel.dangerzone;
 
 import com.vortexel.dangerzone.common.CommonProxy;
 import com.vortexel.dangerzone.common.CreativeTab;
+import com.vortexel.dangerzone.common.api.IMCHandler;
 import com.vortexel.dangerzone.common.entity.ModEntities;
 import com.vortexel.dangerzone.common.gui.GuiHandler;
 import com.vortexel.dangerzone.common.network.PacketHandler;
 import com.vortexel.dangerzone.common.block.ModBlocks;
-import com.vortexel.dangerzone.common.capability.IDangerLevel;
+import com.vortexel.dangerzone.api.IDangerLevel;
 import com.vortexel.dangerzone.common.config.DZConfig;
 import com.vortexel.dangerzone.common.item.ModItems;
 import com.vortexel.dangerzone.common.sound.ModSounds;
@@ -19,6 +20,7 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -99,6 +101,7 @@ public class DangerZone {
         ModTiles.init();
         ModEntities.init();
         ModSounds.init();
+        IMCHandler.init();
         proxy.preInit(e);
         log.info("PreInit complete");
     }
@@ -113,6 +116,11 @@ public class DangerZone {
     public void postInit(FMLPostInitializationEvent e) {
         proxy.postInit(e);
         log.info("PostInit complete");
+    }
+
+    @Mod.EventHandler
+    public void imcCallback(FMLInterModComms.IMCEvent event) {
+        IMCHandler.onIMCEvent(event);
     }
 
     public static ResourceLocation prefix(String resourcePath) {
