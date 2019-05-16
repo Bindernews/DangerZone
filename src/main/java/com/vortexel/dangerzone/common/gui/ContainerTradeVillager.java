@@ -1,6 +1,7 @@
 package com.vortexel.dangerzone.common.gui;
 
 import com.vortexel.dangerzone.DangerZone;
+import com.vortexel.dangerzone.common.entity.EntityTraderVillager;
 import com.vortexel.dangerzone.common.gui.slot.SlotOutput;
 import com.vortexel.dangerzone.common.trade.MerchandiseManager;
 import com.vortexel.dangerzone.common.inventory.ConfigInventoryHandler;
@@ -13,6 +14,7 @@ import lombok.val;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -34,8 +36,11 @@ public class ContainerTradeVillager extends BaseContainer {
     protected long playerMoney;
     protected boolean playerHasMoreMoney;
     protected int scrollRow;
+    private boolean isOpen;
 
     public ContainerTradeVillager(EntityPlayer player) {
+        this.player = player;
+        this.isOpen = true;
         backingInventory = new ConfigInventoryHandler(INVENTORY_CONFIG, null);
         GuiUtil.addInventory(this, backingInventory, 8, 18, COLS, ROWS, (s) ->
                 new OutputSlot(backingInventory, s.index, s.x, s.y));
@@ -47,6 +52,28 @@ public class ContainerTradeVillager extends BaseContainer {
         updatePlayerMoney();
         for (int i = 0; i < firstPlayerSlot(); i++) {
             ((OutputSlot) getSlot(i)).updateOutputSlot();
+        }
+    }
+
+    protected EntityTraderVillager findVillager(EntityPlayer player) {
+        val aabb = player.getEntityBoundingBox().grow(10, 4, 10);
+        for (val entity : player.world.getEntitiesWithinAABB(EntityTraderVillager.class, aabb)) {
+            if (entity.getCustomer() != null && entity.getCustomer().equals(player)) {
+                return entity;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void onContainerClosed(EntityPlayer playerIn) {
+        super.onContainerClosed(playerIn);
+        if (MCUtil.isWorldLocal(playerIn) && isOpen) {
+            isOpen = false;
+            val villager = findVillager(playerIn);
+            if (villager != null) {
+                villager.setCustomer(null);
+            }
         }
     }
 
