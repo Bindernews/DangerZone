@@ -67,11 +67,11 @@ public class GuiHandler implements IGuiHandler {
         openGui(player, guiID, pos.getX(), pos.getY(), pos.getZ());
     }
 
-    public static void openGui(EntityPlayer player, int guiID, int x, int y, int z) {
-        player.openGui(DangerZone.instance, guiID, player.getEntityWorld(), x, y, z);
-    }
-
     public static void openGui(EntityPlayer player, int guiID, BlockPos location) {
         openGui(player, guiID, location.getX(), location.getY(), location.getZ());
+    }
+
+    public static void openGui(EntityPlayer player, int guiID, int x, int y, int z) {
+        player.openGui(DangerZone.getMod(), guiID, player.getEntityWorld(), x, y, z);
     }
 }

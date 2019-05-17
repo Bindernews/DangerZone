@@ -4,7 +4,7 @@ import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.common.Consts;
 import com.vortexel.dangerzone.common.DangerMath;
 import com.vortexel.dangerzone.common.Reflector;
-import com.vortexel.dangerzone.api.IDangerLevel;
+import com.vortexel.dangerzone.common.capability.IDangerLevel;
 import com.vortexel.dangerzone.common.config.EntityConfig;
 import lombok.val;
 import net.minecraft.entity.EntityLivingBase;
@@ -105,7 +105,7 @@ public class ForgeEntityModifier implements IEntityModifier {
         }
         val modifier = new AttributeModifier(uuid, DangerZone.NAME + "-" + name, amount, operation);
         if (attrInstance.hasModifier(modifier)) {
-            DangerZone.log.warn("Entity already has attribute applied.");
+            DangerZone.getLog().warn("Entity already has attribute applied.");
         } else {
             attrInstance.applyModifier(modifier);
         }

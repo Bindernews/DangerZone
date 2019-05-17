@@ -7,6 +7,10 @@ buildscript {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
+repositories {
+    // TOP
+    maven { url = "https://maven.tterrag.com/" }
+}
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
@@ -41,6 +45,7 @@ minecraft {
 
 dependencies {
     compile "org.projectlombok:lombok:1.18.6"
+    deobfCompile "mcjty.theoneprobe:TheOneProbe-${top_version}"
 //    annotationProcessor "org.projectlombok:lombok:1.18.6"
 
     // for more info...

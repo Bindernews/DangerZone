@@ -2,18 +2,13 @@ package com.vortexel.dangerzone.common.api;
 
 import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.api.IDangerZoneAPI;
-import com.vortexel.dangerzone.api.trading.IMerchandiseRegistry;
 import com.vortexel.dangerzone.common.DangerMath;
-import lombok.Getter;
-import lombok.Setter;
+import com.vortexel.dangerzone.common.capability.IDangerLevel;
+import com.vortexel.dangerzone.common.util.MCUtil;
+import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 
-import java.io.Reader;
-
 public class ImplDangerZoneAPI implements IDangerZoneAPI {
-
-    @Getter @Setter
-    private boolean frozen;
 
     @Override
     public double getDangerLevel(World world, int blockX, int blockZ) {
@@ -21,21 +16,12 @@ public class ImplDangerZoneAPI implements IDangerZoneAPI {
     }
 
     @Override
-    public void addEntityConfig(Reader source) {
-        if (!isFrozen()) {
-            DangerZone.proxy.getEntityConfigManager().addFile(source);
+    public int getEntityLevel(Entity entity) {
+        IDangerLevel level = MCUtil.getDangerLevelCapability(entity);
+        if (level != null) {
+            return level.getDanger();
+        } else {
+            return 0;
         }
-    }
-
-    @Override
-    public void addEntityConfig(String source) {
-        if (!isFrozen()) {
-            DangerZone.proxy.getEntityConfigManager().addFile(source);
-        }
-    }
-
-    @Override
-    public IMerchandiseRegistry getMerchandise() {
-        return DangerZone.proxy.getMerchandise();
     }
 }

@@ -123,7 +123,7 @@ public class DifficultyMap {
         double v = generator.getValue((double)x * DZConfig.general.stretchFactor,
                 (double)z * DZConfig.general.stretchFactor);
         if (v < -1 || v > 1) {
-            DangerZone.log.warn("Noise value outside range " + v);
+            DangerZone.getLog().warn("Noise value outside range " + v);
         }
         // Bind v to [0, 1)
         v = (MathHelper.clamp(v, -1, Consts.NOT_ONE) + 1) / 2.0;

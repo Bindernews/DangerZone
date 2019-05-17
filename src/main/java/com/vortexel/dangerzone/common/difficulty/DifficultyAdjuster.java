@@ -3,7 +3,9 @@ package com.vortexel.dangerzone.common.difficulty;
 import com.vortexel.dangerzone.common.Consts;
 import com.vortexel.dangerzone.common.DangerMath;
 import com.vortexel.dangerzone.common.Reflector;
-import com.vortexel.dangerzone.api.IDangerLevel;
+import com.vortexel.dangerzone.common.capability.DangerLevelProvider;
+import com.vortexel.dangerzone.common.capability.DangerLevelStorage;
+import com.vortexel.dangerzone.common.capability.IDangerLevel;
 import com.vortexel.dangerzone.common.config.DZConfig;
 import com.vortexel.dangerzone.common.item.ModItems;
 import com.vortexel.dangerzone.common.util.MCUtil;
@@ -23,6 +25,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootTable;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -65,6 +68,17 @@ public class DifficultyAdjuster {
         val source = e.getSource().getTrueSource();
         if (source instanceof EntityLivingBase) {
             implementDecayTouch(e.getEntityLiving(), (EntityLivingBase)source);
+        }
+    }
+
+    @SubscribeEvent
+    public void onRegisterCapabilities(AttachCapabilitiesEvent<Entity> e) {
+        if (e.getObject() instanceof EntityLivingBase) {
+            val eLiving = (EntityLivingBase)e.getObject();
+            if (!(eLiving instanceof EntityPlayer)) {
+                e.addCapability(DangerLevelStorage.RESOURCE_LOCATION, new DangerLevelProvider());
+            }
+            eLiving.getAttributeMap().registerAttribute(Consts.ATTRIBUTE_DECAY_TOUCH);
         }
     }
 

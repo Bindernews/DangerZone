@@ -1,0 +1,18 @@
+[
+  {
+    "item": "twilightforest:twilight_scepter",
+    "cost": 200
+  },
+  {
+    "item": "twilightforest:lifedrain_scepter",
+    "cost": 200
+  },
+  {
+    "item": "twilightforest:zombie_scepter",
+    "cost": 200
+  },
+  {
+    "item": "twilightforest:shield_scepter",
+    "cost": 200
+  }
+]

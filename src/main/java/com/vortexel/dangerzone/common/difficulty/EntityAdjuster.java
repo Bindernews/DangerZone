@@ -72,7 +72,7 @@ public class EntityAdjuster {
 
         eConfig = entityModifier.getEntityConfig();
         if (eConfig == null) {
-            DangerZone.log.warn("Failed to get entity config for {}", entityModifier.getEntityClassName());
+            DangerZone.getLog().warn("Failed to get entity config for {}", entityModifier.getEntityClassName());
             return false;
         }
         return true;
