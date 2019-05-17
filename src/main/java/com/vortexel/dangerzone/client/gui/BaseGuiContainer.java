@@ -70,10 +70,6 @@ public class BaseGuiContainer extends GuiContainer {
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        componentsMouseClicked(mouseX, mouseY, mouseButton);
-    }
-
-    protected void componentsMouseClicked(int mouseX, int mouseY, int mouseButton) {
         for (IGuiComponent comp : components) {
             comp.onMouseClick(mouseX - guiLeft, mouseY - guiTop, mouseButton);
         }
@@ -82,22 +78,14 @@ public class BaseGuiContainer extends GuiContainer {
     @Override
     protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
         super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
-        componentsMouseDrag(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
-    }
-
-    protected void componentsMouseDrag(int mouseX, int mouseY, int mouseButton, long timeSinceLastClick) {
         for (IGuiComponent comp : components) {
-            comp.onMouseDrag(mouseX, mouseY, mouseButton, timeSinceLastClick);
+            comp.onMouseDrag(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
         }
     }
 
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int state) {
         super.mouseReleased(mouseX, mouseY, state);
-        componentsMouseReleased(mouseX, mouseY, state);
-    }
-
-    protected void componentsMouseReleased(int mouseX, int mouseY, int state) {
         for (IGuiComponent comp : components) {
             comp.onMouseRelease(mouseX - guiLeft, mouseY - guiTop, state);
         }
@@ -109,13 +97,12 @@ public class BaseGuiContainer extends GuiContainer {
     }
 
     @Override
-    public void handleInput() throws IOException {
+    public void handleMouseInput() throws IOException {
         super.handleInput();
         for (IGuiComponent comp : components) {
-            comp.handleInput();
+            comp.handleMouseInput();
         }
     }
-
 
     // region Accessors
 
