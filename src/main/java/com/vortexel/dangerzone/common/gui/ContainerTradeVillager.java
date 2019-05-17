@@ -114,11 +114,11 @@ public class ContainerTradeVillager extends BaseContainer {
     /**
      * Get the loot coin cost of the item in slot {@code index}.
      */
-    protected long getCostForSlot(int index) {
+    public long getCostForSlot(int index) {
         return getMerchandise().getCost(index + (COLS * scrollRow));
     }
 
-    protected ItemStack getMerchandiseForSlot(int index, int count) {
+    public ItemStack getMerchandiseForSlot(int index, int count) {
         val stack = getMerchandise().getItemStack(index + (COLS * scrollRow));
         return ItemHandlerHelper.copyStackWithSize(stack, count * stack.getCount());
     }
@@ -242,7 +242,7 @@ public class ContainerTradeVillager extends BaseContainer {
         return true;
     }
 
-    protected class OutputSlot extends SlotOutput {
+    public class OutputSlot extends SlotOutput {
         public boolean isTaking;
         public boolean enabled;
 

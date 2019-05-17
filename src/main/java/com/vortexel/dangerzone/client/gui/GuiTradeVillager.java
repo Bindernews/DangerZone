@@ -1,5 +1,6 @@
 package com.vortexel.dangerzone.client.gui;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.client.gui.component.BScrollBar;
 import com.vortexel.dangerzone.client.gui.component.IGuiComponent;
@@ -8,9 +9,14 @@ import com.vortexel.dangerzone.common.network.PacketContainerUpdate;
 import com.vortexel.dangerzone.common.trade.MerchandiseManager;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.Container;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextFormatting;
+
+import java.util.List;
 
 public class GuiTradeVillager extends BaseGuiContainer {
 
@@ -70,6 +76,16 @@ public class GuiTradeVillager extends BaseGuiContainer {
         GlStateManager.popMatrix();
         // Render the tooltip
         renderHoveredToolTip(mouseX, mouseY);
+    }
+
+    @Override
+    public List<String> getItemToolTip(ItemStack stack) {
+        List<String> lines = super.getItemToolTip(stack);
+        if (getHoveredSlot() instanceof ContainerTradeVillager.OutputSlot && getHoveredSlot().getStack() == stack) {
+            long cost = getContainer().getCostForSlot(getHoveredSlot().slotNumber);
+            lines.add(TextFormatting.RED + I18n.format("gui.dangerzone.cost", (int)cost));
+        }
+        return lines;
     }
 
     protected void onScroll(float row) {

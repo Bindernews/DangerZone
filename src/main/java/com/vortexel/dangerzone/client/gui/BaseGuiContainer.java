@@ -71,6 +71,7 @@ public class BaseGuiContainer extends GuiContainer {
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         for (IGuiComponent comp : components) {
+            // Make mouseX and mouseY relative to the GUI
             comp.onMouseClick(mouseX - guiLeft, mouseY - guiTop, mouseButton);
         }
     }
@@ -79,6 +80,7 @@ public class BaseGuiContainer extends GuiContainer {
     protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
         super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
         for (IGuiComponent comp : components) {
+            // These mouseX and mouseY are already relative to the GUI
             comp.onMouseDrag(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
         }
     }
@@ -87,6 +89,7 @@ public class BaseGuiContainer extends GuiContainer {
     protected void mouseReleased(int mouseX, int mouseY, int state) {
         super.mouseReleased(mouseX, mouseY, state);
         for (IGuiComponent comp : components) {
+            // Make mouseX and mouseY relative to the GUI
             comp.onMouseRelease(mouseX - guiLeft, mouseY - guiTop, state);
         }
     }
@@ -98,7 +101,7 @@ public class BaseGuiContainer extends GuiContainer {
 
     @Override
     public void handleMouseInput() throws IOException {
-        super.handleInput();
+        super.handleMouseInput();
         for (IGuiComponent comp : components) {
             comp.handleMouseInput();
         }

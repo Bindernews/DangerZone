@@ -12,6 +12,8 @@ entity.trader_villager.name=Loot Coin Trader
 
 # GUI
 gui.dangerzone.coins=Coins: %d
+gui.dangerzone.cost=Cost: %d
 
 # Misc
 misc.dangerzone.level=Level: %d
+
