@@ -2,13 +2,17 @@ package com.vortexel.dangerzone.common.gui;
 
 import com.vortexel.dangerzone.common.gui.slot.SlotOutput;
 import com.vortexel.dangerzone.common.inventory.SingleSlotHelper;
+import com.vortexel.dangerzone.common.network.PacketContainerUpdate;
+import com.vortexel.dangerzone.common.network.PacketHandler;
 import lombok.val;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.apache.commons.lang3.Validate;
 
@@ -28,6 +32,26 @@ public abstract class BaseContainer extends Container {
     @Override
     public boolean canInteractWith(EntityPlayer playerIn) {
         return true;
+    }
+
+    /**
+     * Called when the client sends the container an update packet.
+     * This is a generic way for the client to send user events to the server.
+     * @param sender the player who sent the packet
+     * @param tag the update information
+     */
+    public void onUpdatePacket(EntityPlayer sender, NBTTagCompound tag) {}
+
+    /**
+     * Send an update packet to the server and process it here on the client.
+     * This will call {@code onUpdatePacket} on both this container and the same container on the server.
+     * This keeps both the client and the server in sync, and is a convenient method for the GUI to call.
+     * @param sender the current player
+     * @param tag the data to send to the containers.
+     */
+    public void sendUpdatePacket(EntityPlayer sender, NBTTagCompound tag) {
+        PacketHandler.NETWORK.sendToServer(new PacketContainerUpdate(tag));
+        onUpdatePacket(sender, tag);
     }
 
     /**
@@ -121,7 +145,7 @@ public abstract class BaseContainer extends Container {
         }
         // We use this instead of stack to make sure we can insert at least 1. If we can't then move on.
         val stackOne = ItemHandlerHelper.copyStackWithSize(stack, 1);
-        for (int i = realStart; i != realEnd; i += delta) {
+        for (int i = realStart; i - delta != realEnd; i += delta) {
             if (testMergeStack(stackOne, getSlot(i), true)) {
                 return i;
             }

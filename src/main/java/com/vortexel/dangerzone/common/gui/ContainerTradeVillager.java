@@ -14,7 +14,9 @@ import lombok.val;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -52,6 +54,13 @@ public class ContainerTradeVillager extends BaseContainer {
         updatePlayerMoney();
         for (int i = 0; i < firstPlayerSlot(); i++) {
             ((OutputSlot) getSlot(i)).updateOutputSlot();
+        }
+    }
+
+    @Override
+    public void onUpdatePacket(EntityPlayer sender, NBTTagCompound tag) {
+        if (tag.hasKey("row", Constants.NBT.TAG_INT)) {
+            this.scrollTo(tag.getInteger("row"));
         }
     }
 
@@ -235,10 +244,12 @@ public class ContainerTradeVillager extends BaseContainer {
 
     protected class OutputSlot extends SlotOutput {
         public boolean isTaking;
+        public boolean enabled;
 
         public OutputSlot(IItemHandler itemHandler, int index, int xPosition, int yPosition) {
             super(itemHandler, index, xPosition, yPosition);
             isTaking = false;
+            enabled = false;
         }
 
         /**
@@ -246,8 +257,10 @@ public class ContainerTradeVillager extends BaseContainer {
          */
         @Override
         public void updateOutputSlot() {
+            val merch = getMerch(1);
             isTaking = false;
-            super.putStack(getMerch(1));
+            enabled = !merch.isEmpty();
+            super.putStack(merch);
         }
 
         protected ItemStack getMerch(int count) {
@@ -270,7 +283,7 @@ public class ContainerTradeVillager extends BaseContainer {
 
         @Override
         public boolean isEnabled() {
-            return !getMerchandiseForSlot(getSlotIndex(), 1).isEmpty();
+            return enabled;
         }
 
         @Override

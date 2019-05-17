@@ -4,10 +4,12 @@ import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.client.gui.component.BScrollBar;
 import com.vortexel.dangerzone.client.gui.component.IGuiComponent;
 import com.vortexel.dangerzone.common.gui.ContainerTradeVillager;
+import com.vortexel.dangerzone.common.network.PacketContainerUpdate;
 import com.vortexel.dangerzone.common.trade.MerchandiseManager;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 
 public class GuiTradeVillager extends BaseGuiContainer {
@@ -70,9 +72,10 @@ public class GuiTradeVillager extends BaseGuiContainer {
         renderHoveredToolTip(mouseX, mouseY);
     }
 
-
     protected void onScroll(float row) {
-        getContainer().scrollTo((int)row);
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setInteger("row", (int)row);
+        getContainer().sendUpdatePacket(mc.player, tag);
     }
 
     public ContainerTradeVillager getContainer() {

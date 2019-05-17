@@ -9,9 +9,9 @@ public class PacketHandler {
 
     public static final SimpleNetworkWrapper NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(DangerZone.MOD_ID);
 
-
     public static void init() {
         int id = 0;
         NETWORK.registerMessage(PacketDangerLevel.Handler.class, PacketDangerLevel.class, id++, Side.CLIENT);
+        NETWORK.registerMessage(PacketContainerUpdate.Handler.class, PacketContainerUpdate.class, id++, Side.SERVER);
     }
 }
