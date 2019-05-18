@@ -5,6 +5,7 @@ import com.vortexel.dangerzone.client.gui.BaseGuiContainer;
 import com.vortexel.dangerzone.client.gui.Sprite;
 import com.vortexel.dangerzone.common.Consts;
 import com.vortexel.dangerzone.common.DangerMath;
+import com.vortexel.dangerzone.common.util.EventDispatch;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.input.Mouse;
@@ -27,7 +28,7 @@ public class BScrollBar implements IGuiComponent {
     protected Sprite scrollBarSprite;
     protected boolean renderInBetweenSteps;
 
-    public final List<Consumer<Float>> scrollListeners;
+    public final EventDispatch<Float> eventScroll = new EventDispatch<>();
     public final BaseGuiContainer container;
 
     public BScrollBar(BaseGuiContainer container, int x, int y, int w, int h, Sprite scrollBarSprite) {
@@ -37,7 +38,6 @@ public class BScrollBar implements IGuiComponent {
         stepValue = 0;
         isDragging = false;
         this.scrollBarSprite = scrollBarSprite;
-        scrollListeners = Lists.newArrayList();
         setRange(0, 1, 0);
         renderInBetweenSteps = false;
     }
@@ -65,9 +65,7 @@ public class BScrollBar implements IGuiComponent {
         }
         if (stepValue != temp) {
             stepValue = temp;
-            for (Consumer<Float> con : scrollListeners) {
-                con.accept(temp);
-            }
+            eventScroll.fire(temp);
         }
     }
 

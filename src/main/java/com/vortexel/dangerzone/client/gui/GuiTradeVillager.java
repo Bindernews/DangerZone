@@ -1,11 +1,9 @@
 package com.vortexel.dangerzone.client.gui;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
 import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.client.gui.component.BScrollBar;
 import com.vortexel.dangerzone.client.gui.component.IGuiComponent;
 import com.vortexel.dangerzone.common.gui.ContainerTradeVillager;
-import com.vortexel.dangerzone.common.network.PacketContainerUpdate;
 import com.vortexel.dangerzone.common.trade.MerchandiseManager;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -41,7 +39,7 @@ public class GuiTradeVillager extends BaseGuiContainer {
         scrollBar = new BScrollBar(this, 174, 18, 12, 70,
                 new Sprite(BG_TEXTURE, 232, 0, 12, 15, 256, 256));
         scrollBar.setRange(0, maxScroll, 1);
-        scrollBar.scrollListeners.add(this::onScroll);
+        scrollBar.eventScroll.add(this::onScroll);
         components.add(scrollBar);
     }
 
@@ -78,6 +76,10 @@ public class GuiTradeVillager extends BaseGuiContainer {
         renderHoveredToolTip(mouseX, mouseY);
     }
 
+    /**
+     * We override this and if we're displaying the tooltip for the hovered item, and that item has a cost,
+     * then we display the cost of the item.
+     */
     @Override
     public List<String> getItemToolTip(ItemStack stack) {
         List<String> lines = super.getItemToolTip(stack);
