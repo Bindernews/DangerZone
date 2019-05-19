@@ -16,6 +16,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -200,7 +201,8 @@ public class ContainerTradeVillager extends BaseContainer {
     }
 
     public void scrollTo(int row) {
-        scrollRow = row;
+        val maxRow = (int)Math.ceil((double)getMerchandise().getTotalOffers() / COLS);
+        scrollRow = MathHelper.clamp(row, 0, maxRow);
         for (int i = 0; i < ContainerTradeVillager.VISIBLE_SLOTS; i++) {
             ((OutputSlot)getSlot(i)).updateOutputSlot();
         }
