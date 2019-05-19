@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.api.IDangerZoneAPI;
 import lombok.val;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import org.apache.commons.lang3.Validate;
 

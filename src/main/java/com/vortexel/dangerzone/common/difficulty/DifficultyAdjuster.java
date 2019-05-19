@@ -109,8 +109,8 @@ public class DifficultyAdjuster {
             val entity = e.getEntity();
             val dangerInfo = MCUtil.getDangerLevelCapability(entity);
             if (dangerInfo != null) {
-                val danger = dangerInfo.getDanger();
-                val amount = (int) DangerMath.randRange(e.getEntityLiving().getRNG(), danger - 4, danger + 1);
+                val danger = dangerInfo.getDanger() * DZConfig.general.coinsPerLevel;
+                val amount = (int)DangerMath.randRange(e.getEntityLiving().getRNG(), danger - 2, danger + 1);
                 if (amount > 0) {
                     val stack = new ItemStack(ModItems.lootCoin_1, amount, 0);
                     e.getDrops().add(MCUtil.makeItemAt(entity, stack));

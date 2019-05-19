@@ -78,12 +78,17 @@ public class DZConfig {
         public boolean doFakePlayersDropLoot = false;
 
         @Comment({"Numbers will generate using the entity's danger level +/- this value."})
+        @Config.RangeInt(min = 0, max = Consts.MAX_DANGER_LEVEL)
         public int levelRange = 4;
+
+        @Comment({"Number of loot coins dropped per mob level. (default 0.25)"})
+        @Config.RangeDouble(min = 0.0)
+        public double coinsPerLevel = 0.25;
 
         @Comment({"The stretch factor used to influence how the difficulty map is generated.",
                 "DO NOT change this unless you really know what you are doing!"})
-        @Config.RangeDouble(min = 0.000000001, max = 0.01)
-        public double stretchFactor = 0.0005;
+        @Config.RangeDouble(min = Consts.NOT_ZERO, max = 0.01)
+        public double stretchFactor = 0.0002;
 
         public void load(ConfigCategory cat) {
             ConfigHelper.loadAllCommented(this, cat);
@@ -107,12 +112,12 @@ public class DZConfig {
 
         @Comment({"The radius around spawn where difficulty is always 0."})
         @Config.RangeInt(min = 0)
-        public int spawnRadius = 128;
+        public int spawnRadius = 96;
 
         @Comment({"The radius around spawnRadius where the difficulty transitions from 0 to its real value.",
                 "This acts as a safety buffer where mobs can spawn, but you won't be dumped into super-hard mode."})
         @Config.RangeInt(min = 0)
-        public int spawnTransitionRadius = 896;
+        public int spawnTransitionRadius = 256;
 
         public void load(ConfigCategory cat) {
             ConfigHelper.loadAllCommented(this, cat);

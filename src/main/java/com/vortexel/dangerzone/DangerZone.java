@@ -19,13 +19,16 @@ import com.vortexel.dangerzone.common.trade.MerchandiseLoader;
 import com.vortexel.dangerzone.common.trade.MerchandiseManager;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import org.apache.logging.log4j.Logger;
 
@@ -103,11 +106,10 @@ public class DangerZone {
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
         // Create our API instance
         apiImpl = new ImplDangerZoneAPI();
-        // Register IDangerLevel
         // Register the IDangerLevel capability
         CapabilityManager.INSTANCE.register(IDangerLevel.class, new DangerLevelStorage(),
                 DangerLevelStorage.Basic::new);
-
+        MinecraftForge.EVENT_BUS.register(this);
         // Initialize ALL the things. These can be in any order.
         PacketHandler.init();
         ModBlocks.init();
@@ -144,6 +146,13 @@ public class DangerZone {
     @Mod.EventHandler
     public void imcCallback(FMLInterModComms.IMCEvent event) {
         IMCHandler.onIMCEvent(event);
+    }
+
+    @SubscribeEvent
+    public void onConfigChange(ConfigChangedEvent event) {
+        if (event.getModID().equals(MOD_ID)) {
+            DZConfig.loadAll();
+        }
     }
 
     // region Getters
