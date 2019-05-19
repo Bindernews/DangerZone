@@ -72,10 +72,15 @@ public class MerchandiseManager {
      * @throws JsonParseException if the JSON can't be parsed
      */
     public void addFromReader(Reader r) {
-        for (val offer : parseOffers(r)) {
-            if (offer.isPresent()) {
-                this.offers.add(offer.get());
+        try {
+            for (val offer : parseOffers(r)) {
+                if (offer.isPresent()) {
+                    this.offers.add(offer.get());
+                }
             }
+        } catch (NullPointerException e) {
+            // If the JSON is invalid then it throws a NPE
+            throw new JsonParseException("Invalid JSON when reading merchandise file");
         }
     }
 

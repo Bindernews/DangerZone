@@ -97,6 +97,10 @@ public class DangerZone {
         log = e.getModLog();
         // Set the config dir so we know what it is later
         configDir = new File(e.getModConfigurationDirectory(), MOD_ID);
+        if (!configDir.exists()) {
+            configDir.mkdirs();
+        }
+
         // Initialize some variables that start as null
         creativeTab = new CreativeTab();
         // Load the config.
