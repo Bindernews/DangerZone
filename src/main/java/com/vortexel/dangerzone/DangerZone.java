@@ -104,7 +104,7 @@ public class DangerZone {
         // Initialize some variables that start as null
         creativeTab = new CreativeTab();
         // Load the config.
-        DZConfig.cfg = new Configuration(e.getSuggestedConfigurationFile());
+        DZConfig.configFile = e.getSuggestedConfigurationFile().getAbsolutePath();
         DZConfig.loadAll();
         // Make it so we can display GUIs
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());

@@ -1,5 +1,6 @@
 package com.vortexel.dangerzone.common.config;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.vortexel.dangerzone.common.Reflector;
 import lombok.val;
@@ -112,13 +113,12 @@ public class ConfigHelper {
      * with objects of type {@param T}.
      *
      * @param cfg the configuration object, may be modified to populate default values
-     * @param prefix the prefix string to search for
      * @param initial map containing the default values which will be populated with the parsed results
      * @param newValue factory function to produce a new {@code T}
      */
-    public static <T extends Loadable> void loadIntegerMap(Configuration cfg, String prefix,
-                                                           Map<Integer, T> initial, Supplier<T> newValue) {
-        loadMap(cfg, prefix, initial, ConfigHelper::parseIntSafer, newValue);
+    public static <T extends Loadable> void loadIntegerMap(ConfigCategory cfg, Map<Integer, T> initial,
+                                                           Supplier<T> newValue) {
+        loadMap(cfg, initial, ConfigHelper::parseIntSafer, newValue);
     }
 
     /**
@@ -132,30 +132,34 @@ public class ConfigHelper {
         }
     }
 
-    public static <T extends Loadable> void loadStringMap(Configuration cfg, String prefix,
-                                                          Map<String, T> initial, Supplier<T> newValue) {
-        loadMap(cfg, prefix, initial, (s) -> s, newValue);
+    public static <T extends Loadable> void loadStringMap(ConfigCategory cfg, Map<String, T> initial,
+                                                          Supplier<T> newValue) {
+        loadMap(cfg, initial, (s) -> s, newValue);
     }
 
-    public static <K, V extends Loadable> void loadMap(Configuration cfg, String prefix,
-                                                       Map<K, V> initial, Function<String, K> stringToKey,
-                                                       Supplier<V> newValue) {
-        final String realPrefix = prefix + ".";
+    public static <K, V extends Loadable> void loadMap(ConfigCategory cfg, Map<K, V> initial,
+                                                       Function<String, K> stringToKey, Supplier<V> newValue) {
+        Map<String, ConfigCategory> subCats = Maps.newHashMap();
+        for (val cat : cfg.getChildren()) {
+            subCats.put(cat.getName(), cat);
+        }
 
         // Make sure all our default values get a chance to load
         for (val entry : initial.entrySet()) {
-            val category = realPrefix + entry.getKey();
             // This will create the category if it wasn't already in cfg
-            cfg.getCategory(category);
+            val key = entry.getKey().toString();
+            if (!subCats.containsKey(key)) {
+                val cat = new ConfigCategory(key, cfg);
+                subCats.put(cat.getName(), cat);
+            }
         }
 
         // For each category name that starts with [prefix].
-        for (String categoryName : Sets.filter(cfg.getCategoryNames(), (s) -> s.startsWith(realPrefix))) {
+        for (String categoryName : subCats.keySet()) {
             // Parse the "key" portion of the string
-            String categoryIdSuffix = categoryName.substring(realPrefix.length());
-            K catKey = stringToKey.apply(categoryIdSuffix);
+            K catKey = stringToKey.apply(categoryName);
             initial.putIfAbsent(catKey, newValue.get());
-            initial.get(catKey).load(cfg.getCategory(categoryName));
+            initial.get(catKey).load(subCats.get(categoryName));
         }
     }
 

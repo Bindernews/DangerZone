@@ -25,6 +25,11 @@ public final class Reflector {
         }
     }
 
+    public static <T> T callStaticMethod(Class<?> cls, String name, Class<?>[] paramTypes, Object... params) {
+        val m = getMethod(cls, name, paramTypes);
+        return callMethod(null, m, params);
+    }
+
     public static <T> T callMethod(Object obj, String name, Class<?>[] paramTypes, Object... params) {
         val m = getMethod(obj.getClass(), name, paramTypes);
         methodCachePut(m);
