@@ -1,8 +1,7 @@
 package com.vortexel.dangerzone.common.config;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.vortexel.dangerzone.common.Reflector;
+import com.vortexel.dangerzone.common.util.Reflector;
 import lombok.val;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigCategory;

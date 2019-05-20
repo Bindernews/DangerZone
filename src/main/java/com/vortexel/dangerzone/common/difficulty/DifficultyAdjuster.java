@@ -2,7 +2,7 @@ package com.vortexel.dangerzone.common.difficulty;
 
 import com.vortexel.dangerzone.common.Consts;
 import com.vortexel.dangerzone.common.DangerMath;
-import com.vortexel.dangerzone.common.Reflector;
+import com.vortexel.dangerzone.common.util.Reflector;
 import com.vortexel.dangerzone.common.capability.DangerLevelProvider;
 import com.vortexel.dangerzone.common.capability.DangerLevelStorage;
 import com.vortexel.dangerzone.common.capability.IDangerLevel;

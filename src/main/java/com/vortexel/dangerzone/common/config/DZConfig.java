@@ -3,13 +3,12 @@ package com.vortexel.dangerzone.common.config;
 import com.google.common.collect.Maps;
 import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.common.Consts;
-import com.vortexel.dangerzone.common.Reflector;
+import com.vortexel.dangerzone.common.util.Reflector;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.common.config.Configuration;
 
-import java.lang.reflect.Field;
 import java.util.Map;
 
 @Config(modid = DangerZone.MOD_ID, category = "main")

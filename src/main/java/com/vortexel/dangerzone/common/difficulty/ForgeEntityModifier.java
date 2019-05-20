@@ -3,7 +3,7 @@ package com.vortexel.dangerzone.common.difficulty;
 import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.common.Consts;
 import com.vortexel.dangerzone.common.DangerMath;
-import com.vortexel.dangerzone.common.Reflector;
+import com.vortexel.dangerzone.common.util.Reflector;
 import com.vortexel.dangerzone.common.capability.IDangerLevel;
 import com.vortexel.dangerzone.common.config.EntityConfig;
 import lombok.val;

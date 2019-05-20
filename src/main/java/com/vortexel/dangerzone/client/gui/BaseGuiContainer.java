@@ -2,7 +2,7 @@ package com.vortexel.dangerzone.client.gui;
 
 import com.google.common.collect.Lists;
 import com.vortexel.dangerzone.client.gui.component.IGuiComponent;
-import com.vortexel.dangerzone.common.Reflector;
+import com.vortexel.dangerzone.common.util.Reflector;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiLabel;
