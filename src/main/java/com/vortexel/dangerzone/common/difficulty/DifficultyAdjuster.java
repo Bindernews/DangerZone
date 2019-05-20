@@ -2,8 +2,10 @@ package com.vortexel.dangerzone.common.difficulty;
 
 import com.vortexel.dangerzone.common.Consts;
 import com.vortexel.dangerzone.common.DangerMath;
-import com.vortexel.dangerzone.common.Reflector;
-import com.vortexel.dangerzone.api.IDangerLevel;
+import com.vortexel.dangerzone.common.util.Reflector;
+import com.vortexel.dangerzone.common.capability.DangerLevelProvider;
+import com.vortexel.dangerzone.common.capability.DangerLevelStorage;
+import com.vortexel.dangerzone.common.capability.IDangerLevel;
 import com.vortexel.dangerzone.common.config.DZConfig;
 import com.vortexel.dangerzone.common.item.ModItems;
 import com.vortexel.dangerzone.common.util.MCUtil;
@@ -23,6 +25,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootTable;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -68,6 +71,17 @@ public class DifficultyAdjuster {
         }
     }
 
+    @SubscribeEvent
+    public void onRegisterCapabilities(AttachCapabilitiesEvent<Entity> e) {
+        if (e.getObject() instanceof EntityLivingBase) {
+            val eLiving = (EntityLivingBase)e.getObject();
+            if (!(eLiving instanceof EntityPlayer)) {
+                e.addCapability(DangerLevelStorage.RESOURCE_LOCATION, new DangerLevelProvider());
+            }
+            eLiving.getAttributeMap().registerAttribute(Consts.ATTRIBUTE_DECAY_TOUCH);
+        }
+    }
+
     //endregion Event handlers
 
     /**
@@ -95,8 +109,8 @@ public class DifficultyAdjuster {
             val entity = e.getEntity();
             val dangerInfo = MCUtil.getDangerLevelCapability(entity);
             if (dangerInfo != null) {
-                val danger = dangerInfo.getDanger();
-                val amount = (int) DangerMath.randRange(e.getEntityLiving().getRNG(), danger - 4, danger + 1);
+                val danger = dangerInfo.getDanger() * DZConfig.general.coinsPerLevel;
+                val amount = (int)DangerMath.randRange(e.getEntityLiving().getRNG(), danger - 2, danger + 1);
                 if (amount > 0) {
                     val stack = new ItemStack(ModItems.lootCoin_1, amount, 0);
                     e.getDrops().add(MCUtil.makeItemAt(entity, stack));

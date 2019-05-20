@@ -1,4 +1,4 @@
-package com.vortexel.dangerzone.common;
+package com.vortexel.dangerzone.common.util;
 
 import lombok.val;
 
@@ -25,6 +25,20 @@ public final class Reflector {
         }
     }
 
+    public static <T> T callStaticMethod(Class<?> cls, String name, Class<?>[] paramTypes, Object... params) {
+        val m = getMethod(cls, name, paramTypes);
+        return callMethod(null, m, params);
+    }
+
+    public static <T> T callStaticMethod(Class<?> cls, String name, Object... params) {
+        try {
+            val m = findMethod(cls, name, params.length);
+            return callMethod(null, m, params);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static <T> T callMethod(Object obj, String name, Class<?>[] paramTypes, Object... params) {
         val m = getMethod(obj.getClass(), name, paramTypes);
         methodCachePut(m);
@@ -34,7 +48,6 @@ public final class Reflector {
     public static <T> T callMethod(Object obj, String name, Object... params) {
         try {
             val m = findMethod(obj.getClass(), name, params.length);
-            m.setAccessible(true);
             return callMethod(obj, m, params);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
@@ -59,6 +72,7 @@ public final class Reflector {
 
         for (Method m : clazz.getDeclaredMethods()) {
             if (m.getName().equals(name) && m.getParameterCount() == paramCount) {
+                m.setAccessible(true);
                 methodCachePut(m);
                 return m;
             }

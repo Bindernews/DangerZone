@@ -10,6 +10,11 @@ public final class Consts {
     public static final int STACK_SIZE = 64;
 
     /**
+     * Category name in config.
+     */
+    public static final String WORLDS_PREFIX = "worlds";
+
+    /**
      * Mouse button left
      */
     public static final int MOUSE_LEFT = 0;

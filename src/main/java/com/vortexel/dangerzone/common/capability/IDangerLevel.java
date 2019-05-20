@@ -1,4 +1,4 @@
-package com.vortexel.dangerzone.api;
+package com.vortexel.dangerzone.common.capability;
 
 /**
  * This is a Forge Capability representing the danger level of each entity. This ONLY applies to Living Entities.

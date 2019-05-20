@@ -1,6 +1,5 @@
 package com.vortexel.dangerzone.common.capability;
 
-import com.vortexel.dangerzone.api.IDangerLevel;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;

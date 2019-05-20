@@ -2,7 +2,7 @@ package com.vortexel.dangerzone.client.gui;
 
 import com.google.common.collect.Lists;
 import com.vortexel.dangerzone.client.gui.component.IGuiComponent;
-import com.vortexel.dangerzone.common.Reflector;
+import com.vortexel.dangerzone.common.util.Reflector;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiLabel;
@@ -70,11 +70,8 @@ public class BaseGuiContainer extends GuiContainer {
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        componentsMouseClicked(mouseX, mouseY, mouseButton);
-    }
-
-    protected void componentsMouseClicked(int mouseX, int mouseY, int mouseButton) {
         for (IGuiComponent comp : components) {
+            // Make mouseX and mouseY relative to the GUI
             comp.onMouseClick(mouseX - guiLeft, mouseY - guiTop, mouseButton);
         }
     }
@@ -82,23 +79,17 @@ public class BaseGuiContainer extends GuiContainer {
     @Override
     protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
         super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
-        componentsMouseDrag(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
-    }
-
-    protected void componentsMouseDrag(int mouseX, int mouseY, int mouseButton, long timeSinceLastClick) {
         for (IGuiComponent comp : components) {
-            comp.onMouseDrag(mouseX, mouseY, mouseButton, timeSinceLastClick);
+            // These mouseX and mouseY are already relative to the GUI
+            comp.onMouseDrag(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
         }
     }
 
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int state) {
         super.mouseReleased(mouseX, mouseY, state);
-        componentsMouseReleased(mouseX, mouseY, state);
-    }
-
-    protected void componentsMouseReleased(int mouseX, int mouseY, int state) {
         for (IGuiComponent comp : components) {
+            // Make mouseX and mouseY relative to the GUI
             comp.onMouseRelease(mouseX - guiLeft, mouseY - guiTop, state);
         }
     }
@@ -109,13 +100,12 @@ public class BaseGuiContainer extends GuiContainer {
     }
 
     @Override
-    public void handleInput() throws IOException {
-        super.handleInput();
+    public void handleMouseInput() throws IOException {
+        super.handleMouseInput();
         for (IGuiComponent comp : components) {
-            comp.handleInput();
+            comp.handleMouseInput();
         }
     }
-
 
     // region Accessors
 

@@ -1,11 +1,11 @@
 package com.vortexel.dangerzone.client.gui.component;
 
 import com.google.common.collect.Lists;
-import com.vortexel.dangerzone.client.GLUtil;
 import com.vortexel.dangerzone.client.gui.BaseGuiContainer;
 import com.vortexel.dangerzone.client.gui.Sprite;
 import com.vortexel.dangerzone.common.Consts;
 import com.vortexel.dangerzone.common.DangerMath;
+import com.vortexel.dangerzone.common.util.EventDispatch;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.input.Mouse;
@@ -26,9 +26,9 @@ public class BScrollBar implements IGuiComponent {
     protected float stepValue;
     protected boolean isDragging;
     protected Sprite scrollBarSprite;
-    protected  boolean renderInBetweenSteps;
+    protected boolean renderInBetweenSteps;
 
-    public final List<Consumer<Float>> scrollListeners;
+    public final EventDispatch<Float> eventScroll = new EventDispatch<>();
     public final BaseGuiContainer container;
 
     public BScrollBar(BaseGuiContainer container, int x, int y, int w, int h, Sprite scrollBarSprite) {
@@ -38,7 +38,6 @@ public class BScrollBar implements IGuiComponent {
         stepValue = 0;
         isDragging = false;
         this.scrollBarSprite = scrollBarSprite;
-        scrollListeners = Lists.newArrayList();
         setRange(0, 1, 0);
         renderInBetweenSteps = false;
     }
@@ -66,9 +65,7 @@ public class BScrollBar implements IGuiComponent {
         }
         if (stepValue != temp) {
             stepValue = temp;
-            for (Consumer<Float> con : scrollListeners) {
-                con.accept(temp);
-            }
+            eventScroll.fire(temp);
         }
     }
 
@@ -99,7 +96,7 @@ public class BScrollBar implements IGuiComponent {
     }
 
     @Override
-    public void handleInput() {
+    public void handleMouseInput() {
         if (!isDragging) {
             // Don't do scrolling when the user is already dragging the scroll bar
             int dWheel = Mouse.getEventDWheel();
@@ -135,8 +132,6 @@ public class BScrollBar implements IGuiComponent {
         Minecraft.getMinecraft().getTextureManager().bindTexture(scrollBarSprite.texture);
         container.drawTexturedModalRect(area.x, drawY, scrollBarSprite.x, scrollBarSprite.y, area.width,
                 scrollBarSprite.height);
-//        GLUtil.drawTexturedRect(area.x, drawY, 0, scrollBarSprite.x, scrollBarSprite.y, scrollBarSprite.width,
-//                scrollBarSprite.height, scrollBarSprite.texW, scrollBarSprite.texH);
     }
 
     public boolean isRenderInBetweenSteps() {

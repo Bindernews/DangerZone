@@ -1,7 +1,7 @@
 package com.vortexel.dangerzone.common.util;
 
 import com.vortexel.dangerzone.DangerZone;
-import com.vortexel.dangerzone.api.IDangerLevel;
+import com.vortexel.dangerzone.common.capability.IDangerLevel;
 import com.vortexel.dangerzone.common.config.DZConfig;
 import lombok.val;
 import net.minecraft.entity.Entity;
@@ -12,6 +12,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.EntityEvent;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 /**
  * Minecraft utility methods.
@@ -86,6 +90,23 @@ public class MCUtil {
 
     public static ResourceLocation makeResource(String location) {
         return new ResourceLocation(DangerZone.MOD_ID, location);
+    }
+
+    /**
+     * Open a resource (file in the JAR) as a Reader object.
+     * @param path the path to the resource
+     * @throws IllegalArgumentException if the resource can't be found
+     */
+    public static Reader openResource(String path) {
+        val resource = MCUtil.class.getClassLoader().getResource(path);
+        if (resource == null) {
+            throw new IllegalArgumentException("Unknown resource \"" + path + "\"");
+        }
+        try {
+            return new InputStreamReader(resource.openStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private MCUtil() {}

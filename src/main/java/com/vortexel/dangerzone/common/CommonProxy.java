@@ -2,28 +2,19 @@ package com.vortexel.dangerzone.common;
 
 import com.google.common.collect.Maps;
 import com.vortexel.dangerzone.DangerZone;
-import com.vortexel.dangerzone.api.DangerZoneAPI;
-import com.vortexel.dangerzone.common.api.ImplDangerZoneAPI;
-import com.vortexel.dangerzone.common.capability.DangerLevelProvider;
-import com.vortexel.dangerzone.common.capability.DangerLevelStorage;
-import com.vortexel.dangerzone.api.IDangerLevel;
 import com.vortexel.dangerzone.common.config.EntityConfigManager;
 import com.vortexel.dangerzone.common.difficulty.DifficultyAdjuster;
 import com.vortexel.dangerzone.common.difficulty.DifficultyMap;
 import com.vortexel.dangerzone.common.difficulty.ForgeWorldAdapter;
+import com.vortexel.dangerzone.common.integration.ModIntegrations;
 import com.vortexel.dangerzone.common.network.PacketDangerLevel;
 import com.vortexel.dangerzone.common.network.PacketHandler;
 import com.vortexel.dangerzone.common.trade.MerchandiseManager;
 import com.vortexel.dangerzone.common.util.MCUtil;
 import lombok.Getter;
 import lombok.val;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -41,23 +32,23 @@ import java.util.Map;
 public class CommonProxy {
 
     public static final String DEFAULT_ENTITY_CONFIG_PATH = "assets/dangerzone/other/entity_data.json";
-    public static final String DEFAULT_MERCHANDISE_PATH = "assets/dangerzone/other/merchandise.json";
+    public static final String DEFAULT_MERCHANDISE_PATH = "assets/dangerzone/other/merchandise/default.json";
     public static final String ENTITY_CONFIG_FILE = "entity_config.json";
-    public static final String MERCHANDISE_FILE = "merchandise.json";
+    public static final String MERCHANDISE_FILE = "default.json";
 
     /**
      * Map dimension ID to the DifficultyMap.
      */
-    public Map<Integer, DifficultyMap> worldDifficultyMaps;
+    protected Map<Integer, DifficultyMap> worldDifficultyMaps;
 
-    @Getter
     protected DifficultyAdjuster adjuster;
     @Getter
     protected EntityConfigManager entityConfigManager;
     @Getter
     protected MerchandiseManager merchandise;
 
-    protected ImplDangerZoneAPI apiImpl;
+    // Flag to track if we've baked entityConfig or not.
+    private boolean entityConfigFinalized = false;
 
     public void preInit(FMLPreInitializationEvent event) {
         // Create our object instances so they exist when other things try to use them.
@@ -65,33 +56,33 @@ public class CommonProxy {
         entityConfigManager = new EntityConfigManager();
         merchandise = new MerchandiseManager();
         worldDifficultyMaps = Maps.newHashMap();
-        apiImpl = new ImplDangerZoneAPI();
 
-        // Other mods must be able to access the API during init
-        DangerZoneAPI.setupAPI(apiImpl);
         // Load default entity config
-        entityConfigManager.addFile(openResource(DEFAULT_ENTITY_CONFIG_PATH));
-        // Load the default (or overridden) merchandise data
-        loadMerchandise();
+        entityConfigManager.addFile(MCUtil.openResource(DEFAULT_ENTITY_CONFIG_PATH));
 
-        // Register the IDangerLevel capability
-        CapabilityManager.INSTANCE.register(IDangerLevel.class, new DangerLevelStorage(),
-                DangerLevelStorage.Basic::new);
         // Register our event handlers (including this)
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(adjuster);
     }
 
     public void init(FMLInitializationEvent event) {
+        ModIntegrations.initCommon();
     }
 
     public void postInit(FMLPostInitializationEvent event) {
-        // Freeze the API so nobody can try to add more entity data
-        apiImpl.setFrozen(true);
+
+    }
+
+    public void finalizeEntityConfig() {
+        if (entityConfigFinalized) {
+            return;
+        }
+        entityConfigFinalized = true;
         // Load the user config file(s) last so they override any mod-provided data
         loadUserEntityConfig();
-        // Optimize the config data for performance
-        entityConfigManager.bake();
+        // Optimize the config data for performance. We do this once the server is starting
+        // so we know that other mods have had the chance to send us other info.
+        getEntityConfigManager().bake();
     }
 
     /**
@@ -123,21 +114,21 @@ public class CommonProxy {
     }
 
     public void loadUserEntityConfig() {
-        val entityDataConfig = new File(DangerZone.instance.configDir, ENTITY_CONFIG_FILE);
+        val entityDataConfig = new File(DangerZone.getMod().getConfigDir(), ENTITY_CONFIG_FILE);
         if (entityDataConfig.isFile()) {
             try {
                 val reader = new FileReader(entityDataConfig);
                 entityConfigManager.addFile(reader);
                 reader.close();
             } catch (IOException e) {
-                DangerZone.log.error(e);
+                DangerZone.getLog().error(e);
             }
         }
     }
 
     public void loadMerchandise() {
         boolean shouldAddDefaults = true;
-        val merchandiseConfigFile = new File(DangerZone.instance.configDir, MERCHANDISE_FILE);
+        val merchandiseConfigFile = new File(DangerZone.getMod().getConfigDir(), MERCHANDISE_FILE);
         if (merchandiseConfigFile.isFile()) {
             try {
                 val reader = new FileReader(merchandiseConfigFile);
@@ -145,34 +136,11 @@ public class CommonProxy {
                 reader.close();
                 shouldAddDefaults = false;
             } catch (IOException e) {
-                DangerZone.log.error(e);
+                DangerZone.getLog().error(e);
             }
         }
         if (shouldAddDefaults) {
-            merchandise.addFromReader(openResource(DEFAULT_MERCHANDISE_PATH));
-        }
-    }
-
-    private Reader openResource(String path) {
-        val resource = getClass().getClassLoader().getResource(path);
-        if (resource == null) {
-            throw new IllegalArgumentException("Unknown resource \"" + path + "\"");
-        }
-        try {
-            return new InputStreamReader(resource.openStream());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @SubscribeEvent
-    public void onRegisterCapabilities(AttachCapabilitiesEvent<Entity> e) {
-        if (e.getObject() instanceof EntityLivingBase) {
-            val eLiving = (EntityLivingBase)e.getObject();
-            if (!(eLiving instanceof EntityPlayer)) {
-                e.addCapability(DangerLevelStorage.RESOURCE_LOCATION, new DangerLevelProvider());
-            }
-            eLiving.getAttributeMap().registerAttribute(Consts.ATTRIBUTE_DECAY_TOUCH);
+            merchandise.addFromReader(MCUtil.openResource(DEFAULT_MERCHANDISE_PATH));
         }
     }
 
@@ -182,6 +150,7 @@ public class CommonProxy {
         if (MCUtil.isWorldLocal(w)) {
             worldDifficultyMaps.putIfAbsent(w.provider.getDimension(), new DifficultyMap(new ForgeWorldAdapter(w)));
         }
+        finalizeEntityConfig();
     }
 
     @SubscribeEvent

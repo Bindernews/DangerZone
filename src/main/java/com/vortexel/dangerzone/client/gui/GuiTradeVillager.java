@@ -7,8 +7,14 @@ import com.vortexel.dangerzone.common.gui.ContainerTradeVillager;
 import com.vortexel.dangerzone.common.trade.MerchandiseManager;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.Container;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextFormatting;
+
+import java.util.List;
 
 public class GuiTradeVillager extends BaseGuiContainer {
 
@@ -33,7 +39,7 @@ public class GuiTradeVillager extends BaseGuiContainer {
         scrollBar = new BScrollBar(this, 174, 18, 12, 70,
                 new Sprite(BG_TEXTURE, 232, 0, 12, 15, 256, 256));
         scrollBar.setRange(0, maxScroll, 1);
-        scrollBar.scrollListeners.add(this::onScroll);
+        scrollBar.eventScroll.add(this::onScroll);
         components.add(scrollBar);
     }
 
@@ -70,9 +76,24 @@ public class GuiTradeVillager extends BaseGuiContainer {
         renderHoveredToolTip(mouseX, mouseY);
     }
 
+    /**
+     * We override this and if we're displaying the tooltip for the hovered item, and that item has a cost,
+     * then we display the cost of the item.
+     */
+    @Override
+    public List<String> getItemToolTip(ItemStack stack) {
+        List<String> lines = super.getItemToolTip(stack);
+        if (getHoveredSlot() instanceof ContainerTradeVillager.OutputSlot && getHoveredSlot().getStack() == stack) {
+            long cost = getContainer().getCostForSlot(getHoveredSlot().slotNumber);
+            lines.add(TextFormatting.RED + I18n.format("gui.dangerzone.cost", (int)cost));
+        }
+        return lines;
+    }
 
     protected void onScroll(float row) {
-        getContainer().scrollTo((int)row);
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setInteger("row", (int)row);
+        getContainer().sendUpdatePacket(mc.player, tag);
     }
 
     public ContainerTradeVillager getContainer() {

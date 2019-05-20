@@ -8,7 +8,7 @@ public interface IGuiComponent {
     default void onMouseRelease(int mouseX, int mouseY, int mouseButton) {}
     default void onMouseDrag(int mouseX, int mouseY, int mouseButton, long timeSinceLastClick) {}
     default void onUpdate(float partialTicks) {}
-    default void handleInput() {}
+    default void handleMouseInput() {}
     void draw();
     Rectangle getArea();
 

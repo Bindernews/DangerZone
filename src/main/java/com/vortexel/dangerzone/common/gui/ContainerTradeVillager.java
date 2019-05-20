@@ -14,7 +14,10 @@ import lombok.val;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -52,6 +55,13 @@ public class ContainerTradeVillager extends BaseContainer {
         updatePlayerMoney();
         for (int i = 0; i < firstPlayerSlot(); i++) {
             ((OutputSlot) getSlot(i)).updateOutputSlot();
+        }
+    }
+
+    @Override
+    public void onUpdatePacket(EntityPlayer sender, NBTTagCompound tag) {
+        if (tag.hasKey("row", Constants.NBT.TAG_INT)) {
+            this.scrollTo(tag.getInteger("row"));
         }
     }
 
@@ -105,11 +115,11 @@ public class ContainerTradeVillager extends BaseContainer {
     /**
      * Get the loot coin cost of the item in slot {@code index}.
      */
-    protected long getCostForSlot(int index) {
+    public long getCostForSlot(int index) {
         return getMerchandise().getCost(index + (COLS * scrollRow));
     }
 
-    protected ItemStack getMerchandiseForSlot(int index, int count) {
+    public ItemStack getMerchandiseForSlot(int index, int count) {
         val stack = getMerchandise().getItemStack(index + (COLS * scrollRow));
         return ItemHandlerHelper.copyStackWithSize(stack, count * stack.getCount());
     }
@@ -191,7 +201,8 @@ public class ContainerTradeVillager extends BaseContainer {
     }
 
     public void scrollTo(int row) {
-        scrollRow = row;
+        val maxRow = (int)Math.ceil((double)getMerchandise().getTotalOffers() / COLS);
+        scrollRow = MathHelper.clamp(row, 0, maxRow);
         for (int i = 0; i < ContainerTradeVillager.VISIBLE_SLOTS; i++) {
             ((OutputSlot)getSlot(i)).updateOutputSlot();
         }
@@ -233,12 +244,14 @@ public class ContainerTradeVillager extends BaseContainer {
         return true;
     }
 
-    protected class OutputSlot extends SlotOutput {
+    public class OutputSlot extends SlotOutput {
         public boolean isTaking;
+        public boolean enabled;
 
         public OutputSlot(IItemHandler itemHandler, int index, int xPosition, int yPosition) {
             super(itemHandler, index, xPosition, yPosition);
             isTaking = false;
+            enabled = false;
         }
 
         /**
@@ -246,8 +259,10 @@ public class ContainerTradeVillager extends BaseContainer {
          */
         @Override
         public void updateOutputSlot() {
+            val merch = getMerch(1);
             isTaking = false;
-            super.putStack(getMerch(1));
+            enabled = !merch.isEmpty();
+            super.putStack(merch);
         }
 
         protected ItemStack getMerch(int count) {
@@ -270,7 +285,7 @@ public class ContainerTradeVillager extends BaseContainer {
 
         @Override
         public boolean isEnabled() {
-            return !getMerchandiseForSlot(getSlotIndex(), 1).isEmpty();
+            return enabled;
         }
 
         @Override

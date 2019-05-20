@@ -11,11 +11,6 @@
       "chance": [0.8, 1.2],
       "min_level": 5
     },
-    "regeneration": {
-      "range": [0, 6],
-      "chance": [0, 0.9],
-      "min_level": 50
-    },
     "attack_damage": false,
     "wither": false,
     "armor": false
@@ -26,6 +21,11 @@
       "chance": [0.7, 1.0],
       "range": [1, 20],
       "min_level": 10
+    },
+    "regeneration": {
+      "range": [0, 6],
+      "chance": [0, 0.9],
+      "min_level": 50
     },
     "wither": {
       "range": [0, 3],
@@ -50,6 +50,10 @@
   },
   "minecraft:horse": {
     "inherits": "generic:animal"
+  },
+  "minecraft:villager": {
+    "inherits": "generic:creature",
+    "move_speed": false
   },
   "minecraft:creeper": {
     "inherits": "generic:hostile",

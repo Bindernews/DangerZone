@@ -32,6 +32,7 @@ public class EntityTraderVillager extends EntityVillager implements IVillager {
         super(worldIn);
     }
 
+    @SuppressWarnings("unchecked")
     protected void initEntityAI() {
         this.tasks.addTask(0, new EntityAISwimming(this));
         this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityZombie.class, 8.0F, 0.6D, 0.6D));

@@ -1,7 +1,6 @@
 package com.vortexel.dangerzone.common.capability;
 
 import com.vortexel.dangerzone.DangerZone;
-import com.vortexel.dangerzone.api.IDangerLevel;
 import com.vortexel.dangerzone.common.config.DZConfig;
 import lombok.Data;
 import lombok.Getter;

@@ -1,5 +1,6 @@
 package com.vortexel.dangerzone.common.item;
 
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.vortexel.dangerzone.common.entity.EntityCoinProjectile;
@@ -9,9 +10,9 @@ import com.vortexel.dangerzone.common.util.FnUtil;
 import com.vortexel.dangerzone.common.util.Hitscan;
 import com.vortexel.dangerzone.common.util.MCUtil;
 import lombok.val;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.projectile.EntityTippedArrow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
@@ -108,8 +109,7 @@ public class ItemCoinPumpShotgun extends BaseItem {
                 bullets = 6;
         }
         // Create the filter for the hitscan to use so we only get the entities we want.
-        val hitscanFilter = Predicates.and(EntitySelectors.NOT_SPECTATING, EntitySelectors.IS_ALIVE,
-                (e) -> e instanceof EntityLivingBase);
+        val hitscanFilter = makeEntityFilterPredicate();
 
         // List of entities that we hit.
         List<EntityLivingBase> hitEntities = Lists.newArrayListWithCapacity(bullets);
@@ -143,6 +143,12 @@ public class ItemCoinPumpShotgun extends BaseItem {
                 spawnCoinBulletAt(entity, hitEntities.get(i), coinType, damage * bulletCount);
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Predicate<Entity> makeEntityFilterPredicate() {
+        return Predicates.and(EntitySelectors.NOT_SPECTATING, EntitySelectors.IS_ALIVE,
+                (e) -> e instanceof EntityLivingBase);
     }
 
     private void spawnCoinBulletAt(EntityLivingBase attacker, EntityLivingBase victim, ItemLootCoin coinType,

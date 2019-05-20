@@ -1,6 +1,6 @@
 package com.vortexel.dangerzone.common.difficulty;
 
-import com.vortexel.dangerzone.api.IDangerLevel;
+import com.vortexel.dangerzone.common.capability.IDangerLevel;
 import com.vortexel.dangerzone.common.config.EntityConfig;
 
 import java.util.Random;

@@ -45,7 +45,8 @@ public class DifficultyMap {
         // This should look like a list where each function takes as input the output of the previous call.
         // If any modifiers are added or removed, they should be done here.
         double d = 0.0;
-        d = genChunkDifficulty(d, x, z);
+//        d = genChunkDifficulty(d, x, z);
+        d = getRaw(x, z);
         d = adjustIndividual(d, x, z);
         d = adjustForSpawn(d, x, z);
         d = adjustClamp(d, x, z);
@@ -123,12 +124,12 @@ public class DifficultyMap {
         double v = generator.getValue((double)x * DZConfig.general.stretchFactor,
                 (double)z * DZConfig.general.stretchFactor);
         if (v < -1 || v > 1) {
-            DangerZone.log.warn("Noise value outside range " + v);
+            DangerZone.getLog().warn("Noise value outside range " + v);
         }
         // Bind v to [0, 1)
         v = (MathHelper.clamp(v, -1, Consts.NOT_ONE) + 1) / 2.0;
         // v = v^2 to make lower difficulties more common
-        v = Math.pow(v, 1.6);
+        v = Math.pow(v, 1.2);
         return v;
     }
 
