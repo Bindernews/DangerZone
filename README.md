@@ -69,7 +69,7 @@ maps to an **Entity Config** object.
 **Optional:** yes <br/> 
 
 #### `<modifier>`
-Replace `<modifier>` with one of the modifiers from the [List of Modifiers](#List of Modifiers). <br/>
+Replace `<modifier>` with one of the modifiers from the [List of Modifiers](#List_of_Modifiers). <br/>
 **Valid Values:** `false` will disable this modifier from being applied to this *Entity Config*.
 If the value isn't `false` then it must be an *object* with the following fields.
 

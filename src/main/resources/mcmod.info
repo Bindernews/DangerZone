@@ -5,10 +5,10 @@
   "description": "Creates difficulty zones to make late-game combat more interesting.",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
-  "updateUrl": "",
+  "url": "https://github.com/Bindernews/DangerZone",
+  "updateUrl": "https://gist.github.com/Bindernews/4f55541dce83919d9642c0e2e49184a8",
   "authorList": ["BinderNews"],
-  "credits": "BinderNews, ThunderMagnet, SirGoose3432",
+  "credits": "BinderNews, ThunderMagnet",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
