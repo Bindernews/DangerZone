@@ -124,7 +124,7 @@ public class BaseGuiContainer extends GuiContainer {
         super.renderHoveredToolTip(mouseX, mouseY);
     }
 
-    public void drawSlot(Slot slot) {
+    public void drawSlotHelper(Slot slot) {
         Reflector.callMethod(this, mDrawSlot, slot);
     }
 

@@ -52,7 +52,7 @@ public class GuiContainerHelper {
             Slot slot = inventorySlots.get(i1);
 
             if (slot.isEnabled()) {
-                gui.drawSlot(slot);
+                gui.drawSlotHelper(slot);
             }
 
             if (isMouseOverSlot(slot) && slot.isEnabled()) {
