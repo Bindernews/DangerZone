@@ -1,11 +1,9 @@
 package com.vortexel.dangerzone.common.entity;
 
 import com.vortexel.dangerzone.common.entity.ai.AITaskTradePlayer;
-import com.vortexel.dangerzone.common.entity.ai.IVillager;
 import com.vortexel.dangerzone.common.gui.ContainerTradeVillager;
 import com.vortexel.dangerzone.common.gui.GuiHandler;
 import com.vortexel.dangerzone.common.util.MCUtil;
-import lombok.Getter;
 import lombok.val;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
@@ -23,9 +21,8 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class EntityTraderVillager extends EntityVillager implements IVillager {
+public class EntityTraderVillager extends EntityVillager {
 
-    @Getter
     protected EntityPlayer customer;
 
     public EntityTraderVillager(World worldIn) {
@@ -81,9 +78,10 @@ public class EntityTraderVillager extends EntityVillager implements IVillager {
         GuiHandler.openGui(player, GuiHandler.GUI_TRADER, getPosition());
     }
 
+    @Nullable
     @Override
-    public EntityCreature getEntity() {
-        return this;
+    public EntityPlayer getCustomer() {
+        return this.customer;
     }
 
     @Override

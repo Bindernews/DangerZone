@@ -1,14 +1,15 @@
 package com.vortexel.dangerzone.common.entity.ai;
 
+import com.vortexel.dangerzone.common.entity.EntityTraderVillager;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class AITaskTradePlayer extends EntityAIBase {
 
-    private final IVillager villager;
+    private final EntityTraderVillager villager;
 
-    public AITaskTradePlayer(IVillager villagerIn)
+    public AITaskTradePlayer(EntityTraderVillager villagerIn)
     {
         this.villager = villagerIn;
         this.setMutexBits(5);
@@ -19,7 +20,7 @@ public class AITaskTradePlayer extends EntityAIBase {
      */
     public boolean shouldExecute()
     {
-        EntityCreature entity = villager.getEntity();
+        EntityCreature entity = villager;
         if (!entity.isEntityAlive() || entity.isInWater() || !entity.onGround || entity.velocityChanged) {
             return false;
         } else {
@@ -39,7 +40,7 @@ public class AITaskTradePlayer extends EntityAIBase {
      */
     public void startExecuting()
     {
-        villager.getEntity().getNavigator().clearPath();
+        villager.getNavigator().clearPath();
     }
 
     /**

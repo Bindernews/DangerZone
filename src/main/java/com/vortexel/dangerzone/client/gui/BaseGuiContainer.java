@@ -13,25 +13,30 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 public class BaseGuiContainer extends GuiContainer {
 
-    private static final Method mDrawSlot = Reflector.getMethod(GuiContainer.class, "drawSlot", Slot.class);
-    private static final Field fDraggedStack = getF("draggedStack");
-    private static final Field fIsMouseRightClick = getF("isRightMouseClick");
-    private static final Field fHoveredSlot = getF("hoveredSlot");
-    private static final Field fTouchUpX = getF("touchUpX");
-    private static final Field fTouchUpY = getF("touchUpY");
-    private static final Field fReturningStack = getF("returningStack");
-    private static final Field fReturningStackDestSlot = getF("returningStackDestSlot");
-    private static final Field fDragSplittingRemnant = getF("dragSplittingRemnant");
-    private static final Field fReturningStackTime = getF("returningStackTime");
+
+    private static final Method mDrawSlot = Reflector.findMethodDeobf(GuiContainer.class,
+            "drawSlot", "func_146977_a", Void.class, Slot.class);
+    private static final Field fDraggedStack = getF("field_147012_x", "draggedStack"); // "y"
+    private static final Field fIsMouseRightClick = getF("field_147004_w", "isMouseRightClick"); // "x"
+    private static final Field fHoveredSlot = getF("field_147006_u", "hoveredSlot"); // "v"
+    private static final Field fTouchUpX = getF("field_147011_y", "touchUpX"); // "z"
+    private static final Field fTouchUpY = getF("field_147010_z", "touchUpY"); // "A"
+    private static final Field fReturningStack = getF("field_146991_C", "returningStack");
+    private static final Field fReturningStackDestSlot = getF("field_146989_A", "returningStackDestSlot");
+    private static final Field fDragSplittingRemnant = getF("field_146996_I", "dragSplittingRemnant");
+    private static final Field fReturningStackTime = getF("field_146990_B", "returningStackTime");
 
     protected ResourceLocation backgroundTexture;
     protected List<IGuiComponent> components;
@@ -199,8 +204,8 @@ public class BaseGuiContainer extends GuiContainer {
         return Reflector.get(this, fReturningStackTime);
     }
 
-    protected static Field getF(String name) {
-        return Reflector.getField(GuiContainer.class, name);
+    protected static Field getF(String srgName, String name) {
+        return Reflector.findFieldDeobf(GuiContainer.class, name, srgName);
     }
 
     // endregion Accessors
