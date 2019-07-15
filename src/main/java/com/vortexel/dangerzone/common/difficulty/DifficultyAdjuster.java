@@ -162,25 +162,4 @@ public class DifficultyAdjuster {
     protected boolean shouldModifyWorld(Entity e) {
         return MCUtil.isWorldLocal(e) && MCUtil.isWorldEnabled(e);
     }
-
-    public Collection<ItemStack> getAdditionalDrops(LivingDropsEvent e) {
-        if (e.getEntity() instanceof EntityMob
-                && MCUtil.getDangerLevelCapability(e.getEntity()) != null) {
-            EntityMob eMob = (EntityMob)e.getEntity();
-            World world = eMob.getEntityWorld();
-            IDangerLevel dangerLevel = MCUtil.getDangerLevelCapability(eMob);
-
-            // See EntityLiving#dropLoot for how this is implemented in vanilla and EntityLivingBase#onDeath
-            // for where dropLoot is called and how it translates into the LivingDropsEvent.
-
-            ResourceLocation lootTableRes = Reflector.get(eMob, "deathLootTable");
-            if (lootTableRes == null) {
-                lootTableRes = Reflector.callMethod(eMob, "getLootTable");
-            }
-            LootTable lootTable = world.getLootTableManager().getLootTableFromLocation(lootTableRes);
-            LootContext.Builder ctxBuilder = new LootContext.Builder((WorldServer)world);
-        }
-        // If we don't need to add any drops, we just return an empty set.
-        return null;
-    }
 }

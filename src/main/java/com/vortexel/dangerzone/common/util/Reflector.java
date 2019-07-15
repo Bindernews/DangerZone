@@ -3,6 +3,7 @@ package com.vortexel.dangerzone.common.util;
 import lombok.val;
 
 import com.google.common.collect.Maps;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -14,6 +15,21 @@ public final class Reflector {
 
     private static Map<Class<?>, Map<String, Map<Integer, Method>>> methodCache = Maps.newIdentityHashMap();
 
+    public static Method findMethodDeobf(Class<?> clazz, String name, String srgName, Class<?> returnType, Class<?>... paramTypes) {
+        try {
+            return ObfuscationReflectionHelper.findMethod(clazz, srgName, returnType, paramTypes);
+        } catch (Throwable t) {
+        }
+        return ObfuscationReflectionHelper.findMethod(clazz, name, returnType, paramTypes);
+    }
+
+    public static Field findFieldDeobf(Class<?> clazz, String name, String srgName) {
+        try {
+            return ObfuscationReflectionHelper.findField(clazz, srgName);
+        } catch (Throwable t) {
+        }
+        return ObfuscationReflectionHelper.findField(clazz, name);
+    }
 
     public static <T> Method getMethod(Class<T> clazz, String name, Class<?>... paramTypes) {
         try {

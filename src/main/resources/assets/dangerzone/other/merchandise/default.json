@@ -5,6 +5,31 @@
     "cost": 20
   },
   {
+    "item": "minecraft:iron_ore",
+    "count": 1,
+    "cost": 15
+  },
+  {
+    "item": "minecraft:clay_ball",
+    "count": 8,
+    "cost": 10
+  },
+  {
+    "item": "minecraft:slime_ball",
+    "count": 1,
+    "cost": 40
+  },
+  {
+    "item": "minecraft:cake",
+    "count": 1,
+    "cost": 35
+  },
+  {
+    "item": "minecraft:cookie",
+    "count": 8,
+    "cost": 10
+  },
+  {
     "item": "minecraft:ender_pearl",
     "count": 1,
     "cost": 50
@@ -20,198 +45,18 @@
     "cost": 50
   },
   {
-    "item": "minecraft:ender_pearl",
+    "item": "minecraft:tnt",
     "count": 1,
-    "cost": 50
+    "cost": 125
   },
   {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
+    "item": "minecraft:rail",
+    "count": 8,
+    "cost": 30
   },
   {
-    "item": "minecraft:ender_pearl",
+    "item": "minecraft:lit_pumpkin",
     "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
+    "cost": 10
   }
 ]

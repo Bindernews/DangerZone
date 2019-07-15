@@ -18,6 +18,7 @@ public class ModItems {
     public static ItemLootCoin lootCoin_512;
     public static Item coinPouch;
     public static ItemCoinPumpShotgun coinPumpShotgun;
+    public static ItemSummonLootCoinTrader summonLootCoinTrader;
 
     public static void init() {
         lootCoin_1 = new ItemLootCoin(ItemLootCoin.AMOUNTS[0]);
@@ -32,6 +33,8 @@ public class ModItems {
         ITEMS.add(coinPouch);
         coinPumpShotgun = new ItemCoinPumpShotgun();
         ITEMS.add(coinPumpShotgun);
+        summonLootCoinTrader = new ItemSummonLootCoinTrader();
+        ITEMS.add(summonLootCoinTrader);
 
         MinecraftForge.EVENT_BUS.register(new Registrar());
     }
