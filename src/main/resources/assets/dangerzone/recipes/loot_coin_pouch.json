@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " C ",
+    "SLS",
+    "SSS"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:string"
+    },
+    "L": {
+      "item": "minecraft:leather"
+    },
+    "C": {
+      "item": "dangerzone:loot_coin_1"
+    }
+  },
+  "result": {
+    "item": "dangerzone:coin_pouch"
+  }
+}

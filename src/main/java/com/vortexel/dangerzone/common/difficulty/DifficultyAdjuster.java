@@ -128,7 +128,8 @@ public class DifficultyAdjuster {
         if (shouldModifyWorld(e.getEntity()) && canLoot) {
             val dangerLevelCap = MCUtil.getDangerLevelCapability(e.getEntity());
             if (dangerLevelCap != null) {
-                e.setLootingLevel(e.getLootingLevel() + dangerLevelCap.getDanger());
+                val extraLooting = (int)(dangerLevelCap.getDanger() * DZConfig.general.lootingMultiplier);
+                e.setLootingLevel(e.getLootingLevel() + extraLooting);
             }
         }
     }

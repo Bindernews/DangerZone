@@ -54,6 +54,11 @@ public class DZConfig {
         @Config.RangeDouble(min = 1.0, max = Consts.MAX_DANGER_LEVEL)
         public double dangerMultiplier = 100.0;
 
+        @Config.Comment({"Adds (lootingMultiplier * <entity's danger level>) to the looting level when a player kills",
+                        "an entity."})
+        @Config.RangeDouble(min = 0.0)
+        public double lootingMultiplier = 0.1;
+
         @Config.LangKey(LANG + "looting_non_player_kills")
         @Config.Comment({"Should the increased looting level be applied even if the mob wasn't killed by a player?"})
         public boolean lootingOnNonPlayerKills = true;
