@@ -71,6 +71,9 @@ public class DZConfig {
                 "If this is true, then players can build a mob grinder and get ores from it. Be careful."})
         public boolean doFakePlayersDropLoot = false;
 
+        @Config.Comment("Limit the amount of damage The Incredible Coin Pump Shotgun can do to players.")
+        public boolean nerfShotgunDamageToPlayers = true;
+
         @Config.Comment({"Numbers will generate using the entity's danger level +/- this value."})
         @Config.RangeInt(min = 0, max = Consts.MAX_DANGER_LEVEL)
         public int levelRange = 4;

@@ -3,6 +3,7 @@ package com.vortexel.dangerzone.common.item;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
+import com.vortexel.dangerzone.common.config.DZConfig;
 import com.vortexel.dangerzone.common.entity.EntityCoinProjectile;
 import com.vortexel.dangerzone.common.gui.GuiHandler;
 import com.vortexel.dangerzone.common.sound.ModSounds;
@@ -106,7 +107,7 @@ public class ItemCoinPumpShotgun extends BaseItem {
                 break;
             case 512:
                 damage = 128;
-                bullets = 6;
+                bullets = 5;
         }
         // Create the filter for the hitscan to use so we only get the entities we want.
         val hitscanFilter = makeEntityFilterPredicate();
@@ -140,7 +141,14 @@ public class ItemCoinPumpShotgun extends BaseItem {
                         hitEntities.set(j, null);
                     }
                 }
-                spawnCoinBulletAt(entity, hitEntities.get(i), coinType, damage * bulletCount);
+                // Handle player damage nerfing.
+                float entityDamage;
+                if (entity instanceof EntityPlayer && DZConfig.general.nerfShotgunDamageToPlayers) {
+                    entityDamage = Math.max(4f, damage) * bulletCount;
+                } else {
+                    entityDamage = damage * bulletCount;
+                }
+                spawnCoinBulletAt(entity, hitEntities.get(i), coinType, entityDamage);
             }
         }
     }
