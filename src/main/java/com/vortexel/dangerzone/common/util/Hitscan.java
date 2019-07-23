@@ -38,7 +38,8 @@ public class Hitscan {
         this.motion = this.end.subtract(start).normalize();
         this.entities = Lists.newArrayList();
         this.pos = start;
-        this.endBox = new AxisAlignedBB(this.end, this.end.add(motion.scale(2)));
+        Vec3d end2 = this.end.add(motion.scale(2));
+        this.endBox = new AxisAlignedBB(this.end.x, this.end.y, this.end.z, end2.x, end2.y, end2.z);
         this.rayRadiusSq = rayRadius * rayRadius;
     }
 
