@@ -6,10 +6,14 @@
       "min_level": 30
     },
     "max_health": {
-      "range": [1, 8],
-      "danger_scale": 0.75,
+      "range": [1, 4],
+      "danger_scale": 1.0,
       "chance": [0.8, 1.2],
       "min_level": 10
+    },
+    "spare": {
+      "range": [1, 1],
+      "chance": [0.2, 0.4]
     },
     "attack_damage": false,
     "wither": false,

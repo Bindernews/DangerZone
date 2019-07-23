@@ -3,6 +3,7 @@ package com.vortexel.dangerzone.common.difficulty;
 import com.vortexel.dangerzone.DangerZone;
 import com.vortexel.dangerzone.common.Consts;
 import com.vortexel.dangerzone.common.DangerMath;
+import com.vortexel.dangerzone.common.config.DZConfig;
 import com.vortexel.dangerzone.common.config.EntityConfig;
 import com.vortexel.dangerzone.common.config.ModifierConf;
 import lombok.val;
@@ -19,7 +20,6 @@ import static com.vortexel.dangerzone.common.DangerMath.*;
 public class EntityAdjuster {
 
     private static final int TOTAL_MODIFIER_COUNT = ModifierType.values().length;
-    private static final double POINT_MODIFIER_SCALE = 1 / 3D;
 
     private final IEntityModifier entityModifier;
     private EntityConfig eConfig;
@@ -107,14 +107,15 @@ public class EntityAdjuster {
         }
 
         // The total number of points we can use to modify the entity
-        double points = DangerMath.randomDanger(getRNG(), level - (int)DangerMath.levelRange(),
-                level + (int)DangerMath.levelRange()) * POINT_MODIFIER_SCALE * modCount;
+        int levelRNG = DZConfig.general.levelRange;
+        double points = DangerMath.randomDanger(getRNG(), level - levelRNG, level + levelRNG)
+                * DZConfig.general.dangerPointsPerLevel * modCount;
         // How many points to put into each modifier
         val modPoints = new double[TOTAL_MODIFIER_COUNT];
         // Give points to each modifier
         while (points > Consts.EPSILON) {
             // How many points to put towards the next level: 1-3 or the remaining points.
-            val deltaPoints = Math.min(points, randRange(getRNG(), 1, 3));
+            val deltaPoints = Math.min(points, randRange(getRNG(), 0.5, 3));
             val chance = randRange(getRNG(), 0, totalChance);
             // Find which slot our random value fits in
             int i = 0;

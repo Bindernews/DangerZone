@@ -78,6 +78,10 @@ public class DZConfig {
         @Config.RangeInt(min = 0, max = Consts.MAX_DANGER_LEVEL)
         public int levelRange = 4;
 
+        @Config.Comment("How many danger points the mob will receive per level. Influences mob difficulty.")
+        @Config.RangeDouble(min = 0, max = 1)
+        public double dangerPointsPerLevel = 0.2;
+
         @Config.Comment({"Number of loot coins dropped per mob level. (default 0.25)"})
         @Config.RangeDouble(min = 0.0)
         public double coinsPerLevel = 0.25;

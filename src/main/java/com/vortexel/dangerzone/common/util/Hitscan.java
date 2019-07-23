@@ -83,7 +83,7 @@ public class Hitscan {
         }
 
         final Vec3d nextPos = pos.add(motion);
-        final AxisAlignedBB rayBox = new AxisAlignedBB(pos, nextPos).grow(0.3);
+        final AxisAlignedBB rayBox = new AxisAlignedBB(pos.x, pos.y, pos.z, nextPos.x, nextPos.y, nextPos.z).grow(0.3);
         List<Entity> entitiesInBox = world.getEntitiesInAABBexcluding(ignore, rayBox, filter);
         for (Entity entity : entitiesInBox) {
             if (entity.canBeCollidedWith() && !entity.noClip) {
