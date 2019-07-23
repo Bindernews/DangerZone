@@ -58,5 +58,10 @@
     "item": "minecraft:lit_pumpkin",
     "count": 1,
     "cost": 10
+  },
+  {
+    "item": "minecraft:elytra",
+    "count": 1,
+    "cost": 5000
   }
 ]
