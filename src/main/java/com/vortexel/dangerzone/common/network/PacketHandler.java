@@ -13,5 +13,6 @@ public class PacketHandler {
         int id = 0;
         NETWORK.registerMessage(PacketDangerLevel.Handler.class, PacketDangerLevel.class, id++, Side.CLIENT);
         NETWORK.registerMessage(PacketContainerUpdate.Handler.class, PacketContainerUpdate.class, id++, Side.SERVER);
+        NETWORK.registerMessage(PacketEntityDangerLevel.Handler.class, PacketEntityDangerLevel.class, id++, Side.CLIENT);
     }
 }

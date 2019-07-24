@@ -8,13 +8,17 @@ import com.vortexel.dangerzone.common.difficulty.DifficultyMap;
 import com.vortexel.dangerzone.common.difficulty.ForgeWorldAdapter;
 import com.vortexel.dangerzone.common.integration.ModIntegrations;
 import com.vortexel.dangerzone.common.network.PacketDangerLevel;
+import com.vortexel.dangerzone.common.network.PacketEntityDangerLevel;
 import com.vortexel.dangerzone.common.network.PacketHandler;
 import com.vortexel.dangerzone.common.trade.MerchandiseManager;
 import com.vortexel.dangerzone.common.util.MCUtil;
 import lombok.Getter;
 import lombok.val;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -158,6 +162,23 @@ public class CommonProxy {
         World w = e.getWorld();
         if (MCUtil.isWorldLocal(w)) {
             worldDifficultyMaps.remove(w.provider.getDimension());
+        }
+    }
+
+    /**
+     * Event fired when a client player begins tracking an Entity.
+     * We use this to tell them of its DangerLevel.
+     */
+    @SubscribeEvent
+    public void onPlayerTrack(PlayerEvent.StartTracking e) {
+        Entity target = e.getTarget();
+        // Only do this if we're the server
+        if (!target.world.isRemote && e.getEntityPlayer() instanceof EntityPlayerMP) {
+            val playerMP = (EntityPlayerMP)e.getEntityPlayer();
+            val cap = MCUtil.getDangerLevelCapability(target);
+            if (cap != null) {
+                PacketHandler.NETWORK.sendTo(new PacketEntityDangerLevel(target, cap.getDanger()), playerMP);
+            }
         }
     }
 

@@ -15,10 +15,12 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
+import net.minecraft.util.IntHashMap;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -30,6 +32,7 @@ import java.util.Map;
 public class ClientProxy extends CommonProxy {
 
     private Map<Integer, DifficultyMapCache> worldDifficultyCaches = Maps.newHashMap();
+    private IntHashMap<Integer> entityIdLevelMap = new IntHashMap<>();
 
     @Override
     public void init(FMLInitializationEvent event) {
@@ -77,6 +80,30 @@ public class ClientProxy extends CommonProxy {
             val dimID = e.getWorld().provider.getDimension();
             worldDifficultyCaches.remove(dimID);
         }
+    }
+
+    /**
+     * Clear cached entity data when we stop tracking it.
+     */
+    @SubscribeEvent
+    public void onPlayerStopTracking(PlayerEvent.StopTracking e) {
+        if (e.getEntityPlayer().world.isRemote) {
+            entityIdLevelMap.removeObject(e.getTarget().getEntityId());
+        }
+    }
+
+    /**
+     * When we receive information about an Entity, update that entity's capabilities.
+     * @param entityId
+     * @param level
+     */
+    public void setEntityDangerLevel(int entityId, int level) {
+        entityIdLevelMap.addKey(entityId, level);
+    }
+
+    public int getEntityDangerLevel(int entityId) {
+        Integer level = entityIdLevelMap.lookup(entityId);
+        return level != null ? level : -1;
     }
 
     private void registerItemModels() {
