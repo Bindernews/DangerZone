@@ -11,7 +11,8 @@ public enum ModifierType {
     ARMOR_TOUGHNESS(8),
     WITHER(9),
     EXPLOSION_RADIUS(10),
-    SPARE(11);
+    POISON(11),
+    SPARE(12);
 
     public final int id;
 

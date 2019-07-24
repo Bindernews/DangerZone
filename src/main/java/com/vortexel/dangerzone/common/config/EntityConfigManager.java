@@ -10,6 +10,8 @@ import com.vortexel.dangerzone.common.difficulty.ModifierType;
 import lombok.val;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.util.ResourceLocation;
@@ -20,7 +22,10 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class EntityConfigManager {
     public static final Gson GSON = new GsonBuilder()
@@ -33,6 +38,7 @@ public class EntityConfigManager {
     private static final ResourceLocation RES_GENERIC_CREATURE = new ResourceLocation("generic:creature");
     private static final ResourceLocation RES_GENERIC_ANIMAL = new ResourceLocation("generic:animal");
     private static final ResourceLocation RES_GENERIC_HOSTILE = new ResourceLocation("generic:hostile");
+    private static final ResourceLocation RES_GENERIC_UNDEAD = new ResourceLocation("generic:undead");
 
 
     private Map<ResourceLocation, EntityConfig> tempConfig;
@@ -52,6 +58,25 @@ public class EntityConfigManager {
         return bakedConfig.get(entityResource);
     }
 
+
+    public EntityConfig getConfigDynamic(EntityLivingBase entity) {
+        return getConfigDynamicImpl(entity.getClass(), (cls) -> {
+            if (cls == EntityMob.class) {
+                if (entity.isEntityUndead()) {
+                    return RES_GENERIC_UNDEAD;
+                } else {
+                    return RES_GENERIC_HOSTILE;
+                }
+            } else if (cls == EntityAnimal.class) {
+                return RES_GENERIC_ANIMAL;
+            } else if (cls == EntityCreature.class) {
+                return RES_GENERIC_CREATURE;
+            } else {
+                return null;
+            }
+        });
+    }
+
     /**
      * Get the EntityConfig for the {@code entityClass}, or its closest parent-class that has a known
      * {@link EntityConfig}. If nothing is found, returns {@code null}.
@@ -59,22 +84,37 @@ public class EntityConfigManager {
      * @param entityClass the class of entity to search for configs for
      * @return the {@link EntityConfig} for {@code entityClass} or {@code null} if nothing could be found.
      */
-    @SuppressWarnings("unchecked")
     public EntityConfig getConfigDynamic(Class<? extends Entity> entityClass) {
+        return getConfigDynamicImpl(entityClass, (cls) -> {
+            if (cls == EntityMob.class) {
+                return RES_GENERIC_HOSTILE;
+            } else if (cls == EntityAnimal.class) {
+                return RES_GENERIC_ANIMAL;
+            } else if (cls == EntityCreature.class) {
+                return RES_GENERIC_CREATURE;
+            } else {
+                return null;
+            }
+        });
+    }
+
+    /**
+     * Implementation of getConfigDynamic. The {@code classChecker} allows the public methods to determine
+     * which config to use for default values.
+     * @param entityClass
+     * @param classChecker returns either a {@link ResourceLocation} for the given class or {@code null}
+     *                     to continue searching
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private EntityConfig getConfigDynamicImpl(Class<? extends Entity> entityClass,
+                                              Function<Class<? extends Entity>, ResourceLocation> classChecker) {
         Class<? extends Entity> eClass = entityClass;
         while (eClass != Entity.class && !bakedConfig.containsKey(getEntityName(entityClass))) {
             eClass = (Class<? extends Entity>)eClass.getSuperclass();
-
-            // If we reach one of these classes, use the default values.
-            // Basically, if we find a mob/animal with no custom overrides, use the default.
-            ResourceLocation defaultValue = null;
-            if (eClass == EntityMob.class) {
-                defaultValue = RES_GENERIC_HOSTILE;
-            } else if (eClass == EntityCreature.class) {
-                defaultValue = RES_GENERIC_CREATURE;
-            } else if (eClass == EntityAnimal.class) {
-                defaultValue = RES_GENERIC_ANIMAL;
-            }
+            // If the class checker gives us a resource location, then use that.
+            // This allows us to customize how each public method selects default classes.
+            ResourceLocation defaultValue = classChecker.apply(eClass);
             // If we're using a default value for this entity, then add it to the list of baked values
             if (defaultValue != null) {
                 // Update the baked config

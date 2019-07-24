@@ -48,7 +48,7 @@ public class ForgeEntityModifier implements IEntityModifier {
 
     @Override
     public EntityConfig getEntityConfig() {
-        return DangerZone.proxy.getEntityConfigManager().getConfigDynamic(entity.getClass());
+        return DangerZone.proxy.getEntityConfigManager().getConfigDynamic(entity);
     }
 
     @Override
@@ -89,6 +89,8 @@ public class ForgeEntityModifier implements IEntityModifier {
                 return this::applyExplosionRadius;
             case WITHER:
                 return this::applyWither;
+            case POISON:
+                return this::applyPoison;
             case SPARE:
                 return this::applySpare;
             default:
@@ -171,6 +173,12 @@ public class ForgeEntityModifier implements IEntityModifier {
     private void applyWither(double amount) {
         applyAttributeModifier(Consts.ATTRIBUTE_DECAY_TOUCH, Consts.MODIFIER_DECAY_TOUCH_UUID,
                 "decay-touch", amount, OP_ADD);
+    }
+
+    private void applyPoison(double amount) {
+        val realPoison = DangerMath.roundDecimal(amount, 100);
+        entity.addPotionEffect(new PotionEffect(MobEffects.POISON, Consts.POTION_DURATION_FOREVER,
+                (int)realPoison, false, true));
     }
 
     private void applySpare(double amount) {

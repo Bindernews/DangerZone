@@ -30,6 +30,7 @@ public class ItemCoinPumpShotgun extends BaseItem {
     private static final double SHOT_DISTANCE = 200;
     private static final float RAY_RADIUS = 1f;
     private static float INACCURACY = 10f;
+    private static final int COOLDOWN_TICKS = 25;
 
     public ItemCoinPumpShotgun() {
         super("coin_pump_shotgun");
@@ -82,7 +83,7 @@ public class ItemCoinPumpShotgun extends BaseItem {
                 //Actual firing of weapon
                 fireShot(player, player.getLookVec(), INACCURACY, ammoType);
                 // Set cooldown timer
-                player.getCooldownTracker().setCooldown(this, 25);
+                player.getCooldownTracker().setCooldown(this, COOLDOWN_TICKS);
             }
         }
     }
@@ -144,11 +145,11 @@ public class ItemCoinPumpShotgun extends BaseItem {
                 // Handle player damage nerfing.
                 float entityDamage;
                 if (entity instanceof EntityPlayer && DZConfig.general.nerfShotgunDamageToPlayers) {
-                    entityDamage = Math.max(4f, damage) * bulletCount;
+                    entityDamage = Math.min(4f, damage) * bulletCount;
                 } else {
                     entityDamage = damage * bulletCount;
                 }
-                spawnCoinBulletAt(entity, hitEntities.get(i), coinType, entityDamage);
+                EntityCoinProjectile.spawnCoinBulletAt(entity, hitEntities.get(i), coinType, entityDamage);
             }
         }
     }
@@ -157,15 +158,6 @@ public class ItemCoinPumpShotgun extends BaseItem {
     private static Predicate<Entity> makeEntityFilterPredicate() {
         return Predicates.and(EntitySelectors.NOT_SPECTATING, EntitySelectors.IS_ALIVE,
                 (e) -> e instanceof EntityLivingBase);
-    }
-
-    private void spawnCoinBulletAt(EntityLivingBase attacker, EntityLivingBase victim, ItemLootCoin coinType,
-                                   float damage) {
-        val world = victim.getEntityWorld();
-        val coin = new EntityCoinProjectile(world, attacker, coinType);
-        coin.setPosition(victim.posX, victim.posY, victim.posZ);
-        world.spawnEntity(coin);
-        victim.attackEntityFrom(DamageSource.causeThrownDamage(coin, attacker), damage);
     }
 
     private static Vec3d inaccuracyVec(Random rand, float inaccuracy) {
