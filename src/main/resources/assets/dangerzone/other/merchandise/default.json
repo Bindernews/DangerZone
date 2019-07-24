@@ -40,11 +40,6 @@
     "cost": 2
   },
   {
-    "item": "minecraft:ender_pearl",
-    "count": 1,
-    "cost": 50
-  },
-  {
     "item": "minecraft:tnt",
     "count": 1,
     "cost": 125
