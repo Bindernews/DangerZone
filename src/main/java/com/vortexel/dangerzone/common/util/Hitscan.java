@@ -38,7 +38,8 @@ public class Hitscan {
         this.motion = this.end.subtract(start).normalize();
         this.entities = Lists.newArrayList();
         this.pos = start;
-        this.endBox = new AxisAlignedBB(this.end, this.end.add(motion.scale(2)));
+        Vec3d end2 = this.end.add(motion.scale(2));
+        this.endBox = new AxisAlignedBB(this.end.x, this.end.y, this.end.z, end2.x, end2.y, end2.z);
         this.rayRadiusSq = rayRadius * rayRadius;
     }
 
@@ -82,7 +83,7 @@ public class Hitscan {
         }
 
         final Vec3d nextPos = pos.add(motion);
-        final AxisAlignedBB rayBox = new AxisAlignedBB(pos, nextPos).grow(0.3);
+        final AxisAlignedBB rayBox = new AxisAlignedBB(pos.x, pos.y, pos.z, nextPos.x, nextPos.y, nextPos.z).grow(0.3);
         List<Entity> entitiesInBox = world.getEntitiesInAABBexcluding(ignore, rayBox, filter);
         for (Entity entity : entitiesInBox) {
             if (entity.canBeCollidedWith() && !entity.noClip) {

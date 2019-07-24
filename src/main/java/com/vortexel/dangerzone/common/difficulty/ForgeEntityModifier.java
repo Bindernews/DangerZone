@@ -22,8 +22,8 @@ import java.util.function.Consumer;
 public class ForgeEntityModifier implements IEntityModifier {
 
     private static final int OP_ADD = 0;
-    private static final int OP_MULTIPLY = 1;
-    private static final int OP_MULTIPLY_EXTRA = 2;
+    private static final int OP_ADD_MULTIPLY = 1;
+    private static final int OP_MULTIPLY = 2;
     private static final String FIELD_EXPLOSION_RADIUS = "explosionRadius"; // "field_82226_g"
 
     private final EntityLivingBase entity;
@@ -88,6 +88,8 @@ public class ForgeEntityModifier implements IEntityModifier {
                 return this::applyExplosionRadius;
             case WITHER:
                 return this::applyWither;
+            case SPARE:
+                return this::applySpare;
             default:
                 return null;
         }
@@ -97,6 +99,10 @@ public class ForgeEntityModifier implements IEntityModifier {
         // If it's nearly zero, then just ignore it.
         if (amount <= Consts.NOT_ZERO) {
             return;
+        }
+        if (operation == OP_MULTIPLY) {
+            // The implementation automatically adds a 1D on for us
+            amount -= 1D;
         }
         // Not all entities have all Attributes (e.g. Pigs can't attack).
         val attrInstance = entity.getAttributeMap().getAttributeInstance(attr);
@@ -164,6 +170,10 @@ public class ForgeEntityModifier implements IEntityModifier {
     private void applyWither(double amount) {
         applyAttributeModifier(Consts.ATTRIBUTE_DECAY_TOUCH, Consts.MODIFIER_DECAY_TOUCH_UUID,
                 "decay-touch", amount, OP_ADD);
+    }
+
+    private void applySpare(double amount) {
+        // Does nothing
     }
 
     //endregion
