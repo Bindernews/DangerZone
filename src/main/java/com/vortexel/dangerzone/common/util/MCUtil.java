@@ -13,6 +13,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.EntityEvent;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -73,6 +74,7 @@ public class MCUtil {
         return sb.toString();
     }
 
+    @Nullable
     public static IDangerLevel getDangerLevelCapability(Entity e) {
         return e.getCapability(DangerZone.CAP_DANGER_LEVEL, null);
     }

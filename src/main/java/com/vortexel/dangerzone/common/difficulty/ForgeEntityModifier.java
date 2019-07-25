@@ -24,6 +24,7 @@ public class ForgeEntityModifier implements IEntityModifier {
     private static final int OP_ADD = 0;
     private static final int OP_ADD_MULTIPLY = 1;
     private static final int OP_MULTIPLY = 2;
+
     private static final String FIELD_EXPLOSION_RADIUS = "explosionRadius"; // "field_82226_g"
 
     private final EntityLivingBase entity;

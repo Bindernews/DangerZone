@@ -1,6 +1,7 @@
 package com.vortexel.dangerzone.common.integration;
 
 import com.vortexel.dangerzone.DangerZone;
+import com.vortexel.dangerzone.client.ClientProxy;
 import com.vortexel.dangerzone.common.capability.IDangerLevel;
 import com.vortexel.dangerzone.common.util.MCUtil;
 import mcjty.theoneprobe.api.*;
@@ -29,9 +30,10 @@ public class TheOneProbe {
         @Override
         public void addProbeEntityInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world,
                                        Entity entity, IProbeHitEntityData data) {
-            IDangerLevel dangerLevel = MCUtil.getDangerLevelCapability(entity);
-            if (dangerLevel != null) {
-                probeInfo.text(I18n.format("misc.dangerzone.level", dangerLevel.getDanger()));
+            ClientProxy proxy = (ClientProxy)DangerZone.proxy;
+            int level = proxy.getEntityDangerLevel(entity.getEntityId());
+            if (level != -1) {
+                probeInfo.text(I18n.format("misc.dangerzone.level", level));
             }
         }
     }
