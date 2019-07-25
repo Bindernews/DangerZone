@@ -16,4 +16,4 @@ gui.dangerzone.coins=Coins: %d
 gui.dangerzone.cost=Cost: %d
 
 # Misc
-misc.dangerzone.level=DangerZone Level: %d
+misc.dangerzone.level=DangerZone Level:

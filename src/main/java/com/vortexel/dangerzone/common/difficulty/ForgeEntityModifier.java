@@ -12,6 +12,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.init.MobEffects;
+import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -89,8 +90,6 @@ public class ForgeEntityModifier implements IEntityModifier {
                 return this::applyExplosionRadius;
             case WITHER:
                 return this::applyWither;
-            case POISON:
-                return this::applyPoison;
             case SPARE:
                 return this::applySpare;
             default:
@@ -133,9 +132,14 @@ public class ForgeEntityModifier implements IEntityModifier {
     }
 
     private void applyRegeneration(double amount) {
-        val realRegen = DangerMath.roundDecimal(amount, 100);
-        entity.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, Consts.POTION_DURATION_FOREVER,
-                (int)realRegen, false, true));
+        val realRegen = (int)DangerMath.roundDecimal(amount, 100);
+        Potion effect;
+        if (entity.isEntityUndead()) {
+            effect = MobEffects.POISON;
+        } else {
+            effect = MobEffects.REGENERATION;
+        }
+        entity.addPotionEffect(new PotionEffect(effect, Consts.POTION_DURATION_FOREVER, realRegen, false, true));
     }
 
     private void applyMaxHealth(double amount) {
@@ -173,12 +177,6 @@ public class ForgeEntityModifier implements IEntityModifier {
     private void applyWither(double amount) {
         applyAttributeModifier(Consts.ATTRIBUTE_DECAY_TOUCH, Consts.MODIFIER_DECAY_TOUCH_UUID,
                 "decay-touch", amount, OP_ADD);
-    }
-
-    private void applyPoison(double amount) {
-        val realPoison = DangerMath.roundDecimal(amount, 100);
-        entity.addPotionEffect(new PotionEffect(MobEffects.POISON, Consts.POTION_DURATION_FOREVER,
-                (int)realPoison, false, true));
     }
 
     private void applySpare(double amount) {

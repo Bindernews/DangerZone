@@ -42,15 +42,6 @@
       "min_level": 30
     }
   },
-  "generic:undead": {
-    "inherits": "generic:hostile",
-    "regeneration": false,
-    "poison": {
-      "range": [0, 3],
-      "chance": [0.2, 1],
-      "min_level": 50
-    }
-  },
   "mixin:flying": {
     "fly_speed": {
       "range": [1, 1.5],
