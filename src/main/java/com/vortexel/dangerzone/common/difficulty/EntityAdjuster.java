@@ -60,7 +60,14 @@ public class EntityAdjuster {
         level = dangerLevelCap.getDanger();
         // If we don't have a pre-provided value, generate one.
         if (level == -1) {
-            level = DangerMath.dangerLevel(entityModifier.getDifficultyAtLocation());
+            int levelRNG = DZConfig.general.levelRange;
+            // level = level_at_location +/- levelRNG
+            level = DangerMath.dangerLevel(entityModifier.getDifficultyAtLocation())
+                    + (int)DangerMath.randRange(getRNG(), levelRNG * 2) - levelRNG;
+            // Due to RNG, the level could go below 0, which isn't allowed.
+            if (level < 0) {
+                level = 0;
+            }
         }
         // Whatever we decided, update the existing danger level.
         dangerLevelCap.setDanger(level);
@@ -107,9 +114,7 @@ public class EntityAdjuster {
         }
 
         // The total number of points we can use to modify the entity
-        int levelRNG = DZConfig.general.levelRange;
-        double points = DangerMath.randomDanger(getRNG(), level - levelRNG, level + levelRNG)
-                * DZConfig.general.dangerPointsPerLevel * modCount;
+        double points = level * DZConfig.general.dangerPointsPerLevel * modCount;
         // How many points to put into each modifier
         val modPoints = new double[TOTAL_MODIFIER_COUNT];
         // Give points to each modifier

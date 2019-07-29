@@ -13,6 +13,7 @@ import lombok.val;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
@@ -29,7 +30,9 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LootingLevelEvent;
+import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -56,6 +59,33 @@ public class DifficultyAdjuster {
     @SubscribeEvent
     public void onLootingLevel(LootingLevelEvent e) {
         modifyLootingLevel(e);
+    }
+
+    @SubscribeEvent
+    public void onEntityDropExperience(LivingExperienceDropEvent e) {
+        // Drop extra experience based on the entity's level.
+        val cap = MCUtil.getDangerLevelCapability(e.getEntity());
+        if (cap != null) {
+            double extraXP = DZConfig.general.bonusExpPerLevel * cap.getDanger();
+            e.setDroppedExperience(e.getDroppedExperience() + (int)extraXP);
+        }
+    }
+
+    /**
+     * We watch for explosion events from Creepers to remove any modifiers we applied to them.
+     */
+    @SubscribeEvent
+    public void onExplosionStart(ExplosionEvent.Start e) {
+        EntityLivingBase eLiving = e.getExplosion().getExplosivePlacedBy();
+        if (eLiving instanceof EntityCreeper) {
+            for (PotionEffect effect : eLiving.getActivePotionEffects()) {
+                // If we applied any potion effects for more than 1 year, remove them.
+                // This prevents the lingering potion effects.
+                if (effect.getDuration() >= Consts.TICKS_PER_YEAR) {
+                    eLiving.removePotionEffect(effect.getPotion());
+                }
+            }
+        }
     }
 
     @SubscribeEvent

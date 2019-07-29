@@ -76,15 +76,19 @@ public class DZConfig {
 
         @Config.Comment({"Numbers will generate using the entity's danger level +/- this value."})
         @Config.RangeInt(min = 0, max = Consts.MAX_DANGER_LEVEL)
-        public int levelRange = 4;
+        public int levelRange = 2;
 
         @Config.Comment("How many danger points the mob will receive per level. Influences mob difficulty.")
         @Config.RangeDouble(min = 0, max = 1)
         public double dangerPointsPerLevel = 0.2;
 
-        @Config.Comment({"Number of loot coins dropped per mob level. (default 0.25)"})
+        @Config.Comment({"Number of loot coins dropped per mob level. (default 0.2)"})
         @Config.RangeDouble(min = 0.0)
-        public double coinsPerLevel = 0.25;
+        public double coinsPerLevel = 0.2;
+
+        @Config.Comment("How much bonus experience to drop based on the entity's level.")
+        @Config.RangeDouble(min = 0.0)
+        public double bonusExpPerLevel = 0.2;
 
         @Config.Comment({"The stretch factor used to influence how the difficulty map is generated.",
                 "DO NOT change this unless you really know what you are doing!"})
